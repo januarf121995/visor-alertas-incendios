@@ -723,15 +723,51 @@ require([
   }
 
   /**
-   * Previsualización Dinámica al Pasar el Mouse (Hover) / Selección
-   * 1. Basemap activo únicamente dentro del municipio central + colindantes.
-   * 2. Capa VIIRS: Transparencia sutil (35% opacidad) en los puntos de calor por fuera de la zona activa.
-   * 3. Demás capas nativas del WebMap: Filtro espacial restringido al área activa.
+   * Previsualización Dinámica al Pasar el Mouse (Hover) / Selección Combinada
+   * - Si hay un municipio SELECCIONADO, sus capas y basemap permanecen SIEMPRE ACTIVOS y VISIBLES.
+   * - Al pasar el puntero sobre cualquier otro municipio, se SUMA su área al municipio seleccionado,
+   *   manteniendo ambos visibles a opacidad 100% nativa con basemap descubierto.
+   * - Puntos de calor (VIIRS) fuera del área unificada (seleccionado + hover + colindantes) quedan al 35% de opacidad.
    */
-  async function applyHoverPreview(feature) {
-    const targetFeat = feature || currentSelectedFeature;
+  async function applyHoverPreview(hoverFeature = null) {
+    const selectedFeat = currentSelectedFeature;
+    const hoverFeat = hoverFeature;
 
-    if (!targetFeat) {
+    // A. Recopilar geometrías del municipio SELECCIONADO + sus colindantes
+    let selectedGeoms = [];
+    if (selectedFeat) {
+      const targetGeom = await ensureFeatureGeometry(selectedFeat);
+      if (targetGeom) {
+        selectedGeoms.push(targetGeom);
+        const neighbors = await getAdjacentNeighbors(selectedFeat);
+        neighbors.forEach(n => {
+          if (n.geometry) selectedGeoms.push(n.geometry);
+        });
+      }
+    }
+
+    // B. Recopilar geometrías del municipio HOVERED + sus colindantes
+    let hoverGeoms = [];
+    if (hoverFeat) {
+      const hoverId = hoverFeat.attributes ? (hoverFeat.attributes.OBJECTID || hoverFeat.attributes.id) : null;
+      const selectedId = selectedFeat && selectedFeat.attributes ? (selectedFeat.attributes.OBJECTID || selectedFeat.attributes.id) : null;
+
+      if (!selectedId || hoverId !== selectedId) {
+        const targetGeom = await ensureFeatureGeometry(hoverFeat);
+        if (targetGeom) {
+          hoverGeoms.push(targetGeom);
+          const neighbors = await getAdjacentNeighbors(hoverFeat);
+          neighbors.forEach(n => {
+            if (n.geometry) hoverGeoms.push(n.geometry);
+          });
+        }
+      }
+    }
+
+    const allValidGeoms = [...selectedGeoms, ...hoverGeoms];
+
+    // C. Si no hay ni municipio seleccionado ni hover, mostrar el WebMap completo de Colombia sin máscaras ni filtros
+    if (allValidGeoms.length === 0) {
       updateBasemapMask(null);
       if (webMap && webMap.layers) {
         webMap.layers.forEach(async (layer) => {
@@ -745,19 +781,11 @@ require([
       return;
     }
 
-    const targetGeom = await ensureFeatureGeometry(targetFeat);
-    if (!targetGeom) return;
+    // D. Unificar geometrías del área activa (Seleccionado + Hovered + Colindantes)
+    const unionGeom = allValidGeoms.length > 1 ? geometryEngine.union(allValidGeoms) : allValidGeoms[0];
+    const activeUnion = unionGeom || allValidGeoms[0];
 
-    const neighborFeatures = await getAdjacentNeighbors(targetFeat);
-    const validGeoms = [targetGeom];
-    neighborFeatures.forEach(n => {
-      if (n.geometry) validGeoms.push(n.geometry);
-    });
-
-    const unionGeom = validGeoms.length > 1 ? geometryEngine.union(validGeoms) : targetGeom;
-    const activeUnion = unionGeom || targetGeom;
-
-    // 1. Activar el basemap original ÚNICAMENTE en el municipio central + sus colindantes.
+    // 1. Descuajar la máscara de basemap ÚNICAMENTE sobre el área activa combinada
     updateBasemapMask(activeUnion);
 
     // 2. Aplicar filtro espacial y efectos visuales a todas las capas operacionales visibles del WebMap
@@ -776,19 +804,19 @@ require([
           });
 
           if (layer === viirsLayer) {
-            // Puntos de Calor (VIIRS): Opacidad 100% en municipio + colindantes, leve transparencia (35% opacidad) por fuera
+            // Puntos de calor (VIIRS): Opacidad 100% en municipio seleccionado + hover + colindantes, 35% opacidad exterior
             lv.featureEffect = new FeatureEffect({
               filter: spatialFilter,
               excludedEffect: "opacity(35%)"
             });
           } else if (layer === municipiosLayer) {
-            // Capa Municipios: Enfoque normal dentro, desaturado suave exterior
+            // Capa Municipios: Enfoque normal dentro de la zona unificada activa, desaturado suave exterior
             lv.featureEffect = new FeatureEffect({
               filter: spatialFilter,
               excludedEffect: "grayscale(100%) opacity(20%) brightness(30%)"
             });
           } else if (lv.featureEffect !== undefined) {
-            // Otras capas operacionales visibles en el WebMap
+            // Demás capas operacionales del WebMap
             lv.featureEffect = new FeatureEffect({
               filter: spatialFilter,
               excludedEffect: "opacity(25%)"
