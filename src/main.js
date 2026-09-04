@@ -227,10 +227,8 @@ require([
         closeInfografiasModal();
       }
 
-      // Detección inicial por GPS en segundo plano para no bloquear el despliegue del mapa
-      setTimeout(() => {
-        detectGPSAndFocus(false);
-      }, 300);
+      // Restablecer vista limpia: Mostrar todo Colombia con todos sus puntos de calor visibles sin máscaras iniciales
+      applyHoverPreview(null);
 
     } catch (error) {
       console.error("Error en initApp:", error);
@@ -261,23 +259,30 @@ require([
     webMap.layers.forEach((layer) => {
       if (layer === maskLayer || layer === selectionLayer) return;
       layer.popupEnabled = false; // Prevenir globos emergentes flotantes sobre el mapa
+      layer.visible = true; // Activar visibilidad explícita en ArcGIS Maps SDK 4.x
+
       const titleLower = (layer.title || "").toLowerCase();
       if (titleLower.includes("municipios") || titleLower.includes("col_boundaries")) {
         municipiosLayer = layer;
-        municipiosLayer.visibility = true;
+        municipiosLayer.visible = true;
         municipiosLayer.outFields = ["*"];
       } else if (titleLower.includes("viirs") || titleLower.includes("thermal") || titleLower.includes("puntos de calor")) {
         viirsLayer = layer;
-        viirsLayer.visibility = true;
+        viirsLayer.visible = true;
         viirsLayer.outFields = ["*"];
       } else if (titleLower.includes("ideam") || titleLower.includes("alertas") || titleLower.includes("amenaza")) {
         ideamLayer = layer;
+        ideamLayer.visible = true;
         ideamLayer.outFields = ["*"];
       }
     });
 
     if (!municipiosLayer && webMap.layers.getItemAt(2)) municipiosLayer = webMap.layers.getItemAt(2);
     if (!viirsLayer && webMap.layers.getItemAt(3)) viirsLayer = webMap.layers.getItemAt(3);
+
+    if (municipiosLayer) municipiosLayer.visible = true;
+    if (viirsLayer) viirsLayer.visible = true;
+    if (ideamLayer) ideamLayer.visible = true;
   }
 
   /**
@@ -431,12 +436,6 @@ require([
       });
 
       console.log(`Combobox selectMunicipio cargado exitosamente con ${municipiosList.length} ítems.`);
-
-      // Selección por defecto del primer municipio de la lista si el GPS aún no ha seleccionado uno
-      if (!currentSelectedFeature && municipiosList.length > 0) {
-        const defaultMpio = municipiosList[0].feature;
-        selectMunicipality(defaultMpio, true);
-      }
 
     } catch (err) {
       console.error("Fallo crítico en loadMunicipiosList:", err);
