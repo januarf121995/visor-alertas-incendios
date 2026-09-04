@@ -239,11 +239,18 @@ require([
       if (layer === maskLayer || layer === selectionLayer) return;
       layer.popupEnabled = false; // Prevenir globos emergentes flotantes sobre el mapa
       const titleLower = (layer.title || "").toLowerCase();
+
+      // Apagar completamente la capa innecesaria "Puntos de Calor activos. Fuente: IDEAM"
+      if (titleLower.includes("fuente: ideam") || titleLower.includes("puntos de calor activos")) {
+        layer.visible = false;
+        return;
+      }
+
       if (titleLower.includes("municipios") || titleLower.includes("col_boundaries")) {
         municipiosLayer = layer;
         municipiosLayer.visible = true;
         municipiosLayer.outFields = ["*"];
-      } else if (titleLower.includes("viirs") || titleLower.includes("thermal") || titleLower.includes("puntos de calor")) {
+      } else if (titleLower.includes("satellite (viirs)") || (titleLower.includes("viirs") && !titleLower.includes("ideam"))) {
         viirsLayer = layer;
         viirsLayer.visible = true;
         viirsLayer.outFields = ["*"];
@@ -254,13 +261,18 @@ require([
       }
     });
 
-    if (!municipiosLayer && webMap.layers.getItemAt(2)) municipiosLayer = webMap.layers.getItemAt(2);
-    if (!viirsLayer && webMap.layers.getItemAt(3)) viirsLayer = webMap.layers.getItemAt(3);
+    // Asegurar que capas secundarias de IDEAM permanezcan APAGADAS en la vista del mapa
+    webMap.layers.forEach((layer) => {
+      const t = (layer.title || "").toLowerCase();
+      if (t.includes("fuente: ideam") || t.includes("puntos de calor activos") || layer === ideamLayer) {
+        layer.visible = false;
+      }
+    });
 
-    // Garantizar explícitamente que la capa de Alertas IDEAM permanezca APAGADA en la vista del mapa
-    if (ideamLayer) {
-      ideamLayer.visible = false;
-    }
+    console.log("Capas identificadas correctamente:");
+    console.log(" - Capa Municipios:", municipiosLayer ? municipiosLayer.title : "No hallada");
+    console.log(" - Capa Puntos de Calor (Satellite VIIRS):", viirsLayer ? viirsLayer.title : "No hallada");
+    console.log(" - Capa Backend Alertas (IDEAM):", ideamLayer ? ideamLayer.title : "No hallada");
   }
 
   /**
