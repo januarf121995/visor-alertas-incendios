@@ -241,27 +241,6 @@
     <!-- Scrim de Carga -->
     <calcite-scrim id="appLoader" loading text="Cargando WebMap y Pop-ups..."></calcite-scrim>
 
-    <!-- Script de seguridad inline: Liberar la pantalla en 3.0s máximo pase lo que pase en redes móviles -->
-    <script>
-      (function() {
-        function killLoader() {
-          var loader = document.getElementById("appLoader");
-          if (loader) {
-            loader.removeAttribute("loading");
-            loader.hidden = true;
-            loader.style.display = "none";
-            loader.style.visibility = "hidden";
-            loader.style.pointerEvents = "none";
-            try {
-              if (loader.parentNode) loader.parentNode.removeChild(loader);
-            } catch (e) {}
-          }
-        }
-        setTimeout(killLoader, 3000);
-        window.dismissAppLoader = killLoader;
-      })();
-    </script>
-
     <!-- Alerta Toast -->
     <calcite-alert id="appAlert" kind="info" icon="check-circle" auto-close auto-close-duration="medium">
       <div slot="title" id="alertTitle">Notificación</div>

@@ -4,11 +4,6 @@
  * Caja 3: Pop-up Nativo del WebMap de ArcGIS Online (Arcade) renderizado en contenedor custom.
  */
 
-// Temporizador de respaldo global para garantizar la liberación inmediata del loader en dispositivos móviles
-setTimeout(function() {
-  if (window.dismissAppLoader) window.dismissAppLoader();
-}, 2500);
-
 require([
   "esri/WebMap",
   "esri/views/MapView",
@@ -110,30 +105,14 @@ require([
   let currentInfografiaSlide = 0;
 
   /**
-   * Helper: Promesa con tiempo límite de espera para evitar bloqueos en redes móviles
-   */
-  function promiseWithTimeout(promise, ms, fallbackValue = null) {
-    let timer = null;
-    const timeoutPromise = new Promise((resolve) => {
-      timer = setTimeout(() => {
-        console.warn(`Consulta de red excedió el tiempo de espera de ${ms}ms. Continuando con fallback...`);
-        resolve(fallbackValue);
-      }, ms);
-    });
-    return Promise.race([promise, timeoutPromise]).finally(() => {
-      if (timer) clearTimeout(timer);
-    });
-  }
-
-  /**
    * 1. Inicialización Principal
    */
   async function initApp() {
-    // Timeout de seguridad: Liberar y retirar el loader a los 2.5 segundos pase lo que pase en móviles
+    // Timeout de seguridad: Retirar el loader a los 4.5 segundos pase lo que pase en móviles
     const safetyLoaderTimer = setTimeout(() => {
-      console.warn("Tiempo de espera límite alcanzado. Liberando la interfaz del visor...");
+      console.warn("Tiempo de espera límite alcanzado. Liberando interfaz para el usuario...");
       dismissLoader();
-    }, 2500);
+    }, 4500);
 
     try {
       console.log("Inicializando Visor con Layout 3 Columnas y Pop-up Nativo...");
@@ -144,16 +123,7 @@ require([
         }
       });
 
-      // Suprimir errores de red en capas secundarias/invisibles para que no detengan la carga del mapa en móviles
-      webMap.when().then(() => {
-        webMap.allLayers.forEach(l => {
-          l.on("error", (err) => {
-            console.warn(`Aviso: Capa '${l.title}' reportó error de red no crítico en dispositivo móvil:`, err);
-          });
-        });
-      }).catch(err => console.warn("Aviso en webMap.when():", err));
-
-      // A. Capa de Máscara de Basemap (Oscuro Obsidiana Térmico - Translucidez Elegante para Móvil)
+      // A. Capa de Máscara de Basemap (Oscuro Obsidiana Térmico)
       maskLayer = new GraphicsLayer({
         title: "Máscara Espacial de Basemap",
         listMode: "hide"
@@ -162,7 +132,7 @@ require([
       maskGraphic = new Graphic({
         symbol: {
           type: "simple-fill",
-          color: [13, 13, 15, 0.70], // Oscuro Obsidiana Translucidez Atenuada (no tapa el mapa en negro)
+          color: [13, 13, 15, 0.96], // Oscuro Obsidiana
           outline: {
             color: [249, 115, 22, 0.3], // Borde Naranja Fuego Atenuado
             width: 0.5
@@ -191,19 +161,17 @@ require([
       selectionLayer.add(selectedOutlineGraphic);
       webMap.add(selectionLayer);
 
-      // C. MapView con Fondo Oscuro Obsidiana y Vista Inicial Completa de Colombia
+      // C. MapView con Fondo Oscuro Obsidiana
       view = new MapView({
         container: "viewDiv",
         map: webMap,
-        center: [-74.2973, 4.5709], // Centro de Colombia
-        zoom: 6,
         constraints: {
-          rotationEnabled: false, // Prevenir rotación accidental con multitouch en celulares
+          rotationEnabled: false, // Prevenir rotación multitouch accidental en móviles
           snapToZoom: false
         },
         popupEnabled: false, // Desactivar globos flotantes nativos del SDK en el mapa
         background: {
-          color: [18, 18, 20, 1]
+          color: [13, 13, 15, 1]
         },
         highlightOptions: {
           color: [255, 149, 0, 1],
@@ -214,7 +182,6 @@ require([
         padding: { top: 0, bottom: 0, left: 0, right: 0 }
       });
 
-      // Manejadores de redimensionamiento automático para cambios de orientación en móviles
       window.addEventListener("resize", () => {
         if (view) { try { view.resize(); } catch(e) {} }
       });
@@ -232,23 +199,15 @@ require([
         view: view
       });
 
-      await promiseWithTimeout(webMap.when(), 2000, null);
-      await promiseWithTimeout(view.when(), 2000, null);
-
-      if (view) {
-        try { view.resize(); } catch (e) {}
-      }
+      await webMap.when();
+      await view.when();
 
       console.log("Vista lista. Identificando capas...");
       identifyLayers();
 
-      // Liberar el loader inmediatamente al estar lista la vista del mapa
-      clearTimeout(safetyLoaderTimer);
-      dismissLoader();
-
       if (municipiosLayer) {
         try {
-          if (!municipiosLayer.loaded) await promiseWithTimeout(municipiosLayer.load(), 2000, null);
+          if (!municipiosLayer.loaded) await municipiosLayer.load();
         } catch(e) { console.warn("Aviso al cargar municipiosLayer:", e); }
         loadMunicipiosList();
         view.whenLayerView(municipiosLayer).then(lv => {
@@ -258,7 +217,7 @@ require([
 
       if (viirsLayer) {
         try {
-          if (!viirsLayer.loaded) await promiseWithTimeout(viirsLayer.load(), 2000, null);
+          if (!viirsLayer.loaded) await viirsLayer.load();
         } catch(e) { console.warn("Aviso al cargar viirsLayer:", e); }
         view.whenLayerView(viirsLayer).then(lv => {
           viirsLayerView = lv;
@@ -270,6 +229,8 @@ require([
       setupEventListeners();
       closeCalendarModal(); // Garantizar que inicie cerrado
 
+      clearTimeout(safetyLoaderTimer);
+      dismissLoader();
       showAlert("Sistema Listo", "Selecciona o pasa el mouse sobre un municipio para ver el Pop-up nativo del WebMap.", "success");
 
       // Auto-abrir banner carrusel de infografías si se ingresa desde móvil (<992px)
@@ -293,13 +254,9 @@ require([
   }
 
   function dismissLoader() {
-    if (window.dismissAppLoader) {
-      try { window.dismissAppLoader(); } catch (e) {}
-    }
     const el = document.getElementById("appLoader");
     if (el) {
       el.loading = false;
-      el.removeAttribute("loading");
       el.hidden = true;
       el.style.display = "none";
       el.style.visibility = "hidden";
@@ -325,17 +282,17 @@ require([
       // 1. Capa de Municipios Oficial (Layer 4: "Municipios Colombia", ID: 1a069e22854-layer-204)
       if (id === "1a069e22854-layer-204" || (title === "Municipios Colombia" && !title.includes("expresiones"))) {
         municipiosLayer = layer;
-        municipiosLayer.outFields = ["OBJECTID", "NAME", "NAME_1", "NAME_2", "DEPARTMENT", "DEPTO", "COD_DANE", "MPIO_CNMBR", "DPTO_CNMBR", "NOMBRE_MUNICIPIO", "ID"];
+        municipiosLayer.outFields = ["*"];
       } 
       // 2. Capa de Puntos de Calor VIIRS Satelital Oficial (Layer 5: "Satellite (VIIRS) Thermal Hotspots and Fire Activity", ID: 1a068a58d38-layer-6)
       else if (id === "1a068a58d38-layer-6" || title.includes("Satellite (VIIRS)")) {
         viirsLayer = layer;
-        viirsLayer.outFields = ["OBJECTID", "ACQ_DATE", "ACQ_TIME", "SATELLITE", "CONFIDENCE", "BRIGHT_TI4", "BRIGHT_TI5", "FRP"];
+        viirsLayer.outFields = ["*"];
       } 
       // 3. Capa Backend Alertas IDEAM (Layer 2: "Mapa de Alertas por Incendios - IDEAM - Fuente ref. Oficial", ID: 1a06901e076-layer-147)
       else if (id === "1a06901e076-layer-147" || title.includes("Mapa de Alertas por Incendios - IDEAM")) {
         ideamLayer = layer;
-        ideamLayer.outFields = ["OBJECTID", "PROBABILID", "PROBABILIDAD", "ALERT_NUM", "NIVEL", "COD_DANE", "MPIO_CDPMP", "MPIO_CCDGO", "COD_MPIO", "MUNICIPIO", "MPIO_CNMBR", "NOM_MUN", "NOMBRE"];
+        ideamLayer.outFields = ["*"];
       }
     });
 
@@ -357,7 +314,7 @@ require([
   }
 
   /**
-   * 3. Cargar Municipios en Combobox (Poblado Inmediato + Enriquecimiento Asíncrono de Alertas IDEAM)
+   * 3. Cargar Municipios en Combobox (Filtrado por Alerta IDEAM PROBABILID >= 1)
    */
   async function loadMunicipiosList() {
     if (!municipiosLayer) return;
@@ -365,6 +322,7 @@ require([
     try {
       console.log("Iniciando consulta ligera de atributos de municipios (returnGeometry = false)...");
 
+      // 1. Obtener todos los municipios directamente del servidor REST (solo atributos, sin geometría pesada)
       const query = municipiosLayer.createQuery();
       query.where = "1=1";
       query.outFields = ["*"];
@@ -372,13 +330,11 @@ require([
 
       let results = null;
       try {
-        results = await promiseWithTimeout(municipiosLayer.queryFeatures(query), 3000, null);
+        results = await municipiosLayer.queryFeatures(query);
       } catch (e) {
         console.warn("Fallo consulta en FeatureLayer, intentando LayerView:", e);
         if (municipiosLayerView) {
-          try {
-            results = await promiseWithTimeout(municipiosLayerView.queryFeatures(query), 2000, null);
-          } catch(le) {}
+          results = await municipiosLayerView.queryFeatures(query);
         }
       }
 
@@ -387,118 +343,136 @@ require([
       }
       console.log(`Total municipios base en memoria: ${allMunicipiosFeatures.length}`);
 
-      // Poblar inmediatamente la lista de municipios en el combobox
-      populateCombobox(allMunicipiosFeatures);
+      // 2. Consultar Capa de Alertas IDEAM (solo atributos, returnGeometry = false)
+      let activeDaneCodes = new Map(); // DANE Code -> level
+      let activeNames = new Map(); // Normalized Name -> level
+      let activeIdeamFeatures = [];
 
-      // Enriquecer con Alertas IDEAM en segundo plano de forma no bloqueante
       if (ideamLayer) {
-        enrichMunicipiosWithIdeamAlerts();
+        try {
+          await ideamLayer.load();
+          const ideamQuery = ideamLayer.createQuery();
+          ideamQuery.where = "1=1";
+          ideamQuery.outFields = ["*"];
+          ideamQuery.returnGeometry = false;
+
+          const ideamResults = await ideamLayer.queryFeatures(ideamQuery);
+          if (ideamResults && ideamResults.features) {
+            console.log(`Registros IDEAM consultados: ${ideamResults.features.length}`);
+
+            ideamResults.features.forEach(f => {
+              const attrs = f.attributes || {};
+              const probRaw = attrs.PROBABILID !== undefined ? attrs.PROBABILID : (attrs.PROBABILIDAD || attrs.ALERT_NUM || attrs.NIVEL);
+              const probNum = Number(probRaw);
+
+              if (!isNaN(probNum) && probNum >= 1) {
+                activeIdeamFeatures.push({ feature: f, level: probNum });
+
+                // Extraer código DANE
+                const dane = attrs.COD_DANE || attrs.MPIO_CDPMP || attrs.MPIO_CCDGO || attrs.COD_MPIO;
+                if (dane) {
+                  const key = String(dane).trim().padStart(5, '0');
+                  const prev = activeDaneCodes.get(key) || 0;
+                  activeDaneCodes.set(key, Math.max(prev, probNum));
+                }
+
+                // Extraer nombre de municipio
+                const name = attrs.MUNICIPIO || attrs.MPIO_CNMBR || attrs.NOM_MUN || attrs.NOMBRE;
+                if (name) {
+                  const normName = String(name).toLowerCase().trim();
+                  const prev = activeNames.get(normName) || 0;
+                  activeNames.set(normName, Math.max(prev, probNum));
+                }
+              }
+            });
+            console.log(`Municipios con alerta IDEAM (PROBABILID >= 1): ${activeIdeamFeatures.length} registros activos.`);
+          }
+        } catch (ideamErr) {
+          console.warn("No se pudo consultar la capa IDEAM para el filtro del combobox:", ideamErr);
+        }
+      }
+
+      // 3. Filtrar municipios base por DANE Code o Nombre
+      let filteredFeatures = allMunicipiosFeatures;
+
+      if (activeIdeamFeatures.length > 0) {
+        const matches = allMunicipiosFeatures.filter(mpio => {
+          const mpioAttrs = mpio.attributes || {};
+          const mpioIdStr = String(mpioAttrs.ID || mpioAttrs.COD_DANE || mpioAttrs.OBJECTID || "").trim().padStart(5, '0');
+
+          // A. Coincidencia por Código DANE
+          if (mpioIdStr && activeDaneCodes.has(mpioIdStr)) {
+            mpio.attributes._alertLevel = activeDaneCodes.get(mpioIdStr);
+            return true;
+          }
+
+          // B. Coincidencia por Nombre
+          const mpioName = String(mpioAttrs.NAME || mpioAttrs.NAME_2 || mpioAttrs.NOMBRE_MUNICIPIO || mpioAttrs.MPIO_CNMBR || "").toLowerCase().trim();
+          if (mpioName && activeNames.has(mpioName)) {
+            mpio.attributes._alertLevel = activeNames.get(mpioName);
+            return true;
+          }
+
+          return false;
+        });
+
+        if (matches.length > 0) {
+          filteredFeatures = matches;
+        } else {
+          console.warn("No se hallaron coincidencias de alertas IDEAM, manteniendo municipios base.");
+        }
+      }
+
+      console.log(`Municipios a poblar en combobox: ${filteredFeatures.length}`);
+
+      // 4. Formatear y poblar combobox
+      const getAlertBadge = (lvl) => {
+        if (lvl === 3) return "🔴 Alerta Alta (Roja)";
+        if (lvl === 2) return "🟠 Alerta Media (Naranja)";
+        if (lvl === 1) return "🟡 Alerta Baja (Amarilla)";
+        return "⚠️ Con Alerta IDEAM";
+      };
+
+      const municipiosList = filteredFeatures.map(f => {
+        const attrs = f.attributes || {};
+        const name = attrs.NAME || attrs.NAME_2 || attrs.NOMBRE_MUNICIPIO || attrs.MPIO_CNMBR || "Municipio";
+        const dept = attrs.DEPARTMENT || attrs.NAME_1 || attrs.DEPTO || attrs.DPTO_CNMBR || "Colombia";
+        const alertLvl = attrs._alertLevel;
+        const alertText = alertLvl ? ` - ${getAlertBadge(alertLvl)}` : "";
+        return {
+          id: attrs.OBJECTID,
+          name: name,
+          dept: dept,
+          alertLvl: alertLvl || 0,
+          label: `${name} (${dept})${alertText}`,
+          feature: f
+        };
+      }).sort((a, b) => a.name.localeCompare(b.name, 'es'));
+
+      selectMunicipio.innerHTML = "";
+      municipiosList.forEach(m => {
+        const item = document.createElement("calcite-combobox-item");
+        item.setAttribute("value", String(m.id));
+        item.setAttribute("text-label", m.label);
+        item.setAttribute("label", m.label);
+        item.setAttribute("heading", m.label);
+        item.value = String(m.id);
+        item.textLabel = m.label;
+        item.label = m.label;
+        item.textContent = m.label;
+        selectMunicipio.appendChild(item);
+      });
+
+      console.log(`Combobox selectMunicipio cargado exitosamente con ${municipiosList.length} ítems.`);
+
+      // Selección por defecto del primer municipio de la lista si el GPS aún no ha seleccionado uno
+      if (!currentSelectedFeature && municipiosList.length > 0) {
+        const defaultMpio = municipiosList[0].feature;
+        selectMunicipality(defaultMpio, true);
       }
 
     } catch (err) {
-      console.error("Fallo en loadMunicipiosList:", err);
-    }
-  }
-
-  function populateCombobox(features) {
-    if (!selectMunicipio || !features) return;
-    const getAlertBadge = (lvl) => {
-      if (lvl === 3) return "🔴 Alerta Alta (Roja)";
-      if (lvl === 2) return "🟠 Alerta Media (Naranja)";
-      if (lvl === 1) return "🟡 Alerta Baja (Amarilla)";
-      return "⚠️ Con Alerta IDEAM";
-    };
-
-    const municipiosList = features.map(f => {
-      const attrs = f.attributes || {};
-      const name = attrs.NAME || attrs.NAME_2 || attrs.NOMBRE_MUNICIPIO || attrs.MPIO_CNMBR || "Municipio";
-      const dept = attrs.DEPARTMENT || attrs.NAME_1 || attrs.DEPTO || attrs.DPTO_CNMBR || "Colombia";
-      const alertLvl = attrs._alertLevel;
-      const alertText = alertLvl ? ` - ${getAlertBadge(alertLvl)}` : "";
-      return {
-        id: attrs.OBJECTID,
-        name: name,
-        dept: dept,
-        alertLvl: alertLvl || 0,
-        label: `${name} (${dept})${alertText}`,
-        feature: f
-      };
-    }).sort((a, b) => a.name.localeCompare(b.name, 'es'));
-
-    selectMunicipio.innerHTML = "";
-    municipiosList.forEach(m => {
-      const item = document.createElement("calcite-combobox-item");
-      item.setAttribute("value", String(m.id));
-      item.setAttribute("text-label", m.label);
-      item.setAttribute("label", m.label);
-      item.setAttribute("heading", m.label);
-      item.value = String(m.id);
-      item.textLabel = m.label;
-      item.label = m.label;
-      item.textContent = m.label;
-      selectMunicipio.appendChild(item);
-    });
-
-    console.log(`Combobox selectMunicipio cargado exitosamente con ${municipiosList.length} ítems.`);
-  }
-
-  async function enrichMunicipiosWithIdeamAlerts() {
-    if (!ideamLayer) return;
-    try {
-      if (!ideamLayer.loaded) {
-        await promiseWithTimeout(ideamLayer.load(), 2000, null);
-      }
-      const ideamQuery = ideamLayer.createQuery();
-      ideamQuery.where = "1=1";
-      ideamQuery.outFields = ["*"];
-      ideamQuery.returnGeometry = false;
-
-      const ideamResults = await promiseWithTimeout(ideamLayer.queryFeatures(ideamQuery), 2500, null);
-      if (!ideamResults || !ideamResults.features) return;
-
-      let activeDaneCodes = new Map();
-      let activeNames = new Map();
-
-      ideamResults.features.forEach(f => {
-        const attrs = f.attributes || {};
-        const probRaw = attrs.PROBABILID !== undefined ? attrs.PROBABILID : (attrs.PROBABILIDAD || attrs.ALERT_NUM || attrs.NIVEL);
-        const probNum = Number(probRaw);
-
-        if (!isNaN(probNum) && probNum >= 1) {
-          const dane = attrs.COD_DANE || attrs.MPIO_CDPMP || attrs.MPIO_CCDGO || attrs.COD_MPIO;
-          if (dane) {
-            const key = String(dane).trim().padStart(5, '0');
-            const prev = activeDaneCodes.get(key) || 0;
-            activeDaneCodes.set(key, Math.max(prev, probNum));
-          }
-          const name = attrs.MUNICIPIO || attrs.MPIO_CNMBR || attrs.NOM_MUN || attrs.NOMBRE;
-          if (name) {
-            const normName = String(name).toLowerCase().trim();
-            const prev = activeNames.get(normName) || 0;
-            activeNames.set(normName, Math.max(prev, probNum));
-          }
-        }
-      });
-
-      if (activeDaneCodes.size > 0 || activeNames.size > 0) {
-        allMunicipiosFeatures.forEach(mpio => {
-          const mpioAttrs = mpio.attributes || {};
-          const mpioIdStr = String(mpioAttrs.ID || mpioAttrs.COD_DANE || mpioAttrs.OBJECTID || "").trim().padStart(5, '0');
-          if (mpioIdStr && activeDaneCodes.has(mpioIdStr)) {
-            mpio.attributes._alertLevel = activeDaneCodes.get(mpioIdStr);
-          } else {
-            const mpioName = String(mpioAttrs.NAME || mpioAttrs.NAME_2 || mpioAttrs.NOMBRE_MUNICIPIO || mpioAttrs.MPIO_CNMBR || "").toLowerCase().trim();
-            if (mpioName && activeNames.has(mpioName)) {
-              mpio.attributes._alertLevel = activeNames.get(mpioName);
-            }
-          }
-        });
-
-        // Re-poblar combobox con etiquetas actualizadas de alertas
-        populateCombobox(allMunicipiosFeatures);
-      }
-    } catch (e) {
-      console.warn("Consulta asíncrona de alertas IDEAM finalizada o interrumpida:", e);
+      console.error("Fallo crítico en loadMunicipiosList:", err);
     }
   }
 
@@ -658,7 +632,7 @@ require([
         gQuery.objectIds = [feature.attributes.OBJECTID];
         gQuery.returnGeometry = true;
         gQuery.outFields = ["*"];
-        const gRes = await promiseWithTimeout(municipiosLayer.queryFeatures(gQuery), 2500, null);
+        const gRes = await municipiosLayer.queryFeatures(gQuery);
         if (gRes && gRes.features && gRes.features.length > 0) {
           feature.geometry = gRes.features[0].geometry;
         }

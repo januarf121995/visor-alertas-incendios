@@ -4,8 +4,7 @@ body,
 body.calcite-mode-dark {
   padding: 0;
   margin: 0;
-  height: 100%;
-  height: 100dvh;
+  min-height: 100%;
   width: 100%;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   overflow-x: hidden;
@@ -16,14 +15,9 @@ body.calcite-mode-dark {
 
 calcite-shell,
 calcite-shell.calcite-mode-dark {
-  display: flex !important;
-  flex-direction: column !important;
-  height: 100vh !important;
-  height: 100dvh !important;
-  width: 100% !important;
-  min-height: 100dvh !important;
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
+  height: auto;
+  min-height: 100vh;
+  overflow-y: auto;
   background-color: #0d0d0f !important;
 }
 
