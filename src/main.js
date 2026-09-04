@@ -428,7 +428,7 @@ require([
           const spatialQuery = municipiosLayer.createQuery();
           spatialQuery.geometry = userPointWGS;
           spatialQuery.spatialRelationship = "intersects";
-          spatialQuery.returnGeometry = true;
+          spatialQuery.returnGeometry = false; // Consulta ultrarrápida sin descargar geometría pesada
           spatialQuery.outFields = ["*"];
 
           let res = null;
@@ -468,7 +468,7 @@ require([
       (err) => {
         console.warn("GPS no autorizado o inalcanzable:", err.message);
       },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+      { enableHighAccuracy: false, timeout: 6000, maximumAge: 60000 }
     );
   }
 

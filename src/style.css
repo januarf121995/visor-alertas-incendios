@@ -634,3 +634,87 @@ calcite-combobox::part(container) {
   transform: translateY(-1px);
   box-shadow: 0 6px 18px rgba(239, 68, 68, 0.55);
 }
+
+/* ==========================================================================
+   RESPONSIVE DESIGN (DISEÑO ADAPTATIVO PARA MÓVILES Y TABLETS)
+   ========================================================================== */
+
+/* Tablets y Dispositivos Móviles (pantallas menores a 992px) */
+@media (max-width: 992px) {
+  /* Ocultar sidebars de infografías en dispositivos móviles para dar 100% de ancho y alto al mapa */
+  .sidebar-block {
+    display: none !important;
+  }
+
+  .app-main-layout {
+    height: calc(100vh - 52px);
+    width: 100%;
+  }
+
+  .center-map-container {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  #viewDiv {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .app-header-bar {
+    padding: 6px 10px;
+  }
+
+  .header-combobox {
+    width: 180px;
+    max-width: 45vw;
+  }
+
+  .bottom-popup-section {
+    padding: 16px 10px 30px 10px;
+  }
+
+  .designer-box-horizontal {
+    padding: 12px 14px;
+    border-radius: 12px;
+  }
+}
+
+/* Teléfonos Móviles Pequeños (pantallas menores a 640px) */
+@media (max-width: 640px) {
+  .header-brand .header-title {
+    display: none; /* Ocultar texto largo del título en pantallas muy estrechas */
+  }
+
+  .header-brand {
+    font-size: 16px;
+  }
+
+  .header-combobox {
+    width: 150px;
+    max-width: 40vw;
+  }
+
+  .header-controls {
+    gap: 4px;
+  }
+
+  .glass-calendar-container {
+    max-width: 94vw;
+    padding: 10px;
+  }
+
+  .glass-calendar-card {
+    padding: 16px 12px;
+    border-radius: 18px;
+  }
+
+  .calendar-month-title {
+    font-size: 18px;
+  }
+
+  .calendar-day-btn {
+    height: 32px;
+    font-size: 11px;
+  }
+}
