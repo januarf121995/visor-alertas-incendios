@@ -241,20 +241,26 @@ require([
       const titleLower = (layer.title || "").toLowerCase();
       if (titleLower.includes("municipios") || titleLower.includes("col_boundaries")) {
         municipiosLayer = layer;
-        municipiosLayer.visibility = true;
+        municipiosLayer.visible = true;
         municipiosLayer.outFields = ["*"];
       } else if (titleLower.includes("viirs") || titleLower.includes("thermal") || titleLower.includes("puntos de calor")) {
         viirsLayer = layer;
-        viirsLayer.visibility = true;
+        viirsLayer.visible = true;
         viirsLayer.outFields = ["*"];
       } else if (titleLower.includes("ideam") || titleLower.includes("alertas") || titleLower.includes("amenaza")) {
         ideamLayer = layer;
+        ideamLayer.visible = false; // APAGADO por defecto igual al WebMap original (solo consulta backend)
         ideamLayer.outFields = ["*"];
       }
     });
 
     if (!municipiosLayer && webMap.layers.getItemAt(2)) municipiosLayer = webMap.layers.getItemAt(2);
     if (!viirsLayer && webMap.layers.getItemAt(3)) viirsLayer = webMap.layers.getItemAt(3);
+
+    // Garantizar explícitamente que la capa de Alertas IDEAM permanezca APAGADA en la vista del mapa
+    if (ideamLayer) {
+      ideamLayer.visible = false;
+    }
   }
 
   /**
@@ -679,7 +685,7 @@ require([
     // Recortar Basemap (Máscara Espacial + Adyacentes) del municipio bajo el puntero
     updateBasemapMask(unionGeom);
 
-    // Aplicar FeatureEffect para resaltar municipio flotante + adyacentes
+    // Aplicar FeatureEffect para resaltar municipio flotante + adyacentes ÚNICAMENTE en municipiosLayer
     if (municipiosLayerView) {
       const spatialFilter = new FeatureFilter({
         geometry: unionGeom,
@@ -690,13 +696,11 @@ require([
         filter: spatialFilter,
         excludedEffect: "grayscale(100%) opacity(20%) brightness(30%)"
       });
+    }
 
-      if (viirsLayerView) {
-        viirsLayerView.featureEffect = new FeatureEffect({
-          filter: spatialFilter,
-          excludedEffect: "opacity(40%) brightness(50%)"
-        });
-      }
+    // Los puntos de calor VIIRS permanecen 100% visibles y destacados en todo Colombia sin restricciones
+    if (viirsLayerView) {
+      viirsLayerView.featureEffect = null;
     }
   }
 
