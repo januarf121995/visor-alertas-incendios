@@ -452,12 +452,6 @@ require([
 
       console.log(`Combobox selectMunicipio cargado exitosamente con ${municipiosList.length} ítems.`);
 
-      // Selección por defecto del primer municipio de la lista si el GPS aún no ha seleccionado uno
-      if (!currentSelectedFeature && municipiosList.length > 0) {
-        const defaultMpio = municipiosList[0].feature;
-        selectMunicipality(defaultMpio, true);
-      }
-
     } catch (err) {
       console.error("Fallo crítico en loadMunicipiosList:", err);
     }
