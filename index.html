@@ -47,6 +47,15 @@
           kind="brand">
         </calcite-action>
 
+        <!-- Botón Guía e Infografías (Vista Móvil / Guía General) -->
+        <calcite-action
+          id="btnOpenInfografias"
+          icon="lightbulb"
+          text="Infografías"
+          scale="s"
+          kind="brand">
+        </calcite-action>
+
         <!-- Botones de Acción -->
         <calcite-action id="btnDetectGPS" icon="gps" text="GPS" scale="s" kind="brand"></calcite-action>
         <calcite-action id="btnResetAll" icon="reset" text="Reset" scale="s"></calcite-action>
@@ -147,6 +156,84 @@
               <button id="btnApplyDateFilter" class="btn-glass-primary">Aplicar Filtro</button>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Emergente Banner Carrusel de Infografías (Vista Móvil & Botón Guía) -->
+    <div id="modalInfografias" class="glass-modal-overlay hidden">
+      <div class="glass-modal-backdrop" id="btnCloseInfografiasBackdrop"></div>
+      <div class="glass-infografia-container">
+        <div class="glass-infografia-card">
+          
+          <!-- Header del Modal -->
+          <div class="infografia-header-top">
+            <div class="infografia-header-title-wrap">
+              <calcite-icon icon="lightbulb" scale="s"></calcite-icon>
+              <span class="infografia-header-label">GUÍA E INFOGRAFÍAS DEL VISOR</span>
+            </div>
+            <button id="btnCloseInfografias" class="calendar-icon-btn" title="Cerrar e ir al mapa">
+              <calcite-icon icon="x" scale="s"></calcite-icon>
+            </button>
+          </div>
+
+          <!-- Pestañas de Selección Superior -->
+          <div class="infografia-tabs-row">
+            <button id="btnTabInfografia1" class="infografia-tab-btn active">
+              <calcite-icon icon="image" scale="s"></calcite-icon>
+              <span>1. Tutorial de Uso</span>
+            </button>
+            <button id="btnTabInfografia2" class="infografia-tab-btn">
+              <calcite-icon icon="book" scale="s"></calcite-icon>
+              <span>2. Metodología IDEAM</span>
+            </button>
+          </div>
+
+          <!-- Área Carrusel Deslizable -->
+          <div class="infografia-carousel-viewport">
+            <div id="infografiaCarouselTrack" class="infografia-carousel-track slide-0">
+              
+              <!-- Slide 1: Infografía 1 (Tutorial de Uso) -->
+              <div class="infografia-slide">
+                <div class="designer-box-vertical popup-infografia-box" id="boxInfografia1Mobile">
+                  <calcite-icon icon="image" scale="l"></calcite-icon>
+                  <span>[ Espacio Vacío para Infografía 1 ]</span>
+                  <p>Reservado para que el <b>Diseñador Gráfico</b> inserte la infografía tutorial explicativa sobre el uso del visor.</p>
+                  <small>Formato recomendado: PNG / JPG / SVG</small>
+                </div>
+              </div>
+
+              <!-- Slide 2: Infografía 2 (Metodología IDEAM & VIIRS) -->
+              <div class="infografia-slide">
+                <div class="designer-box-vertical popup-infografia-box" id="boxInfografia2Mobile">
+                  <calcite-icon icon="image" scale="l"></calcite-icon>
+                  <span>[ Espacio Vacío para Infografía 2 ]</span>
+                  <p>Reservado para que el <b>Diseñador Gráfico</b> inserte la infografía de metodología IDEAM y sensores VIIRS.</p>
+                  <small>Formato recomendado: PNG / JPG / SVG</small>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Navegación de Carrusel y Puntos -->
+          <div class="infografia-nav-controls">
+            <button id="btnPrevInfografia" class="infografia-nav-btn" title="Anterior">&lsaquo; Anterior</button>
+            <div class="infografia-dots">
+              <span id="dotInfografia0" class="infografia-dot active"></span>
+              <span id="dotInfografia1" class="infografia-dot"></span>
+            </div>
+            <button id="btnNextInfografia" class="infografia-nav-btn" title="Siguiente">Siguiente &rsaquo;</button>
+          </div>
+
+          <div class="calendar-divider"></div>
+
+          <!-- Footer del Banner Modal -->
+          <div class="infografia-footer">
+            <span class="infografia-footer-hint">Puedes consultar esta guía en cualquier momento desde el botón de la barra superior.</span>
+            <button id="btnGoToMap" class="btn-glass-primary">Entendido, ir al Mapa &rarr;</button>
+          </div>
+
         </div>
       </div>
     </div>
