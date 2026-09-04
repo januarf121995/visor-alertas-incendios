@@ -105,14 +105,30 @@ require([
   let currentInfografiaSlide = 0;
 
   /**
+   * Helper: Promesa con tiempo límite de espera para evitar bloqueos en redes móviles
+   */
+  function promiseWithTimeout(promise, ms, fallbackValue = null) {
+    let timer = null;
+    const timeoutPromise = new Promise((resolve) => {
+      timer = setTimeout(() => {
+        console.warn(`Consulta de red excedió el tiempo de espera de ${ms}ms. Continuando con fallback...`);
+        resolve(fallbackValue);
+      }, ms);
+    });
+    return Promise.race([promise, timeoutPromise]).finally(() => {
+      if (timer) clearTimeout(timer);
+    });
+  }
+
+  /**
    * 1. Inicialización Principal
    */
   async function initApp() {
-    // Timeout de seguridad: Retirar el loader a los 4.5 segundos pase lo que pase en móviles
+    // Timeout de seguridad: Liberar y retirar el loader a los 3.5 segundos pase lo que pase en móviles
     const safetyLoaderTimer = setTimeout(() => {
-      console.warn("Tiempo de espera límite alcanzado. Liberando interfaz para el usuario...");
+      console.warn("Tiempo de espera límite alcanzado. Liberando la interfaz del visor...");
       dismissLoader();
-    }, 4500);
+    }, 3500);
 
     try {
       console.log("Inicializando Visor con Layout 3 Columnas y Pop-up Nativo...");
@@ -186,15 +202,19 @@ require([
         view: view
       });
 
-      await webMap.when();
-      await view.when();
+      await promiseWithTimeout(webMap.when(), 3500, null);
+      await promiseWithTimeout(view.when(), 3500, null);
 
       console.log("Vista lista. Identificando capas...");
       identifyLayers();
 
+      // Liberar el loader inmediatamente al estar lista la vista del mapa
+      clearTimeout(safetyLoaderTimer);
+      dismissLoader();
+
       if (municipiosLayer) {
         try {
-          if (!municipiosLayer.loaded) await municipiosLayer.load();
+          if (!municipiosLayer.loaded) await promiseWithTimeout(municipiosLayer.load(), 2500, null);
         } catch(e) { console.warn("Aviso al cargar municipiosLayer:", e); }
         loadMunicipiosList();
         view.whenLayerView(municipiosLayer).then(lv => {
@@ -204,7 +224,7 @@ require([
 
       if (viirsLayer) {
         try {
-          if (!viirsLayer.loaded) await viirsLayer.load();
+          if (!viirsLayer.loaded) await promiseWithTimeout(viirsLayer.load(), 2500, null);
         } catch(e) { console.warn("Aviso al cargar viirsLayer:", e); }
         view.whenLayerView(viirsLayer).then(lv => {
           viirsLayerView = lv;
@@ -216,8 +236,6 @@ require([
       setupEventListeners();
       closeCalendarModal(); // Garantizar que inicie cerrado
 
-      clearTimeout(safetyLoaderTimer);
-      dismissLoader();
       showAlert("Sistema Listo", "Selecciona o pasa el mouse sobre un municipio para ver el Pop-up nativo del WebMap.", "success");
 
       // Auto-abrir banner carrusel de infografías si se ingresa desde móvil (<992px)
