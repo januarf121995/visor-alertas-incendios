@@ -679,6 +679,15 @@ require([
         featureWidget.graphic = null;
         featureWidget.graphic = feature;
       }
+
+      // Desplazamiento suave hacia la Caja 3 si la selección fue iniciada por el usuario
+      if (boxPopupDetails && animateZoom) {
+        setTimeout(() => {
+          try {
+            boxPopupDetails.scrollIntoView({ behavior: "smooth", block: "start" });
+          } catch(e) {}
+        }, 600);
+      }
     } catch (err) {
       console.warn("No se pudo renderizar el pop-up nativo:", err);
     }
