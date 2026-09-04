@@ -8,19 +8,16 @@ body.calcite-mode-dark {
   width: 100%;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   overflow-x: hidden;
-  overflow-y: auto !important;
+  overflow-y: auto;
   background-color: #0d0d0f !important;
   color: #ffffff !important;
 }
 
-.app-shell,
-calcite-shell {
-  display: flex !important;
-  flex-direction: column !important;
-  min-height: 100vh !important;
-  width: 100% !important;
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
+calcite-shell,
+calcite-shell.calcite-mode-dark {
+  height: auto;
+  min-height: 100vh;
+  overflow-y: auto;
   background-color: #0d0d0f !important;
 }
 
@@ -638,52 +635,14 @@ calcite-combobox::part(container) {
   box-shadow: 0 6px 18px rgba(239, 68, 68, 0.55);
 }
 
-/* Overlay de Carga Principal (Puro HTML/CSS para compatibilidad 100% en móviles) */
-.app-loader-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  height: 100dvh;
-  background: #0d0d0f;
-  z-index: 999999 !important;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-
-.app-loader-overlay.hidden,
-#appLoader.hidden,
+/* Reglas para asegurar que el scrim de carga nunca bloquee la pantalla al ocultarse */
+calcite-scrim[hidden],
+calcite-scrim:not([loading]),
 #appLoader[hidden] {
-  opacity: 0 !important;
+  display: none !important;
   visibility: hidden !important;
   pointer-events: none !important;
-  display: none !important;
-}
-
-.loader-spinner {
-  width: 44px;
-  height: 44px;
-  border: 3px solid rgba(249, 115, 22, 0.2);
-  border-top-color: #f97316;
-  border-radius: 50%;
-  animation: appSpin 0.8s linear infinite;
-}
-
-@keyframes appSpin {
-  to { transform: rotate(360deg); }
-}
-
-.loader-text {
-  color: #ff9500;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  opacity: 0 !important;
 }
 
 /* ==========================================================================
@@ -718,7 +677,7 @@ calcite-combobox::part(container) {
     left: 0;
     right: 0;
     bottom: 0;
-    touch-action: pan-x pan-y;
+    touch-action: none;
   }
 
   .app-header-bar {

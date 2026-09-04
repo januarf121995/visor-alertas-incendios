@@ -132,7 +132,7 @@ require([
       maskGraphic = new Graphic({
         symbol: {
           type: "simple-fill",
-          color: [13, 13, 15, 0.50], // Oscuro Obsidiana Traslúcido
+          color: [13, 13, 15, 0.96], // Oscuro Obsidiana
           outline: {
             color: [249, 115, 22, 0.3], // Borde Naranja Fuego Atenuado
             width: 0.5
@@ -161,19 +161,13 @@ require([
       selectionLayer.add(selectedOutlineGraphic);
       webMap.add(selectionLayer);
 
-      // C. MapView con Fondo Oscuro Obsidiana y Vista Inicial Completa de Colombia
+      // C. MapView con Fondo Oscuro Obsidiana
       view = new MapView({
         container: "viewDiv",
         map: webMap,
-        center: [-74.2973, 4.5709], // Centro de Colombia
-        zoom: 6,
-        constraints: {
-          rotationEnabled: false, // Prevenir rotación multitouch accidental en móviles
-          snapToZoom: false
-        },
         popupEnabled: false, // Desactivar globos flotantes nativos del SDK en el mapa
         background: {
-          color: [18, 18, 20, 1]
+          color: [13, 13, 15, 1]
         },
         highlightOptions: {
           color: [255, 149, 0, 1],
@@ -182,15 +176,6 @@ require([
           haloOpacity: 0.9
         },
         padding: { top: 0, bottom: 0, left: 0, right: 0 }
-      });
-
-      window.addEventListener("resize", () => {
-        if (view) { try { view.resize(); } catch(e) {} }
-      });
-      window.addEventListener("orientationchange", () => {
-        setTimeout(() => {
-          if (view) { try { view.resize(); } catch(e) {} }
-        }, 250);
       });
 
       // CAJA 3: Feature Widget para renderizar el Pop-up Nativo del WebMap (Arcade) en #sheetContentContainer
@@ -203,10 +188,6 @@ require([
 
       await webMap.when();
       await view.when();
-
-      if (view) {
-        try { view.resize(); } catch (e) {}
-      }
 
       console.log("Vista lista. Identificando capas...");
       identifyLayers();
@@ -234,11 +215,17 @@ require([
       initWidgets();
       setupEventListeners();
       closeCalendarModal(); // Garantizar que inicie cerrado
-      closeInfografiasModal(); // Garantizar que inicie cerrado para exponer el mapa 100% de inmediato
 
       clearTimeout(safetyLoaderTimer);
       dismissLoader();
       showAlert("Sistema Listo", "Selecciona o pasa el mouse sobre un municipio para ver el Pop-up nativo del WebMap.", "success");
+
+      // Auto-abrir banner carrusel de infografías si se ingresa desde móvil (<992px)
+      if (window.innerWidth <= 992) {
+        openInfografiasModal();
+      } else {
+        closeInfografiasModal();
+      }
 
       // Detección inicial por GPS en segundo plano para no bloquear el despliegue del mapa
       setTimeout(() => {
@@ -254,14 +241,9 @@ require([
   }
 
   function dismissLoader() {
-    if (window.dismissAppLoader) {
-      try { window.dismissAppLoader(); } catch (e) {}
-    }
     const el = document.getElementById("appLoader");
     if (el) {
-      el.className = "app-loader-overlay hidden";
       el.loading = false;
-      el.removeAttribute("loading");
       el.hidden = true;
       el.style.display = "none";
       el.style.visibility = "hidden";
@@ -469,6 +451,12 @@ require([
       });
 
       console.log(`Combobox selectMunicipio cargado exitosamente con ${municipiosList.length} ítems.`);
+
+      // Selección por defecto del primer municipio de la lista si el GPS aún no ha seleccionado uno
+      if (!currentSelectedFeature && municipiosList.length > 0) {
+        const defaultMpio = municipiosList[0].feature;
+        selectMunicipality(defaultMpio, true);
+      }
 
     } catch (err) {
       console.error("Fallo crítico en loadMunicipiosList:", err);
@@ -678,15 +666,6 @@ require([
       if (featureWidget) {
         featureWidget.graphic = null;
         featureWidget.graphic = feature;
-      }
-
-      // Desplazamiento suave hacia la Caja 3 si la selección fue iniciada por el usuario
-      if (boxPopupDetails && animateZoom) {
-        setTimeout(() => {
-          try {
-            boxPopupDetails.scrollIntoView({ behavior: "smooth", block: "start" });
-          } catch(e) {}
-        }, 600);
       }
     } catch (err) {
       console.warn("No se pudo renderizar el pop-up nativo:", err);

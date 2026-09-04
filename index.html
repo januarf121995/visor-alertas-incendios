@@ -18,7 +18,7 @@
 </head>
 
 <body class="calcite-mode-dark">
-  <div class="app-shell calcite-mode-dark">
+  <calcite-shell content-behind class="calcite-mode-dark">
     <!-- Encabezado / Barra Superior de Controles -->
     <div slot="header" class="app-header-bar">
       <div class="header-brand">
@@ -238,36 +238,15 @@
       </div>
     </div>
 
-    <!-- Contenedor Loader HTML/CSS de Carga (Puro HTML/CSS para compatibilidad 100% en móviles) -->
-    <div id="appLoader" class="app-loader-overlay">
-      <div class="loader-spinner"></div>
-      <span class="loader-text">Cargando Visor de Alertas...</span>
-    </div>
-
-    <!-- Script de seguridad inline para garantizar el retiro inmediato del loader en móviles -->
-    <script>
-      (function() {
-        function dismiss() {
-          var el = document.getElementById("appLoader");
-          if (el) {
-            el.className = "app-loader-overlay hidden";
-            el.style.display = "none";
-            el.style.visibility = "hidden";
-            el.style.pointerEvents = "none";
-            try { if (el.parentNode) el.parentNode.removeChild(el); } catch (e) {}
-          }
-        }
-        setTimeout(dismiss, 3500);
-        window.dismissAppLoader = dismiss;
-      })();
-    </script>
+    <!-- Scrim de Carga -->
+    <calcite-scrim id="appLoader" loading text="Cargando WebMap y Pop-ups..."></calcite-scrim>
 
     <!-- Alerta Toast -->
     <calcite-alert id="appAlert" kind="info" icon="check-circle" auto-close auto-close-duration="medium">
       <div slot="title" id="alertTitle">Notificación</div>
       <div slot="message" id="alertMessage">Operación realizada con éxito.</div>
     </calcite-alert>
-  </div>
+  </calcite-shell>
 
   <script src="src/main.js"></script>
 </body>
