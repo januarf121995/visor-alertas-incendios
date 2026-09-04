@@ -144,7 +144,7 @@ require([
         }
       });
 
-      // A. Capa de Máscara de Basemap (Oscuro Obsidiana Térmico)
+      // A. Capa de Máscara de Basemap (Oscuro Obsidiana Térmico - Translucidez Elegante para Móvil)
       maskLayer = new GraphicsLayer({
         title: "Máscara Espacial de Basemap",
         listMode: "hide"
@@ -153,7 +153,7 @@ require([
       maskGraphic = new Graphic({
         symbol: {
           type: "simple-fill",
-          color: [13, 13, 15, 0.96], // Oscuro Obsidiana
+          color: [13, 13, 15, 0.70], // Oscuro Obsidiana Translucidez Atenuada (no tapa el mapa en negro)
           outline: {
             color: [249, 115, 22, 0.3], // Borde Naranja Fuego Atenuado
             width: 0.5
@@ -182,13 +182,15 @@ require([
       selectionLayer.add(selectedOutlineGraphic);
       webMap.add(selectionLayer);
 
-      // C. MapView con Fondo Oscuro Obsidiana
+      // C. MapView con Fondo Oscuro Obsidiana y Vista Inicial Completa de Colombia
       view = new MapView({
         container: "viewDiv",
         map: webMap,
+        center: [-74.2973, 4.5709], // Centro de Colombia
+        zoom: 6,
         popupEnabled: false, // Desactivar globos flotantes nativos del SDK en el mapa
         background: {
-          color: [13, 13, 15, 1]
+          color: [18, 18, 20, 1]
         },
         highlightOptions: {
           color: [255, 149, 0, 1],
@@ -209,6 +211,10 @@ require([
 
       await promiseWithTimeout(webMap.when(), 2500, null);
       await promiseWithTimeout(view.when(), 2500, null);
+
+      if (view) {
+        try { view.resize(); } catch (e) {}
+      }
 
       console.log("Vista lista. Identificando capas...");
       identifyLayers();
@@ -360,11 +366,6 @@ require([
 
       // Poblar inmediatamente la lista de municipios en el combobox
       populateCombobox(allMunicipiosFeatures);
-
-      // Selección por defecto del primer municipio si el GPS aún no ha seleccionado uno
-      if (!currentSelectedFeature && allMunicipiosFeatures.length > 0) {
-        selectMunicipality(allMunicipiosFeatures[0], true);
-      }
 
       // Enriquecer con Alertas IDEAM en segundo plano de forma no bloqueante
       if (ideamLayer) {
