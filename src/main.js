@@ -737,9 +737,17 @@ require([
       });
     }
 
-    // 3. Capa Puntos de Calor (VIIRS): Simbología y visualización 100% nativa heredada del WebMap de ArcGIS Online (sin featureEffect)
+    // 3. Capa Puntos de Calor (VIIRS): Leve transparencia (35% opacidad) sobre los puntos fuera del municipio central + colindantes
     if (viirsLayerView) {
-      viirsLayerView.featureEffect = null;
+      const spatialFilter = new FeatureFilter({
+        geometry: unionGeom,
+        spatialRelationship: "intersects"
+      });
+
+      viirsLayerView.featureEffect = new FeatureEffect({
+        filter: spatialFilter,
+        excludedEffect: "opacity(35%)"
+      });
     }
   }
 
