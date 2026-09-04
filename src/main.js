@@ -650,7 +650,9 @@ require([
   }
 
   /**
-   * Previsualización Dinámica al Pasar el Mouse (Hover) SIN alterar la Selección Fija
+   * Previsualización Dinámica al Pasar el Mouse (Hover) / Selección
+   * 1. Basemap activo únicamente dentro del municipio central + colindantes. Por fuera: fondo plano de un solo tono.
+   * 2. Capa VIIRS: 100% opacidad en municipio central + colindantes; transparencia leve (35%) por fuera.
    */
   async function applyHoverPreview(feature) {
     const targetFeat = feature || currentSelectedFeature;
@@ -658,7 +660,11 @@ require([
     if (!targetFeat) {
       updateBasemapMask(null);
       if (municipiosLayerView) municipiosLayerView.featureEffect = null;
-      if (viirsLayerView) viirsLayerView.featureEffect = null;
+      if (viirsLayerView) {
+        viirsLayerView.featureEffect = new FeatureEffect({
+          excludedEffect: "opacity(35%)"
+        });
+      }
       return;
     }
 
@@ -682,10 +688,10 @@ require([
     const combinedGeometries = [targetGeom, ...neighborFeatures.map(n => n.geometry)];
     const unionGeom = geometryEngine.union(combinedGeometries) || targetGeom;
 
-    // Recortar Basemap (Máscara Espacial + Adyacentes) del municipio bajo el puntero
+    // 1. Activar el basemap original ÚNICAMENTE en el municipio central + sus colindantes.
     updateBasemapMask(unionGeom);
 
-    // Aplicar FeatureEffect para resaltar municipio flotante + adyacentes ÚNICAMENTE en municipiosLayer
+    // 2. Capa Municipios: Condición normal dentro de municipio central + colindantes, tono desaturado plano por fuera
     if (municipiosLayerView) {
       const spatialFilter = new FeatureFilter({
         geometry: unionGeom,
@@ -698,9 +704,18 @@ require([
       });
     }
 
-    // Los puntos de calor VIIRS permanecen 100% visibles y destacados en todo Colombia sin restricciones
+    // 3. Capa Puntos de Calor (VIIRS): 100% opacidad en zona activa; Transparencia leve (35%) en todos los focos por fuera
     if (viirsLayerView) {
-      viirsLayerView.featureEffect = null;
+      const spatialFilter = new FeatureFilter({
+        geometry: unionGeom,
+        spatialRelationship: "intersects"
+      });
+
+      viirsLayerView.featureEffect = new FeatureEffect({
+        filter: spatialFilter,
+        includedEffect: "opacity(100%)",
+        excludedEffect: "opacity(35%)"
+      });
     }
   }
 
