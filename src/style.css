@@ -737,3 +737,217 @@ calcite-scrim:not([loading]),
     font-size: 11px;
   }
 }
+
+/* ==========================================================================
+   MODAL EMERGENTE BANNER CARRUSEL DE INFOGRAFÍAS (GLASSMORPHISM MÓVIL)
+   ========================================================================== */
+
+.glass-infografia-container {
+  position: relative;
+  z-index: 100000;
+  width: 100%;
+  max-width: 520px;
+  padding: 14px;
+  box-sizing: border-box;
+}
+
+.glass-infografia-card {
+  background: rgba(18, 18, 20, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1.5px solid rgba(249, 115, 22, 0.4);
+  border-radius: 22px;
+  padding: 20px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(249, 115, 22, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.infografia-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 10px;
+}
+
+.infografia-header-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #ff9500;
+}
+
+.infografia-header-label {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+.infografia-tabs-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.infografia-tab-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: #a1a1aa;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.infografia-tab-btn calcite-icon {
+  color: #a1a1aa;
+}
+
+.infografia-tab-btn:hover {
+  background: rgba(249, 115, 22, 0.15);
+  color: #ffffff;
+}
+
+.infografia-tab-btn.active {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.3) 0%, rgba(249, 115, 22, 0.3) 100%);
+  border-color: #f97316;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(249, 115, 22, 0.25);
+}
+
+.infografia-tab-btn.active calcite-icon {
+  color: #ff9500;
+}
+
+.infografia-carousel-viewport {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 14px;
+  position: relative;
+  min-height: 220px;
+}
+
+.infografia-carousel-track {
+  display: flex;
+  width: 200%;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.infografia-carousel-track.slide-0 {
+  transform: translateX(0%);
+}
+
+.infografia-carousel-track.slide-1 {
+  transform: translateX(-50%);
+}
+
+.infografia-slide {
+  width: 50%;
+  box-sizing: border-box;
+  padding: 4px;
+}
+
+.popup-infografia-box {
+  min-height: 200px;
+}
+
+.infografia-nav-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.infografia-nav-btn {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffedd5;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.infografia-nav-btn:hover {
+  background: rgba(249, 115, 22, 0.3);
+  border-color: #f97316;
+}
+
+.infografia-dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.infografia-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.infografia-dot.active {
+  width: 20px;
+  border-radius: 10px;
+  background: #f97316;
+  box-shadow: 0 0 8px rgba(249, 115, 22, 0.6);
+}
+
+.infografia-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.infografia-footer-hint {
+  font-size: 10px;
+  color: #a1a1aa;
+  flex: 1;
+}
+
+@media (max-width: 640px) {
+  .glass-infografia-container {
+    max-width: 96vw;
+    padding: 6px;
+  }
+
+  .glass-infografia-card {
+    padding: 14px 10px;
+    border-radius: 16px;
+  }
+
+  .infografia-tab-btn {
+    font-size: 11px;
+    padding: 7px 8px;
+  }
+
+  .infografia-footer {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .infografia-footer button {
+    width: 100%;
+  }
+}
