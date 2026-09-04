@@ -254,9 +254,14 @@ require([
   }
 
   function dismissLoader() {
+    if (window.dismissAppLoader) {
+      try { window.dismissAppLoader(); } catch (e) {}
+    }
     const el = document.getElementById("appLoader");
     if (el) {
+      el.className = "app-loader-overlay hidden";
       el.loading = false;
+      el.removeAttribute("loading");
       el.hidden = true;
       el.style.display = "none";
       el.style.visibility = "hidden";

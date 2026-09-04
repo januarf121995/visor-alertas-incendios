@@ -635,14 +635,52 @@ calcite-combobox::part(container) {
   box-shadow: 0 6px 18px rgba(239, 68, 68, 0.55);
 }
 
-/* Reglas para asegurar que el scrim de carga nunca bloquee la pantalla al ocultarse */
-calcite-scrim[hidden],
-calcite-scrim:not([loading]),
+/* Overlay de Carga Principal (Puro HTML/CSS para compatibilidad 100% en móviles) */
+.app-loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  background: #0d0d0f;
+  z-index: 999999 !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.app-loader-overlay.hidden,
+#appLoader.hidden,
 #appLoader[hidden] {
-  display: none !important;
+  opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
-  opacity: 0 !important;
+  display: none !important;
+}
+
+.loader-spinner {
+  width: 44px;
+  height: 44px;
+  border: 3px solid rgba(249, 115, 22, 0.2);
+  border-top-color: #f97316;
+  border-radius: 50%;
+  animation: appSpin 0.8s linear infinite;
+}
+
+@keyframes appSpin {
+  to { transform: rotate(360deg); }
+}
+
+.loader-text {
+  color: #ff9500;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 /* ==========================================================================

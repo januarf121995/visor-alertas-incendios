@@ -238,8 +238,29 @@
       </div>
     </div>
 
-    <!-- Scrim de Carga -->
-    <calcite-scrim id="appLoader" loading text="Cargando WebMap y Pop-ups..."></calcite-scrim>
+    <!-- Contenedor Loader HTML/CSS de Carga (Puro HTML/CSS para compatibilidad 100% en móviles) -->
+    <div id="appLoader" class="app-loader-overlay">
+      <div class="loader-spinner"></div>
+      <span class="loader-text">Cargando Visor de Alertas...</span>
+    </div>
+
+    <!-- Script de seguridad inline para garantizar el retiro inmediato del loader en móviles -->
+    <script>
+      (function() {
+        function dismiss() {
+          var el = document.getElementById("appLoader");
+          if (el) {
+            el.className = "app-loader-overlay hidden";
+            el.style.display = "none";
+            el.style.visibility = "hidden";
+            el.style.pointerEvents = "none";
+            try { if (el.parentNode) el.parentNode.removeChild(el); } catch (e) {}
+          }
+        }
+        setTimeout(dismiss, 3500);
+        window.dismissAppLoader = dismiss;
+      })();
+    </script>
 
     <!-- Alerta Toast -->
     <calcite-alert id="appAlert" kind="info" icon="check-circle" auto-close auto-close-duration="medium">
