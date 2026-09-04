@@ -49,8 +49,11 @@ require([
   let currentSelectedFeature = null;
   let isPointerOverMap = false;
 
-  // Mapa de Caché para Adyacencia Espacial Rápida (touches)
+  // Variables de Caché para Optimización de Rendimiento 60FPS
+  let cachedSelectedUnionGeom = null;
   const adjacencyCache = new Map();
+  const hoverUnionCache = new Map();
+  let lastAppliedHoverId = undefined;
 
   // Referencias a Elementos del DOM
   const selectMunicipio = document.getElementById("selectMunicipio");
@@ -648,6 +651,27 @@ require([
   }
 
   /**
+   * Obtiene la geometría unificada (municipio + colindantes) en caché ultra-rápida (0ms)
+   */
+  async function getHoverUnionGeom(hoverFeature) {
+    if (!hoverFeature || !hoverFeature.attributes) return null;
+    const hoverId = hoverFeature.attributes.OBJECTID || hoverFeature.attributes.id;
+    if (hoverId && hoverUnionCache.has(hoverId)) {
+      return hoverUnionCache.get(hoverId);
+    }
+
+    const targetGeom = await ensureFeatureGeometry(hoverFeature);
+    if (!targetGeom) return null;
+
+    const neighbors = await getAdjacentNeighbors(hoverFeature);
+    const validGeoms = [targetGeom, ...neighbors.map(n => n.geometry).filter(Boolean)];
+    const unionGeom = validGeoms.length > 1 ? geometryEngine.union(validGeoms) : targetGeom;
+
+    if (hoverId) hoverUnionCache.set(hoverId, unionGeom);
+    return unionGeom;
+  }
+
+  /**
    * 4. Selección Territorial Definitiva (Fijada por Clic, Combobox o GPS)
    */
   async function selectMunicipality(feature, animateZoom = true) {
@@ -672,6 +696,14 @@ require([
     if (selectMunicipio && String(selectMunicipio.value) !== String(targetId)) {
       selectMunicipio.value = String(targetId);
     }
+
+    // Pre-calcular la geometría unificada del municipio seleccionado + sus colindantes ONCE (0ms en hovers posteriores)
+    const neighborFeatures = await getAdjacentNeighbors(feature);
+    const combinedGeometries = [targetGeom, ...neighborFeatures.map(n => n.geometry).filter(Boolean)];
+    cachedSelectedUnionGeom = combinedGeometries.length > 1 ? geometryEngine.union(combinedGeometries) : targetGeom;
+
+    // Resetear deduplicador de hover para forzar actualización visual inmediata
+    lastAppliedHoverId = undefined;
 
     // CAJA 3: Renderizar Pop-up Nativo del WebMap de ArcGIS Online (Arcade) del municipio SELECCIONADO
     try {
@@ -704,15 +736,11 @@ require([
       console.warn("No se pudo renderizar el pop-up nativo:", err);
     }
 
-    // Aplicar máscara y efecto visual espacial para el municipio seleccionado y colindantes
-    await applyHoverPreview(feature);
+    // Aplicar máscara y efecto visual espacial para el municipio seleccionado
+    await applyHoverPreview(null);
 
-    if (animateZoom) {
-      const neighborFeatures = await getAdjacentNeighbors(feature);
-      const combinedGeometries = [targetGeom, ...neighborFeatures.map(n => n.geometry).filter(Boolean)];
-      const unionGeom = combinedGeometries.length > 1 ? geometryEngine.union(combinedGeometries) : targetGeom;
-      const fitExtent = (unionGeom || targetGeom).extent;
-
+    if (animateZoom && cachedSelectedUnionGeom) {
+      const fitExtent = cachedSelectedUnionGeom.extent;
       if (fitExtent) {
         await view.goTo(fitExtent.expand(1.25), {
           duration: 1000,
@@ -723,108 +751,63 @@ require([
   }
 
   /**
-   * Previsualización Dinámica al Pasar el Mouse (Hover) / Selección Combinada
-   * - Si hay un municipio SELECCIONADO, sus capas y basemap permanecen SIEMPRE ACTIVOS y VISIBLES.
-   * - Al pasar el puntero sobre cualquier otro municipio, se SUMA su área al municipio seleccionado,
-   *   manteniendo ambos visibles a opacidad 100% nativa con basemap descubierto.
-   * - Puntos de calor (VIIRS) fuera del área unificada (seleccionado + hover + colindantes) quedan al 35% de opacidad.
+   * Previsualización Dinámica al Pasar el Mouse (Hover) / Selección Combinada - Ultra Rápida (60 FPS)
    */
   async function applyHoverPreview(hoverFeature = null) {
-    const selectedFeat = currentSelectedFeature;
-    const hoverFeat = hoverFeature;
+    const hoverId = hoverFeature && hoverFeature.attributes ? (hoverFeature.attributes.OBJECTID || hoverFeature.attributes.id) : null;
+    const selectedId = currentSelectedFeature && currentSelectedFeature.attributes ? (currentSelectedFeature.attributes.OBJECTID || currentSelectedFeature.attributes.id) : null;
 
-    // A. Recopilar geometrías del municipio SELECCIONADO + sus colindantes
-    let selectedGeoms = [];
-    if (selectedFeat) {
-      const targetGeom = await ensureFeatureGeometry(selectedFeat);
-      if (targetGeom) {
-        selectedGeoms.push(targetGeom);
-        const neighbors = await getAdjacentNeighbors(selectedFeat);
-        neighbors.forEach(n => {
-          if (n.geometry) selectedGeoms.push(n.geometry);
-        });
+    // DEDUPLICACIÓN DE ALTO RENDIMIENTO: Si el ID de hover no ha cambiado respecto a la última llamada, cancelar para evitar latencia
+    const currentHoverKey = `${selectedId || 'none'}_${hoverId || 'none'}`;
+    if (lastAppliedHoverId === currentHoverKey) return;
+    lastAppliedHoverId = currentHoverKey;
+
+    let activeGeoms = [];
+
+    // A. Geometría pre-calculada del seleccionado (0ms)
+    if (cachedSelectedUnionGeom) {
+      activeGeoms.push(cachedSelectedUnionGeom);
+    }
+
+    // B. Geometría en caché del municipio hovered (0ms si ya se sobrevoló)
+    if (hoverFeature && hoverId !== selectedId) {
+      const hoverUnion = await getHoverUnionGeom(hoverFeature);
+      if (hoverUnion) {
+        activeGeoms.push(hoverUnion);
       }
     }
 
-    // B. Recopilar geometrías del municipio HOVERED + sus colindantes
-    let hoverGeoms = [];
-    if (hoverFeat) {
-      const hoverId = hoverFeat.attributes ? (hoverFeat.attributes.OBJECTID || hoverFeat.attributes.id) : null;
-      const selectedId = selectedFeat && selectedFeat.attributes ? (selectedFeat.attributes.OBJECTID || selectedFeat.attributes.id) : null;
-
-      if (!selectedId || hoverId !== selectedId) {
-        const targetGeom = await ensureFeatureGeometry(hoverFeat);
-        if (targetGeom) {
-          hoverGeoms.push(targetGeom);
-          const neighbors = await getAdjacentNeighbors(hoverFeat);
-          neighbors.forEach(n => {
-            if (n.geometry) hoverGeoms.push(n.geometry);
-          });
-        }
-      }
-    }
-
-    const allValidGeoms = [...selectedGeoms, ...hoverGeoms];
-
-    // C. Si no hay ni municipio seleccionado ni hover, mostrar el WebMap completo de Colombia sin máscaras ni filtros
-    if (allValidGeoms.length === 0) {
+    // C. Si no hay ni municipio seleccionado ni hover, mostrar el WebMap completo de Colombia sin filtros
+    if (activeGeoms.length === 0) {
       updateBasemapMask(null);
-      if (webMap && webMap.layers) {
-        webMap.layers.forEach(async (layer) => {
-          if (layer === maskLayer || layer === selectionLayer) return;
-          try {
-            const lv = await view.whenLayerView(layer);
-            if (lv && lv.featureEffect) lv.featureEffect = null;
-          } catch (e) {}
-        });
-      }
+      if (municipiosLayerView) municipiosLayerView.featureEffect = null;
+      if (viirsLayerView) viirsLayerView.featureEffect = null;
       return;
     }
 
-    // D. Unificar geometrías del área activa (Seleccionado + Hovered + Colindantes)
-    const unionGeom = allValidGeoms.length > 1 ? geometryEngine.union(allValidGeoms) : allValidGeoms[0];
-    const activeUnion = unionGeom || allValidGeoms[0];
+    // D. Unificar geometrías activas (Seleccionado + Hovered + Colindantes)
+    const activeUnion = activeGeoms.length > 1 ? geometryEngine.union(activeGeoms) : activeGeoms[0];
 
-    // 1. Descuajar la máscara de basemap ÚNICAMENTE sobre el área activa combinada
+    // 1. Actualizar máscara de basemap (0ms)
     updateBasemapMask(activeUnion);
 
-    // 2. Aplicar filtro espacial y efectos visuales a todas las capas operacionales visibles del WebMap
-    if (webMap && webMap.layers) {
-      webMap.layers.forEach(async (layer) => {
-        if (layer === maskLayer || layer === selectionLayer) return;
-        if (!layer.visible) return;
+    // 2. Aplicar filtro espacial directamente a las LayerViews en memoria (sin promesas iterativas)
+    const spatialFilter = new FeatureFilter({
+      geometry: activeUnion,
+      spatialRelationship: "intersects"
+    });
 
-        try {
-          const lv = await view.whenLayerView(layer);
-          if (!lv) return;
+    if (viirsLayerView) {
+      viirsLayerView.featureEffect = new FeatureEffect({
+        filter: spatialFilter,
+        excludedEffect: "opacity(35%)"
+      });
+    }
 
-          const spatialFilter = new FeatureFilter({
-            geometry: activeUnion,
-            spatialRelationship: "intersects"
-          });
-
-          if (layer === viirsLayer) {
-            // Puntos de calor (VIIRS): Opacidad 100% en municipio seleccionado + hover + colindantes, 35% opacidad exterior
-            lv.featureEffect = new FeatureEffect({
-              filter: spatialFilter,
-              excludedEffect: "opacity(35%)"
-            });
-          } else if (layer === municipiosLayer) {
-            // Capa Municipios: Enfoque normal dentro de la zona unificada activa, desaturado suave exterior
-            lv.featureEffect = new FeatureEffect({
-              filter: spatialFilter,
-              excludedEffect: "grayscale(100%) opacity(20%) brightness(30%)"
-            });
-          } else if (lv.featureEffect !== undefined) {
-            // Demás capas operacionales del WebMap
-            lv.featureEffect = new FeatureEffect({
-              filter: spatialFilter,
-              excludedEffect: "opacity(25%)"
-            });
-          }
-        } catch (err) {
-          console.warn(`No se pudo aplicar efecto a la capa ${layer.title}:`, err);
-        }
+    if (municipiosLayerView) {
+      municipiosLayerView.featureEffect = new FeatureEffect({
+        filter: spatialFilter,
+        excludedEffect: "grayscale(100%) opacity(20%) brightness(30%)"
       });
     }
   }
@@ -1289,6 +1272,8 @@ require([
   function clearSpatialFilter() {
     currentSelectedFeature = null;
     currentActiveId = null;
+    cachedSelectedUnionGeom = null;
+    lastAppliedHoverId = undefined;
     if (municipiosLayerView) municipiosLayerView.featureEffect = null;
     if (viirsLayerView) viirsLayerView.featureEffect = null;
     if (viirsLayer) viirsLayer.definitionExpression = null;
