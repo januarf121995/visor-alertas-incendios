@@ -132,7 +132,7 @@ require([
       maskGraphic = new Graphic({
         symbol: {
           type: "simple-fill",
-          color: [13, 13, 15, 0.96], // Oscuro Obsidiana
+          color: [13, 13, 15, 0.50], // Oscuro Obsidiana Traslúcido
           outline: {
             color: [249, 115, 22, 0.3], // Borde Naranja Fuego Atenuado
             width: 0.5
@@ -469,12 +469,6 @@ require([
       });
 
       console.log(`Combobox selectMunicipio cargado exitosamente con ${municipiosList.length} ítems.`);
-
-      // Selección por defecto del primer municipio de la lista si el GPS aún no ha seleccionado uno
-      if (!currentSelectedFeature && municipiosList.length > 0) {
-        const defaultMpio = municipiosList[0].feature;
-        selectMunicipality(defaultMpio, true);
-      }
 
     } catch (err) {
       console.error("Fallo crítico en loadMunicipiosList:", err);
