@@ -232,47 +232,49 @@ require([
   }
 
   /**
-   * 2. Identificación de Capas Operacionales
+   * 2. Identificación de Capas Operacionales por ID/Título Oficial del WebMap
+   * Preserva 100% las visibilidades y estilos nativos configurados en ArcGIS Online.
    */
   function identifyLayers() {
     webMap.layers.forEach((layer) => {
       if (layer === maskLayer || layer === selectionLayer) return;
       layer.popupEnabled = false; // Prevenir globos emergentes flotantes sobre el mapa
-      const titleLower = (layer.title || "").toLowerCase();
 
-      // Apagar completamente la capa innecesaria "Puntos de Calor activos. Fuente: IDEAM"
-      if (titleLower.includes("fuente: ideam") || titleLower.includes("puntos de calor activos")) {
-        layer.visible = false;
-        return;
-      }
+      const title = layer.title || "";
+      const id = layer.id || "";
 
-      if (titleLower.includes("municipios") || titleLower.includes("col_boundaries")) {
+      // 1. Capa de Municipios Oficial (Layer 4: "Municipios Colombia", ID: 1a069e22854-layer-204)
+      if (id === "1a069e22854-layer-204" || (title === "Municipios Colombia" && !title.includes("expresiones"))) {
         municipiosLayer = layer;
-        municipiosLayer.visible = true;
         municipiosLayer.outFields = ["*"];
-      } else if (titleLower.includes("satellite (viirs)") || (titleLower.includes("viirs") && !titleLower.includes("ideam"))) {
+      } 
+      // 2. Capa de Puntos de Calor VIIRS Satelital Oficial (Layer 5: "Satellite (VIIRS) Thermal Hotspots and Fire Activity", ID: 1a068a58d38-layer-6)
+      else if (id === "1a068a58d38-layer-6" || title.includes("Satellite (VIIRS)")) {
         viirsLayer = layer;
-        viirsLayer.visible = true;
         viirsLayer.outFields = ["*"];
-      } else if (titleLower.includes("ideam") || titleLower.includes("alertas") || titleLower.includes("amenaza")) {
+      } 
+      // 3. Capa Backend Alertas IDEAM (Layer 2: "Mapa de Alertas por Incendios - IDEAM - Fuente ref. Oficial", ID: 1a06901e076-layer-147)
+      else if (id === "1a06901e076-layer-147" || title.includes("Mapa de Alertas por Incendios - IDEAM")) {
         ideamLayer = layer;
-        ideamLayer.visible = false; // APAGADO por defecto igual al WebMap original (solo consulta backend)
         ideamLayer.outFields = ["*"];
       }
     });
 
-    // Asegurar que capas secundarias de IDEAM permanezcan APAGADAS en la vista del mapa
-    webMap.layers.forEach((layer) => {
-      const t = (layer.title || "").toLowerCase();
-      if (t.includes("fuente: ideam") || t.includes("puntos de calor activos") || layer === ideamLayer) {
-        layer.visible = false;
-      }
-    });
+    // Fallbacks de seguridad si por alguna razón no coincidió por id o título exacto
+    if (!municipiosLayer) {
+      municipiosLayer = webMap.layers.find(l => l !== maskLayer && l !== selectionLayer && (l.title || "").includes("Municipios Colombia") && !l.title.includes("expresiones"));
+    }
+    if (!viirsLayer) {
+      viirsLayer = webMap.layers.find(l => l !== maskLayer && l !== selectionLayer && (l.title || "").includes("Satellite (VIIRS)"));
+    }
+    if (!ideamLayer) {
+      ideamLayer = webMap.layers.find(l => l !== maskLayer && l !== selectionLayer && (l.title || "").includes("Mapa de Alertas por Incendios - IDEAM"));
+    }
 
-    console.log("Capas identificadas correctamente:");
-    console.log(" - Capa Municipios:", municipiosLayer ? municipiosLayer.title : "No hallada");
-    console.log(" - Capa Puntos de Calor (Satellite VIIRS):", viirsLayer ? viirsLayer.title : "No hallada");
-    console.log(" - Capa Backend Alertas (IDEAM):", ideamLayer ? ideamLayer.title : "No hallada");
+    console.log("Capas identificadas en el WebMap:");
+    console.log(" - municipiosLayer:", municipiosLayer ? `${municipiosLayer.title} (ID: ${municipiosLayer.id}, visible: ${municipiosLayer.visible})` : "NO HALLADA");
+    console.log(" - viirsLayer:", viirsLayer ? `${viirsLayer.title} (ID: ${viirsLayer.id}, visible: ${viirsLayer.visible})` : "NO HALLADA");
+    console.log(" - ideamLayer:", ideamLayer ? `${ideamLayer.title} (ID: ${ideamLayer.id}, visible: ${ideamLayer.visible})` : "NO HALLADA");
   }
 
   /**
