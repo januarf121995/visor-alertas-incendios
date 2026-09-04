@@ -161,17 +161,19 @@ require([
       selectionLayer.add(selectedOutlineGraphic);
       webMap.add(selectionLayer);
 
-      // C. MapView con Fondo Oscuro Obsidiana
+      // C. MapView con Fondo Oscuro Obsidiana y Vista Inicial Completa de Colombia
       view = new MapView({
         container: "viewDiv",
         map: webMap,
+        center: [-74.2973, 4.5709], // Centro de Colombia
+        zoom: 6,
         constraints: {
           rotationEnabled: false, // Prevenir rotación multitouch accidental en móviles
           snapToZoom: false
         },
         popupEnabled: false, // Desactivar globos flotantes nativos del SDK en el mapa
         background: {
-          color: [13, 13, 15, 1]
+          color: [18, 18, 20, 1]
         },
         highlightOptions: {
           color: [255, 149, 0, 1],
@@ -202,6 +204,10 @@ require([
       await webMap.when();
       await view.when();
 
+      if (view) {
+        try { view.resize(); } catch (e) {}
+      }
+
       console.log("Vista lista. Identificando capas...");
       identifyLayers();
 
@@ -228,17 +234,11 @@ require([
       initWidgets();
       setupEventListeners();
       closeCalendarModal(); // Garantizar que inicie cerrado
+      closeInfografiasModal(); // Garantizar que inicie cerrado para exponer el mapa 100% de inmediato
 
       clearTimeout(safetyLoaderTimer);
       dismissLoader();
       showAlert("Sistema Listo", "Selecciona o pasa el mouse sobre un municipio para ver el Pop-up nativo del WebMap.", "success");
-
-      // Auto-abrir banner carrusel de infografías si se ingresa desde móvil (<992px)
-      if (window.innerWidth <= 992) {
-        openInfografiasModal();
-      } else {
-        closeInfografiasModal();
-      }
 
       // Detección inicial por GPS en segundo plano para no bloquear el despliegue del mapa
       setTimeout(() => {

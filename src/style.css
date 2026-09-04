@@ -715,7 +715,7 @@ calcite-combobox::part(container) {
     left: 0;
     right: 0;
     bottom: 0;
-    touch-action: none;
+    touch-action: pan-x pan-y;
   }
 
   .app-header-bar {
