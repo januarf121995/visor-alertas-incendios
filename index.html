@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Visor Territorial de Puntos de Calor y Alertas de Incendio - Colombia</title>
+  
+  <!-- Calcite Design System CDN -->
+  <script type="module" src="https://js.arcgis.com/calcite-components/2.13.2/calcite.esm.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/2.13.2/calcite.css" />
+
+  <!-- ArcGIS Maps SDK for JavaScript 4.31 CDN (Tema Oscuro) -->
+  <link rel="stylesheet" href="https://js.arcgis.com/4.31/esri/themes/dark/main.css" />
+  <script src="https://js.arcgis.com/4.31/"></script>
+
+  <!-- Estilos Personalizados -->
+  <link rel="stylesheet" href="src/style.css" />
+</head>
+
+<body class="calcite-mode-dark">
+  <calcite-shell content-behind class="calcite-mode-dark">
+    <!-- Encabezado / Barra Superior de Controles -->
+    <div slot="header" class="app-header-bar">
+      <div class="header-brand">
+        <calcite-icon icon="fire" scale="s"></calcite-icon>
+        <span class="header-title">Monitoreo de Incendios & Puntos de Calor</span>
+      </div>
+
+      <div class="header-controls">
+        <!-- Buscador Combobox de Municipios -->
+        <calcite-combobox 
+          id="selectMunicipio" 
+          placeholder="Buscar municipio..." 
+          selection-mode="single"
+          overlay-positioning="fixed"
+          clear-button-disabled="false"
+          scale="s"
+          class="header-combobox">
+        </calcite-combobox>
+
+        <!-- Botón Filtro Calendario (VIIRS ACQ_DATE) -->
+        <calcite-action 
+          id="btnOpenCalendar" 
+          icon="calendar" 
+          text="Fechas VIIRS" 
+          scale="s" 
+          kind="brand">
+        </calcite-action>
+
+        <!-- Botones de Acción -->
+        <calcite-action id="btnDetectGPS" icon="gps" text="GPS" scale="s" kind="brand"></calcite-action>
+        <calcite-action id="btnResetAll" icon="reset" text="Reset" scale="s"></calcite-action>
+      </div>
+    </div>
+
+    <!-- Layout Principal: 3 Columnas (Bloque Izq Infografía 1 | Mapa Central | Bloque Der Infografía 2) -->
+    <div class="app-main-layout">
+      
+      <!-- CAJA 1: Bloque Lateral Izquierdo (Espacio Vacío Infografía 1 para Diseñador Gráfico) -->
+      <aside class="sidebar-block left-block">
+        <div class="designer-box-vertical" id="boxInfografia1">
+          <calcite-icon icon="image" scale="l"></calcite-icon>
+          <span>[ Espacio Vacío para Infografía 1 ]</span>
+          <p>Reservado para que el <b>Diseñador Gráfico</b> inserte la infografía tutorial explicativa sobre el uso del visor.</p>
+          <small>Formato recomendado: PNG / JPG / SVG</small>
+        </div>
+      </aside>
+
+      <!-- ÁREA CENTRAL: Contenedor del Mapa (#viewDiv) -->
+      <main class="center-map-container">
+        <div id="viewDiv"></div>
+      </main>
+
+      <!-- CAJA 2: Bloque Lateral Derecho (Espacio Vacío Infografía 2 para Diseñador Gráfico) -->
+      <aside class="sidebar-block right-block">
+        <div class="designer-box-vertical" id="boxInfografia2">
+          <calcite-icon icon="image" scale="l"></calcite-icon>
+          <span>[ Espacio Vacío para Infografía 2 ]</span>
+          <p>Reservado para que el <b>Diseñador Gráfico</b> inserte la infografía de metodología IDEAM y sensores VIIRS.</p>
+          <small>Formato recomendado: PNG / JPG / SVG</small>
+        </div>
+      </aside>
+
+    </div>
+
+    <!-- CAJA 3: Pop-up Nativo del WebMap (Sección Horizontal Ubicada Debajo de Todos los Elementos de la App) -->
+    <section id="boxPopupDetails" class="bottom-popup-section">
+      <div class="designer-box-horizontal">
+        <div class="popup-box-header">
+          <div class="popup-title-group">
+            <calcite-icon icon="information" scale="s"></calcite-icon>
+            <span id="popupBoxTitle">INDICADORES DE ALERTA Y POP-UP WEBMAP DE ARCGIS ONLINE</span>
+          </div>
+        </div>
+        <!-- Contenedor donde ArcGIS JS SDK renderiza el Pop-up nativo del WebMap -->
+        <div id="sheetContentContainer" class="popup-box-content">
+          <div class="popup-placeholder">
+            <calcite-icon icon="cursor-click" scale="m"></calcite-icon>
+            <span>Selecciona un municipio en el mapa para cargar su Pop-up nativo de ArcGIS Online con todos los indicadores de alerta.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modal Emergente de Calendario Glassmorphism (Filtro por Fecha VIIRS ACQ_DATE) -->
+    <div id="modalCalendar" class="glass-modal-overlay hidden">
+      <div class="glass-modal-backdrop" id="btnCloseCalendarBackdrop"></div>
+      <div class="glass-calendar-container">
+        <div class="glass-calendar-card">
+          <!-- Header: Título y Botón Cerrar -->
+          <div class="calendar-header-top">
+            <div class="calendar-header-title-wrap">
+              <span class="calendar-header-label">FILTRAR FECHAS SATELITALES</span>
+            </div>
+            <button id="btnCloseCalendar" class="calendar-icon-btn" title="Cerrar">
+              <calcite-icon icon="x" scale="s"></calcite-icon>
+            </button>
+          </div>
+
+          <!-- Insignia del Campo VIIRS ACQ_DATE -->
+          <div class="calendar-field-badge">
+            <calcite-icon icon="satellite" scale="s"></calcite-icon>
+            <span>Capa VIIRS &bull; Campo <b>ACQ_DATE</b> (UTC)</span>
+          </div>
+
+          <!-- Navegación de Mes -->
+          <div class="calendar-month-nav">
+            <span id="calendarMonthTitle" class="calendar-month-title">Septiembre 2026</span>
+            <div class="calendar-nav-buttons">
+              <button id="btnPrevMonth" class="calendar-nav-btn" title="Mes Anterior">&lsaquo;</button>
+              <button id="btnNextMonth" class="calendar-nav-btn" title="Mes Siguiente">&rsaquo;</button>
+            </div>
+          </div>
+
+          <!-- Grid Carrusel de Días del Mes (Generado con JS) -->
+          <div id="calendarDaysGrid" class="calendar-days-grid scrollbar-hide"></div>
+
+          <div class="calendar-divider"></div>
+
+          <!-- Pie del Calendario: Información y Botones de Acción -->
+          <div class="calendar-footer">
+            <div class="calendar-selected-info">
+              <span id="txtSelectedDateRange">Fecha: Todo el periodo</span>
+            </div>
+            <div class="calendar-footer-actions">
+              <button id="btnClearDateFilter" class="btn-glass-secondary">Limpiar</button>
+              <button id="btnApplyDateFilter" class="btn-glass-primary">Aplicar Filtro</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scrim de Carga -->
+    <calcite-scrim id="appLoader" loading text="Cargando WebMap y Pop-ups..."></calcite-scrim>
+
+    <!-- Alerta Toast -->
+    <calcite-alert id="appAlert" kind="info" icon="check-circle" auto-close auto-close-duration="medium">
+      <div slot="title" id="alertTitle">Notificación</div>
+      <div slot="message" id="alertMessage">Operación realizada con éxito.</div>
+    </calcite-alert>
+  </calcite-shell>
+
+  <script src="src/main.js"></script>
+</body>
+</html>

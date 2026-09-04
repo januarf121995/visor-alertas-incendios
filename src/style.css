@@ -1,0 +1,636 @@
+/* Reset y Estilos Globales - Tema Oscuro Fuego Glassmorphism */
+html,
+body,
+body.calcite-mode-dark {
+  padding: 0;
+  margin: 0;
+  min-height: 100%;
+  width: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-color: #0d0d0f !important;
+  color: #ffffff !important;
+}
+
+calcite-shell,
+calcite-shell.calcite-mode-dark {
+  height: auto;
+  min-height: 100vh;
+  overflow-y: auto;
+  background-color: #0d0d0f !important;
+}
+
+/* Header Superior - Oscuro Glassmorphism */
+.app-header-bar {
+  position: relative;
+  z-index: 99999;
+  overflow: visible !important;
+  background: rgba(18, 18, 20, 0.96) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(249, 115, 22, 0.3) !important;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  height: 52px;
+  box-sizing: border-box;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #ff9500 !important;
+}
+
+.header-brand calcite-icon {
+  color: #ff9500 !important;
+}
+
+.header-title {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+  color: #ffffff !important;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  z-index: 99999;
+  overflow: visible !important;
+}
+
+.header-combobox {
+  width: 260px;
+  position: relative;
+  z-index: 99999;
+  overflow: visible !important;
+}
+
+calcite-combobox {
+  position: relative;
+  z-index: 99999;
+  overflow: visible !important;
+}
+
+/* Custom Overrides para Calcite Buttons & Actions */
+calcite-action[kind="brand"],
+calcite-button[kind="brand"] {
+  --calcite-color-brand: #ff9500;
+  --calcite-color-brand-hover: #f97316;
+  --calcite-color-brand-press: #ea580c;
+}
+
+/* Superposición absoluta del Popover flotante de Calcite Combobox */
+calcite-combobox::part(popover),
+calcite-combobox::part(list),
+calcite-combobox::part(container) {
+  z-index: 999999 !important;
+  background-color: #18181b !important;
+  border: 1px solid rgba(249, 115, 22, 0.3) !important;
+  color: #ffffff !important;
+}
+
+.header-basemap-select {
+  width: 100px;
+}
+
+/* Layout Principal 3 Columnas */
+.app-main-layout {
+  display: flex;
+  height: calc(100vh - 52px);
+  min-height: 520px;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+  background-color: #0d0d0f;
+}
+
+/* CAJA 1 (Izq) & CAJA 2 (Der): Bloques Laterales para Infografías */
+.sidebar-block {
+  width: 290px;
+  min-width: 260px;
+  max-width: 320px;
+  background: #121214 !important;
+  border-right: 1px solid #27272a !important;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 20;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+  box-sizing: border-box;
+}
+
+.right-block {
+  border-right: none !important;
+  border-left: 1px solid #27272a !important;
+}
+
+.designer-box-vertical {
+  border: 2px dashed #f97316 !important;
+  background: linear-gradient(145deg, rgba(28, 16, 12, 0.85) 0%, rgba(18, 12, 12, 0.95) 100%) !important;
+  border-radius: 14px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #ff9500 !important;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: inset 0 1px 0 rgba(254, 215, 170, 0.15);
+}
+
+.designer-box-vertical:hover {
+  background: linear-gradient(145deg, rgba(40, 20, 14, 0.9) 0%, rgba(24, 14, 14, 0.98) 100%) !important;
+  border-color: #ff9500 !important;
+  box-shadow: 0 10px 30px -5px rgba(249, 115, 22, 0.25);
+}
+
+.designer-box-vertical calcite-icon {
+  color: #ff9500 !important;
+}
+
+.designer-box-vertical span {
+  font-weight: 800;
+  font-size: 15px;
+  color: #ffffff !important;
+}
+
+.designer-box-vertical p {
+  font-size: 12px;
+  color: #a1a1aa !important;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.designer-box-vertical small {
+  color: #71717a !important;
+  font-size: 10px;
+}
+
+/* Área Central del Mapa */
+.center-map-container {
+  flex: 1;
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  background-color: #0d0d0f;
+}
+
+#viewDiv {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #0d0d0f !important;
+}
+
+/* CAJA 3: Pop-up Nativo del WebMap (Sección Ubicada Debajo de Todos los Elementos de la App) */
+.bottom-popup-section {
+  position: relative;
+  width: 100%;
+  padding: 24px 16px 40px 16px;
+  background: #0d0d0f !important;
+  border-top: 1px solid rgba(249, 115, 22, 0.3) !important;
+  box-sizing: border-box;
+}
+
+.designer-box-horizontal {
+  border: 2px dashed #f97316 !important;
+  background: linear-gradient(145deg, rgba(24, 24, 27, 0.95) 0%, rgba(18, 18, 20, 0.98) 100%) !important;
+  border-radius: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 18px 24px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(254, 215, 170, 0.15);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all 0.3s ease;
+  color: #ffffff !important;
+}
+
+.designer-box-horizontal:hover {
+  border-color: #ff9500 !important;
+}
+
+.popup-box-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.popup-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #ff9500 !important;
+}
+
+.popup-title-group calcite-icon {
+  color: #ff9500 !important;
+}
+
+#popupBoxTitle {
+  font-size: 13px;
+  font-weight: 800;
+  color: #ff9500 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.popup-box-content {
+  padding: 10px 0;
+  color: #ffffff !important;
+}
+
+.popup-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 30px 20px;
+  color: #a1a1aa !important;
+  font-weight: 600;
+  font-size: 14px;
+  text-align: center;
+}
+
+.popup-placeholder calcite-icon {
+  color: #ff9500 !important;
+}
+
+/* Feature Widget Custom Overrides inside Caja 3 */
+.popup-box-content .esri-feature {
+  background: transparent !important;
+  color: #ffffff !important;
+  padding: 0 !important;
+  width: 100% !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.popup-box-content .esri-widget {
+  background-color: transparent !important;
+  color: #ffffff !important;
+}
+
+.popup-box-content table {
+  width: 100% !important;
+  color: #ffffff !important;
+  border-collapse: collapse !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.popup-box-content th,
+.popup-box-content td {
+  color: #e4e4e7 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  padding: 8px 12px !important;
+}
+
+.popup-box-content .esri-feature__header,
+.popup-box-content .esri-feature__title {
+  display: none !important;
+}
+
+.popup-box-content .esri-feature__main-container {
+  padding: 0 !important;
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+.popup-box-content .esri-popup__header {
+  display: none !important;
+}
+
+/* Modal Emergente de Calendario Glassmorphism Tema Incendios / Térmico (VIIRS ACQ_DATE) */
+.glass-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.glass-modal-overlay.hidden {
+  display: none !important;
+}
+
+.glass-modal-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(12, 4, 4, 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.glass-calendar-container {
+  position: relative;
+  z-index: 510;
+  width: 100%;
+  max-width: 440px;
+  animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.glass-calendar-card {
+  width: 100%;
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 25px 60px -12px rgba(225, 29, 72, 0.45), inset 0 1px 0 rgba(254, 215, 170, 0.25);
+  background: linear-gradient(145deg, rgba(28, 9, 8, 0.94) 0%, rgba(14, 4, 4, 0.96) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(249, 115, 22, 0.35);
+  color: #ffffff;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-calendar-card::before {
+  content: '';
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle, rgba(249, 115, 22, 0.25) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.calendar-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.calendar-header-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #f97316;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  background: rgba(249, 115, 22, 0.12);
+  border: 1px solid rgba(249, 115, 22, 0.3);
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
+.calendar-icon-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.calendar-icon-btn:hover {
+  background: rgba(239, 68, 68, 0.35);
+}
+
+.calendar-field-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #fed7aa;
+  background: rgba(249, 115, 22, 0.15);
+  border: 1px solid rgba(249, 115, 22, 0.25);
+  padding: 6px 12px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.calendar-month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.calendar-month-title {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #ffedd5;
+  text-transform: capitalize;
+}
+
+.calendar-nav-buttons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.calendar-nav-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  font-size: 20px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.calendar-nav-btn:hover {
+  background: rgba(249, 115, 22, 0.35);
+}
+
+/* Grid Completo Mensual de 7 Columnas */
+.calendar-weekdays-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.calendar-weekday-hdr {
+  font-size: 10px;
+  font-weight: 800;
+  color: #f97316;
+  text-transform: uppercase;
+  padding: 2px 0;
+}
+
+.calendar-days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  padding: 4px 0 10px 0;
+}
+
+.calendar-day-empty {
+  height: 36px;
+}
+
+.calendar-day-btn {
+  width: 100%;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.calendar-day-btn:hover {
+  background: rgba(249, 115, 22, 0.25);
+  border-color: rgba(249, 115, 22, 0.4);
+}
+
+.calendar-day-btn.selected {
+  background: linear-gradient(135deg, #ef4444 0%, #f97316 100%) !important;
+  color: #ffffff !important;
+  border-color: #f97316 !important;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.5);
+  font-weight: 900;
+}
+
+.calendar-day-btn.in-range {
+  background: rgba(239, 68, 68, 0.35) !important;
+  border-color: rgba(239, 68, 68, 0.5) !important;
+  color: #ffffff;
+}
+
+.calendar-day-btn.is-today::after {
+  content: '';
+  position: absolute;
+  bottom: 3px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #f97316;
+}
+
+.calendar-day-btn.selected.is-today::after {
+  background: #ffffff;
+}
+
+.calendar-day-btn.disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.calendar-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.15);
+  margin: 14px 0 12px 0;
+}
+
+.calendar-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.calendar-selected-info {
+  font-size: 11px;
+  color: #ffedd5;
+  font-weight: 600;
+}
+
+.calendar-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-glass-secondary {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.4);
+  color: #ffffff;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-glass-secondary:hover {
+  background: rgba(0, 0, 0, 0.65);
+}
+
+.btn-glass-primary {
+  border: none;
+  background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
+  color: #ffffff;
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.45);
+  transition: all 0.2s ease;
+}
+
+.btn-glass-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(239, 68, 68, 0.55);
+}
