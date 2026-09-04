@@ -652,7 +652,7 @@ require([
   /**
    * Previsualización Dinámica al Pasar el Mouse (Hover) / Selección
    * 1. Basemap activo únicamente dentro del municipio central + colindantes. Por fuera: fondo plano de un solo tono.
-   * 2. Capa VIIRS: 100% opacidad en municipio central + colindantes; transparencia leve (35%) por fuera.
+   * 2. Capa VIIRS: Conserva 100% intactas sus reglas de simbología y visualización nativas del WebMap de ArcGIS Online sin alteraciones.
    */
   async function applyHoverPreview(feature) {
     const targetFeat = feature || currentSelectedFeature;
@@ -660,11 +660,7 @@ require([
     if (!targetFeat) {
       updateBasemapMask(null);
       if (municipiosLayerView) municipiosLayerView.featureEffect = null;
-      if (viirsLayerView) {
-        viirsLayerView.featureEffect = new FeatureEffect({
-          excludedEffect: "opacity(35%)"
-        });
-      }
+      if (viirsLayerView) viirsLayerView.featureEffect = null;
       return;
     }
 
@@ -704,18 +700,9 @@ require([
       });
     }
 
-    // 3. Capa Puntos de Calor (VIIRS): 100% opacidad en zona activa; Transparencia leve (35%) en todos los focos por fuera
+    // 3. Capa Puntos de Calor (VIIRS): Simbología y visualización 100% nativa heredada del WebMap de ArcGIS Online (sin featureEffect)
     if (viirsLayerView) {
-      const spatialFilter = new FeatureFilter({
-        geometry: unionGeom,
-        spatialRelationship: "intersects"
-      });
-
-      viirsLayerView.featureEffect = new FeatureEffect({
-        filter: spatialFilter,
-        includedEffect: "opacity(100%)",
-        excludedEffect: "opacity(35%)"
-      });
+      viirsLayerView.featureEffect = null;
     }
   }
 
