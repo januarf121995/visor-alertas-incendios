@@ -582,22 +582,68 @@ require([
     }
   }
 
-  function getAdjacentNeighbors(targetFeature) {
-    const targetId = targetFeature.attributes.OBJECTID;
-    if (adjacencyCache.has(targetId)) {
+  async function ensureFeatureGeometry(feature) {
+    if (!feature) return null;
+    if (feature.geometry) return feature.geometry;
+
+    const objId = feature.attributes ? (feature.attributes.OBJECTID || feature.attributes.id) : null;
+    if (objId !== null && objId !== undefined && municipiosLayer) {
+      try {
+        const q = municipiosLayer.createQuery();
+        q.objectIds = [Number(objId)];
+        q.returnGeometry = true;
+        q.outFields = ["*"];
+
+        let res = null;
+        if (municipiosLayerView) {
+          try { res = await municipiosLayerView.queryFeatures(q); } catch(e) {}
+        }
+        if (!res || !res.features || res.features.length === 0) {
+          res = await municipiosLayer.queryFeatures(q);
+        }
+        if (res && res.features && res.features.length > 0) {
+          feature.geometry = res.features[0].geometry;
+          return feature.geometry;
+        }
+      } catch (err) {
+        console.warn("Error al consultar geometría de municipio bajo demanda:", err);
+      }
+    }
+    return null;
+  }
+
+  async function getAdjacentNeighbors(targetFeature) {
+    if (!targetFeature || !targetFeature.attributes) return [];
+    const targetId = targetFeature.attributes.OBJECTID || targetFeature.attributes.id;
+    if (targetId && adjacencyCache.has(targetId)) {
       return adjacencyCache.get(targetId);
     }
 
-    const targetGeom = targetFeature.geometry;
-    if (!targetGeom) return [];
+    const targetGeom = await ensureFeatureGeometry(targetFeature);
+    if (!targetGeom || !municipiosLayer) return [];
 
-    const neighbors = allMunicipiosFeatures.filter(f => {
-      if (f.attributes.OBJECTID === targetId) return false;
-      return f.geometry && geometryEngine.touches(targetGeom, f.geometry);
-    });
+    try {
+      const q = municipiosLayer.createQuery();
+      q.geometry = targetGeom;
+      q.spatialRelationship = "touches";
+      q.returnGeometry = true;
+      q.outFields = ["OBJECTID", "NAME", "NAME_2"];
 
-    adjacencyCache.set(targetId, neighbors);
-    return neighbors;
+      let res = null;
+      if (municipiosLayerView) {
+        try { res = await municipiosLayerView.queryFeatures(q); } catch(e) {}
+      }
+      if (!res || !res.features || res.features.length === 0) {
+        res = await municipiosLayer.queryFeatures(q);
+      }
+
+      const neighbors = (res && res.features) ? res.features : [];
+      if (targetId) adjacencyCache.set(targetId, neighbors);
+      return neighbors;
+    } catch (err) {
+      console.warn("Error consultando municipios colindantes adyacentes:", err);
+      return [];
+    }
   }
 
   /**
@@ -606,31 +652,19 @@ require([
   async function selectMunicipality(feature, animateZoom = true) {
     if (!feature) return;
 
-    // Si la geometría del municipio aún no está cargada en memoria, la consultamos bajo demanda por OBJECTID
-    if (!feature.geometry && municipiosLayer) {
-      try {
-        const gQuery = municipiosLayer.createQuery();
-        gQuery.objectIds = [feature.attributes.OBJECTID];
-        gQuery.returnGeometry = true;
-        gQuery.outFields = ["*"];
-        const gRes = await municipiosLayer.queryFeatures(gQuery);
-        if (gRes && gRes.features && gRes.features.length > 0) {
-          feature.geometry = gRes.features[0].geometry;
-        }
-      } catch (gErr) {
-        console.warn("No se pudo consultar geometría bajo demanda del municipio:", gErr);
-      }
+    // Asegurar disponibilidad de geometría del municipio
+    const targetGeom = await ensureFeatureGeometry(feature);
+    if (!targetGeom) {
+      console.warn("Imposible obtener geometría del municipio seleccionado.");
+      return;
     }
-
-    if (!feature.geometry) return;
 
     // FIJAR Selección de Municipio Activo
     currentSelectedFeature = feature;
     const targetId = feature.attributes.OBJECTID;
     currentActiveId = targetId;
-    const targetGeom = feature.geometry;
 
-    // Fijar el Borde Azul de Selección únicamente en el municipio SELECCIONADO
+    // Fijar el Borde Resaltado Naranja de Selección únicamente en el municipio SELECCIONADO
     selectedOutlineGraphic.geometry = targetGeom;
 
     // Mantener sincronizada la lista desplegable combobox
@@ -649,7 +683,7 @@ require([
 
       if (municipiosLayer) {
         try {
-          await municipiosLayer.load();
+          if (!municipiosLayer.loaded) await municipiosLayer.load();
         } catch (e) {}
         feature.layer = municipiosLayer;
         if (municipiosLayer.popupTemplate) {
@@ -661,86 +695,107 @@ require([
         featureWidget.graphic = null;
         featureWidget.graphic = feature;
       }
+
+      if (boxPopupDetails && window.innerWidth <= 992) {
+        boxPopupDetails.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
     } catch (err) {
       console.warn("No se pudo renderizar el pop-up nativo:", err);
     }
 
-    // Aplicar máscara y efecto visual para el municipio seleccionado
+    // Aplicar máscara y efecto visual espacial para el municipio seleccionado y colindantes
     await applyHoverPreview(feature);
 
     if (animateZoom) {
-      let neighborFeatures = getAdjacentNeighbors(feature);
-      const combinedGeometries = [targetGeom, ...neighborFeatures.map(n => n.geometry)];
-      const unionGeom = geometryEngine.union(combinedGeometries) || targetGeom;
+      const neighborFeatures = await getAdjacentNeighbors(feature);
+      const combinedGeometries = [targetGeom, ...neighborFeatures.map(n => n.geometry).filter(Boolean)];
+      const unionGeom = combinedGeometries.length > 1 ? geometryEngine.union(combinedGeometries) : targetGeom;
+      const fitExtent = (unionGeom || targetGeom).extent;
 
-      await view.goTo(unionGeom.extent.expand(1.25), {
-        duration: 1000,
-        easing: "ease-in-out"
-      });
+      if (fitExtent) {
+        await view.goTo(fitExtent.expand(1.25), {
+          duration: 1000,
+          easing: "ease-in-out"
+        });
+      }
     }
   }
 
   /**
    * Previsualización Dinámica al Pasar el Mouse (Hover) / Selección
-   * 1. Basemap activo únicamente dentro del municipio central + colindantes. Por fuera: fondo plano de un solo tono.
-   * 2. Capa VIIRS: Conserva 100% intactas sus reglas de simbología y visualización nativas del WebMap de ArcGIS Online sin alteraciones.
+   * 1. Basemap activo únicamente dentro del municipio central + colindantes.
+   * 2. Capa VIIRS: Transparencia sutil (35% opacidad) en los puntos de calor por fuera de la zona activa.
+   * 3. Demás capas nativas del WebMap: Filtro espacial restringido al área activa.
    */
   async function applyHoverPreview(feature) {
     const targetFeat = feature || currentSelectedFeature;
 
     if (!targetFeat) {
       updateBasemapMask(null);
-      if (municipiosLayerView) municipiosLayerView.featureEffect = null;
-      if (viirsLayerView) viirsLayerView.featureEffect = null;
+      if (webMap && webMap.layers) {
+        webMap.layers.forEach(async (layer) => {
+          if (layer === maskLayer || layer === selectionLayer) return;
+          try {
+            const lv = await view.whenLayerView(layer);
+            if (lv && lv.featureEffect) lv.featureEffect = null;
+          } catch (e) {}
+        });
+      }
       return;
     }
 
-    if (!targetFeat.geometry && municipiosLayer) {
-      try {
-        const gQuery = municipiosLayer.createQuery();
-        gQuery.objectIds = [targetFeat.attributes.OBJECTID];
-        gQuery.returnGeometry = true;
-        gQuery.outFields = ["*"];
-        const gRes = await municipiosLayer.queryFeatures(gQuery);
-        if (gRes && gRes.features && gRes.features.length > 0) {
-          targetFeat.geometry = gRes.features[0].geometry;
-        }
-      } catch (e) {}
-    }
+    const targetGeom = await ensureFeatureGeometry(targetFeat);
+    if (!targetGeom) return;
 
-    if (!targetFeat.geometry) return;
+    const neighborFeatures = await getAdjacentNeighbors(targetFeat);
+    const validGeoms = [targetGeom];
+    neighborFeatures.forEach(n => {
+      if (n.geometry) validGeoms.push(n.geometry);
+    });
 
-    const targetGeom = targetFeat.geometry;
-    let neighborFeatures = getAdjacentNeighbors(targetFeat);
-    const combinedGeometries = [targetGeom, ...neighborFeatures.map(n => n.geometry)];
-    const unionGeom = geometryEngine.union(combinedGeometries) || targetGeom;
+    const unionGeom = validGeoms.length > 1 ? geometryEngine.union(validGeoms) : targetGeom;
+    const activeUnion = unionGeom || targetGeom;
 
     // 1. Activar el basemap original ÚNICAMENTE en el municipio central + sus colindantes.
-    updateBasemapMask(unionGeom);
+    updateBasemapMask(activeUnion);
 
-    // 2. Capa Municipios: Condición normal dentro de municipio central + colindantes, tono desaturado plano por fuera
-    if (municipiosLayerView) {
-      const spatialFilter = new FeatureFilter({
-        geometry: unionGeom,
-        spatialRelationship: "intersects"
-      });
+    // 2. Aplicar filtro espacial y efectos visuales a todas las capas operacionales visibles del WebMap
+    if (webMap && webMap.layers) {
+      webMap.layers.forEach(async (layer) => {
+        if (layer === maskLayer || layer === selectionLayer) return;
+        if (!layer.visible) return;
 
-      municipiosLayerView.featureEffect = new FeatureEffect({
-        filter: spatialFilter,
-        excludedEffect: "grayscale(100%) opacity(20%) brightness(30%)"
-      });
-    }
+        try {
+          const lv = await view.whenLayerView(layer);
+          if (!lv) return;
 
-    // 3. Capa Puntos de Calor (VIIRS): Leve transparencia (35% opacidad) sobre los puntos fuera del municipio central + colindantes
-    if (viirsLayerView) {
-      const spatialFilter = new FeatureFilter({
-        geometry: unionGeom,
-        spatialRelationship: "intersects"
-      });
+          const spatialFilter = new FeatureFilter({
+            geometry: activeUnion,
+            spatialRelationship: "intersects"
+          });
 
-      viirsLayerView.featureEffect = new FeatureEffect({
-        filter: spatialFilter,
-        excludedEffect: "opacity(35%)"
+          if (layer === viirsLayer) {
+            // Puntos de Calor (VIIRS): Opacidad 100% en municipio + colindantes, leve transparencia (35% opacidad) por fuera
+            lv.featureEffect = new FeatureEffect({
+              filter: spatialFilter,
+              excludedEffect: "opacity(35%)"
+            });
+          } else if (layer === municipiosLayer) {
+            // Capa Municipios: Enfoque normal dentro, desaturado suave exterior
+            lv.featureEffect = new FeatureEffect({
+              filter: spatialFilter,
+              excludedEffect: "grayscale(100%) opacity(20%) brightness(30%)"
+            });
+          } else if (lv.featureEffect !== undefined) {
+            // Otras capas operacionales visibles en el WebMap
+            lv.featureEffect = new FeatureEffect({
+              filter: spatialFilter,
+              excludedEffect: "opacity(25%)"
+            });
+          }
+        } catch (err) {
+          console.warn(`No se pudo aplicar efecto a la capa ${layer.title}:`, err);
+        }
       });
     }
   }
@@ -1102,20 +1157,24 @@ require([
     // Al pasar el mouse (pointer-move): previsualizar basemap/puntos del municipio flotante SIN alterar la selección fija, ni el combobox, ni el Pop-up
     const handlePointerMove = promiseUtils.debounce(async (event) => {
       if (!municipiosLayerView) return;
-      const response = await view.hitTest(event, { include: [municipiosLayer] });
-      const viewDivEl = document.getElementById("viewDiv");
-      if (response.results.length > 0) {
-        const graphic = response.results[0].graphic;
-        if (graphic && graphic.layer === municipiosLayer) {
-          if (viewDivEl) viewDivEl.style.cursor = "pointer";
-          applyHoverPreview(graphic);
+      try {
+        const response = await view.hitTest(event, { include: [municipiosLayer] });
+        const viewDivEl = document.getElementById("viewDiv");
+        if (response.results.length > 0) {
+          const graphic = response.results[0].graphic;
+          if (graphic && graphic.layer === municipiosLayer) {
+            if (viewDivEl) viewDivEl.style.cursor = "pointer";
+            await applyHoverPreview(graphic);
+            return;
+          }
         }
-      } else {
         if (viewDivEl) viewDivEl.style.cursor = "default";
         // Al salir de cualquier municipio en el mapa, restaurar previsualización al municipio seleccionado fijado
-        applyHoverPreview(null);
+        await applyHoverPreview(currentSelectedFeature);
+      } catch (err) {
+        console.warn("Error en handlePointerMove:", err);
       }
-    });
+    }, 25);
 
     view.on("pointer-move", (event) => {
       handlePointerMove(event);
