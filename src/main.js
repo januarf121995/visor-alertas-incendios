@@ -144,6 +144,15 @@ require([
         }
       });
 
+      // Suprimir errores de red en capas secundarias/invisibles para que no detengan la carga del mapa en móviles
+      webMap.when().then(() => {
+        webMap.allLayers.forEach(l => {
+          l.on("error", (err) => {
+            console.warn(`Aviso: Capa '${l.title}' reportó error de red no crítico en dispositivo móvil:`, err);
+          });
+        });
+      }).catch(err => console.warn("Aviso en webMap.when():", err));
+
       // A. Capa de Máscara de Basemap (Oscuro Obsidiana Térmico - Translucidez Elegante para Móvil)
       maskLayer = new GraphicsLayer({
         title: "Máscara Espacial de Basemap",
@@ -188,6 +197,10 @@ require([
         map: webMap,
         center: [-74.2973, 4.5709], // Centro de Colombia
         zoom: 6,
+        constraints: {
+          rotationEnabled: false, // Prevenir rotación accidental con multitouch en celulares
+          snapToZoom: false
+        },
         popupEnabled: false, // Desactivar globos flotantes nativos del SDK en el mapa
         background: {
           color: [18, 18, 20, 1]
@@ -201,6 +214,16 @@ require([
         padding: { top: 0, bottom: 0, left: 0, right: 0 }
       });
 
+      // Manejadores de redimensionamiento automático para cambios de orientación en móviles
+      window.addEventListener("resize", () => {
+        if (view) { try { view.resize(); } catch(e) {} }
+      });
+      window.addEventListener("orientationchange", () => {
+        setTimeout(() => {
+          if (view) { try { view.resize(); } catch(e) {} }
+        }, 250);
+      });
+
       // CAJA 3: Feature Widget para renderizar el Pop-up Nativo del WebMap (Arcade) en #sheetContentContainer
       view.popup.autoOpenEnabled = false;
       view.popup.visible = false;
@@ -209,8 +232,8 @@ require([
         view: view
       });
 
-      await promiseWithTimeout(webMap.when(), 2500, null);
-      await promiseWithTimeout(view.when(), 2500, null);
+      await promiseWithTimeout(webMap.when(), 2000, null);
+      await promiseWithTimeout(view.when(), 2000, null);
 
       if (view) {
         try { view.resize(); } catch (e) {}
@@ -302,17 +325,17 @@ require([
       // 1. Capa de Municipios Oficial (Layer 4: "Municipios Colombia", ID: 1a069e22854-layer-204)
       if (id === "1a069e22854-layer-204" || (title === "Municipios Colombia" && !title.includes("expresiones"))) {
         municipiosLayer = layer;
-        municipiosLayer.outFields = ["*"];
+        municipiosLayer.outFields = ["OBJECTID", "NAME", "NAME_1", "NAME_2", "DEPARTMENT", "DEPTO", "COD_DANE", "MPIO_CNMBR", "DPTO_CNMBR", "NOMBRE_MUNICIPIO", "ID"];
       } 
       // 2. Capa de Puntos de Calor VIIRS Satelital Oficial (Layer 5: "Satellite (VIIRS) Thermal Hotspots and Fire Activity", ID: 1a068a58d38-layer-6)
       else if (id === "1a068a58d38-layer-6" || title.includes("Satellite (VIIRS)")) {
         viirsLayer = layer;
-        viirsLayer.outFields = ["*"];
+        viirsLayer.outFields = ["OBJECTID", "ACQ_DATE", "ACQ_TIME", "SATELLITE", "CONFIDENCE", "BRIGHT_TI4", "BRIGHT_TI5", "FRP"];
       } 
       // 3. Capa Backend Alertas IDEAM (Layer 2: "Mapa de Alertas por Incendios - IDEAM - Fuente ref. Oficial", ID: 1a06901e076-layer-147)
       else if (id === "1a06901e076-layer-147" || title.includes("Mapa de Alertas por Incendios - IDEAM")) {
         ideamLayer = layer;
-        ideamLayer.outFields = ["*"];
+        ideamLayer.outFields = ["OBJECTID", "PROBABILID", "PROBABILIDAD", "ALERT_NUM", "NIVEL", "COD_DANE", "MPIO_CDPMP", "MPIO_CCDGO", "COD_MPIO", "MUNICIPIO", "MPIO_CNMBR", "NOM_MUN", "NOMBRE"];
       }
     });
 
