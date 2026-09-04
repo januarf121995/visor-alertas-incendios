@@ -47,6 +47,7 @@ require([
   let allMunicipiosFeatures = [];
   let currentActiveId = null;
   let currentSelectedFeature = null;
+  let isPointerOverMap = false;
 
   // Mapa de Caché para Adyacencia Espacial Rápida (touches)
   const adjacencyCache = new Map();
@@ -1154,12 +1155,39 @@ require([
       btnApplyDateFilter.addEventListener("click", applyViirsDateFilter);
     }
 
+    // Control de presencia del puntero sobre el contenedor del mapa (#viewDiv)
+    const viewDivEl = document.getElementById("viewDiv");
+    if (viewDivEl) {
+      const onMapEnter = () => {
+        isPointerOverMap = true;
+      };
+      const onMapLeave = async () => {
+        isPointerOverMap = false;
+        viewDivEl.style.cursor = "default";
+        await applyHoverPreview(currentSelectedFeature);
+      };
+
+      viewDivEl.addEventListener("mouseenter", onMapEnter);
+      viewDivEl.addEventListener("pointerenter", onMapEnter);
+      viewDivEl.addEventListener("mouseleave", onMapLeave);
+      viewDivEl.addEventListener("pointerleave", onMapLeave);
+    }
+
     // Al pasar el mouse (pointer-move): previsualizar basemap/puntos del municipio flotante SIN alterar la selección fija, ni el combobox, ni el Pop-up
     const handlePointerMove = promiseUtils.debounce(async (event) => {
       if (!municipiosLayerView) return;
+      if (!isPointerOverMap) {
+        await applyHoverPreview(currentSelectedFeature);
+        return;
+      }
       try {
         const response = await view.hitTest(event, { include: [municipiosLayer] });
-        const viewDivEl = document.getElementById("viewDiv");
+        if (!isPointerOverMap) {
+          if (viewDivEl) viewDivEl.style.cursor = "default";
+          await applyHoverPreview(currentSelectedFeature);
+          return;
+        }
+
         if (response.results.length > 0) {
           const graphic = response.results[0].graphic;
           if (graphic && graphic.layer === municipiosLayer) {
