@@ -635,6 +635,16 @@ calcite-combobox::part(container) {
   box-shadow: 0 6px 18px rgba(239, 68, 68, 0.55);
 }
 
+/* Reglas para asegurar que el scrim de carga nunca bloquee la pantalla al ocultarse */
+calcite-scrim[hidden],
+calcite-scrim:not([loading]),
+#appLoader[hidden] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+}
+
 /* ==========================================================================
    RESPONSIVE DESIGN (DISEÑO ADAPTATIVO PARA MÓVILES Y TABLETS)
    ========================================================================== */
@@ -648,17 +658,26 @@ calcite-combobox::part(container) {
 
   .app-main-layout {
     height: calc(100vh - 52px);
+    height: calc(100dvh - 52px);
     width: 100%;
+    min-height: 350px;
   }
 
   .center-map-container {
     width: 100% !important;
     height: 100% !important;
+    position: relative;
   }
 
   #viewDiv {
     width: 100% !important;
     height: 100% !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    touch-action: none;
   }
 
   .app-header-bar {

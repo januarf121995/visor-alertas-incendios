@@ -92,6 +92,12 @@ require([
    * 1. Inicialización Principal
    */
   async function initApp() {
+    // Timeout de seguridad: Retirar el loader a los 4.5 segundos pase lo que pase en móviles
+    const safetyLoaderTimer = setTimeout(() => {
+      console.warn("Tiempo de espera límite alcanzado. Liberando interfaz para el usuario...");
+      dismissLoader();
+    }, 4500);
+
     try {
       console.log("Inicializando Visor con Layout 3 Columnas y Pop-up Nativo...");
 
@@ -170,10 +176,10 @@ require([
       console.log("Vista lista. Identificando capas...");
       identifyLayers();
 
-      // Detección inicial por GPS
-      detectGPSAndFocus(false);
-
       if (municipiosLayer) {
+        try {
+          if (!municipiosLayer.loaded) await municipiosLayer.load();
+        } catch(e) { console.warn("Aviso al cargar municipiosLayer:", e); }
         loadMunicipiosList();
         view.whenLayerView(municipiosLayer).then(lv => {
           municipiosLayerView = lv;
@@ -181,6 +187,9 @@ require([
       }
 
       if (viirsLayer) {
+        try {
+          if (!viirsLayer.loaded) await viirsLayer.load();
+        } catch(e) { console.warn("Aviso al cargar viirsLayer:", e); }
         view.whenLayerView(viirsLayer).then(lv => {
           viirsLayerView = lv;
           queryViirsDateExtent();
@@ -191,20 +200,34 @@ require([
       setupEventListeners();
       closeCalendarModal(); // Garantizar que inicie cerrado
 
+      clearTimeout(safetyLoaderTimer);
       dismissLoader();
       showAlert("Sistema Listo", "Selecciona o pasa el mouse sobre un municipio para ver el Pop-up nativo del WebMap.", "success");
 
+      // Detección inicial por GPS en segundo plano para no bloquear el despliegue del mapa
+      setTimeout(() => {
+        detectGPSAndFocus(false);
+      }, 300);
+
     } catch (error) {
       console.error("Error en initApp:", error);
+      clearTimeout(safetyLoaderTimer);
       dismissLoader();
       showAlert("Error de Carga", "No se pudo inicializar el mapa.", "danger");
     }
   }
 
   function dismissLoader() {
-    if (appLoader) {
-      appLoader.loading = false;
-      appLoader.hidden = true;
+    const el = document.getElementById("appLoader");
+    if (el) {
+      el.loading = false;
+      el.hidden = true;
+      el.style.display = "none";
+      el.style.visibility = "hidden";
+      el.style.pointerEvents = "none";
+      try {
+        if (el.parentNode) el.parentNode.removeChild(el);
+      } catch (e) {}
     }
   }
 
