@@ -1267,6 +1267,45 @@ require([
         btnToggleTimeSlider.icon = boxTimeSlider.classList.contains("minimized") ? "chevron-up" : "chevron-down";
       });
     }
+
+    // Detección de Desplazamiento (Scroll) para ocultar la cápsula flotante de pie de mapa
+    const scrollHintEl = document.querySelector(".mobile-map-scroll-hint");
+    let hasDismissedScrollHint = false;
+
+    const dismissScrollHint = () => {
+      if (hasDismissedScrollHint || !scrollHintEl) return;
+      hasDismissedScrollHint = true;
+      scrollHintEl.classList.add("fade-out");
+      setTimeout(() => {
+        if (scrollHintEl && scrollHintEl.parentNode) {
+          scrollHintEl.style.display = "none";
+        }
+      }, 400);
+    };
+
+    const handleScrollCheck = () => {
+      const scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+      const shellElement = document.querySelector("calcite-shell");
+      const shellScroll = shellElement ? shellElement.scrollTop : 0;
+
+      if (scrollY > 15 || shellScroll > 15) {
+        dismissScrollHint();
+      }
+    };
+
+    window.addEventListener("scroll", handleScrollCheck, { passive: true });
+    document.addEventListener("scroll", handleScrollCheck, { passive: true });
+    const shellElement = document.querySelector("calcite-shell");
+    if (shellElement) shellElement.addEventListener("scroll", handleScrollCheck, { passive: true });
+
+    if (scrollHintEl) {
+      scrollHintEl.addEventListener("click", () => {
+        if (boxPopupDetails) {
+          boxPopupDetails.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+        dismissScrollHint();
+      });
+    }
   }
 
   function clearSpatialFilter() {

@@ -146,9 +146,49 @@ calcite-combobox::part(container) {
   font-weight: 500;
 }
 
-/* Indicador Pie de Mapa Adaptado para Móvil */
+/* Indicador Pie de Mapa Flotante (Visible al cargar la web, se desvanece al deslizar) */
 .mobile-map-scroll-hint {
-  display: none;
+  display: flex !important;
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 35;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(13, 13, 15, 0.9) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(249, 115, 22, 0.4) !important;
+  border-radius: 20px;
+  padding: 6px 16px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6), 0 0 14px rgba(249, 115, 22, 0.25);
+  cursor: pointer;
+  max-width: 92vw;
+  box-sizing: border-box;
+  opacity: 1;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mobile-map-scroll-hint.fade-out {
+  opacity: 0 !important;
+  transform: translate(-50%, 15px) !important;
+  pointer-events: none !important;
+}
+
+.mobile-map-scroll-hint .hint-gif {
+  height: 18px;
+  width: auto;
+  object-fit: contain;
+}
+
+.mobile-map-scroll-hint span {
+  color: #ffedd5 !important;
+  font-size: 11.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  letter-spacing: -0.1px;
 }
 
 /* Layout Principal 3 Columnas */
@@ -721,39 +761,8 @@ calcite-scrim:not([loading]),
   }
 
   .mobile-map-scroll-hint {
-    display: flex !important;
-    position: absolute;
     bottom: 12px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 35;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    background: rgba(13, 13, 15, 0.88) !important;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(249, 115, 22, 0.4) !important;
-    border-radius: 20px;
-    padding: 6px 14px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6), 0 0 12px rgba(249, 115, 22, 0.25);
-    pointer-events: none;
-    max-width: 92vw;
-    box-sizing: border-box;
-  }
-
-  .mobile-map-scroll-hint .hint-gif {
-    height: 18px;
-    width: auto;
-    object-fit: contain;
-  }
-
-  .mobile-map-scroll-hint span {
-    color: #ffedd5 !important;
-    font-size: 11px;
-    font-weight: 700;
-    white-space: nowrap;
-    letter-spacing: -0.1px;
+    padding: 5px 12px;
   }
 
   .center-map-container {
