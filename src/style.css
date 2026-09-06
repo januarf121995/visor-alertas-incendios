@@ -153,11 +153,12 @@ calcite-combobox::part(container) {
   bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 35;
+  z-index: 99999 !important;
+  pointer-events: auto !important;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: rgba(13, 13, 15, 0.9) !important;
+  background: rgba(13, 13, 15, 0.92) !important;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(249, 115, 22, 0.4) !important;

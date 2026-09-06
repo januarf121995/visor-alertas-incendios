@@ -1311,13 +1311,43 @@ require([
       }
     }, { passive: true });
 
-    // 4. Clic directo sobre la cápsula flotante
+    // 4. Clic o Toque táctil directo sobre la cápsula flotante (Móvil y Escritorio)
     if (scrollHintEl) {
-      scrollHintEl.addEventListener("click", () => {
-        if (boxPopupDetails) {
-          boxPopupDetails.scrollIntoView({ behavior: "smooth", block: "start" });
+      const triggerScrollAndDismiss = (e) => {
+        if (e) {
+          try { e.preventDefault(); } catch(err) {}
+          try { e.stopPropagation(); } catch(err) {}
         }
+
+        if (boxPopupDetails) {
+          try {
+            boxPopupDetails.scrollIntoView({ behavior: "smooth", block: "start" });
+          } catch(err) {}
+        }
+        try {
+          const shellEl = document.querySelector("calcite-shell");
+          if (shellEl) {
+            shellEl.scrollTo({ top: shellEl.scrollHeight || 1200, behavior: "smooth" });
+          }
+        } catch(err) {}
+        try {
+          window.scrollTo({ top: document.body.scrollHeight || 1200, behavior: "smooth" });
+        } catch(err) {}
+
         dismissScrollHint();
+      };
+
+      let isTouchHandled = false;
+      scrollHintEl.addEventListener("touchend", (e) => {
+        isTouchHandled = true;
+        triggerScrollAndDismiss(e);
+        setTimeout(() => { isTouchHandled = false; }, 400);
+      }, { passive: false });
+
+      scrollHintEl.addEventListener("click", (e) => {
+        if (!isTouchHandled) {
+          triggerScrollAndDismiss(e);
+        }
       });
     }
   }
