@@ -167,28 +167,15 @@
       <div class="glass-infografia-container">
         <div class="glass-infografia-card">
           
-          <!-- Header: Título y Botón Cerrar -->
-          <div class="infografia-header-top">
-            <div class="infografia-header-title-wrap">
-              <calcite-icon icon="lightbulb" scale="s"></calcite-icon>
-              <span class="infografia-header-label">GUÍA & METODOLOGÍA DEL VISOR</span>
-            </div>
-            <button id="btnCloseInfografias" class="calendar-icon-btn" title="Cerrar">
-              <calcite-icon icon="x" scale="s"></calcite-icon>
-            </button>
-          </div>
+          <!-- Botón Cerrar (X) Flotante -->
+          <button id="btnCloseInfografias" class="infografia-close-btn" title="Cerrar">
+            <calcite-icon icon="x" scale="m"></calcite-icon>
+          </button>
 
-          <!-- Tabs de Navegación del Carrusel -->
-          <div class="infografia-tabs-row">
-            <button id="btnTabInfografia1" class="infografia-tab-btn active">
-              <calcite-icon icon="question" scale="s"></calcite-icon>
-              <span>1. Guía de Uso</span>
-            </button>
-            <button id="btnTabInfografia2" class="infografia-tab-btn">
-              <calcite-icon icon="layer-search" scale="s"></calcite-icon>
-              <span>2. Metodología IDEAM</span>
-            </button>
-          </div>
+          <!-- Botón Flecha Izquierda Flotante -->
+          <button id="btnPrevInfografia" class="infografia-arrow-btn prev-arrow" title="Anterior">
+            <calcite-icon icon="chevron-left" scale="m"></calcite-icon>
+          </button>
 
           <!-- Área Carrusel Deslizable -->
           <div class="infografia-carousel-viewport">
@@ -211,23 +198,10 @@
             </div>
           </div>
 
-          <!-- Navegación de Carrusel y Puntos -->
-          <div class="infografia-nav-controls">
-            <button id="btnPrevInfografia" class="infografia-nav-btn" title="Anterior">&lsaquo; Anterior</button>
-            <div class="infografia-dots">
-              <span id="dotInfografia0" class="infografia-dot active"></span>
-              <span id="dotInfografia1" class="infografia-dot"></span>
-            </div>
-            <button id="btnNextInfografia" class="infografia-nav-btn" title="Siguiente">Siguiente &rsaquo;</button>
-          </div>
-
-          <div class="calendar-divider"></div>
-
-          <!-- Footer del Banner Modal -->
-          <div class="infografia-footer">
-            <span class="infografia-footer-hint">Puedes consultar esta guía en cualquier momento desde el botón de la barra superior.</span>
-            <button id="btnGoToMap" class="btn-glass-primary">Entendido, ir al Mapa &rarr;</button>
-          </div>
+          <!-- Botón Flecha Derecha Flotante -->
+          <button id="btnNextInfografia" class="infografia-arrow-btn next-arrow" title="Siguiente">
+            <calcite-icon icon="chevron-right" scale="m"></calcite-icon>
+          </button>
 
         </div>
       </div>

@@ -1137,6 +1137,35 @@ require([
       dotInfografia1.addEventListener("click", () => setInfografiaSlide(1));
     }
 
+    // Soporte para gestos táctiles (Swipe) en la ventana emergente de infografías
+    const carouselViewportEl = document.querySelector(".infografia-carousel-viewport");
+    if (carouselViewportEl) {
+      let touchStartX = 0;
+      let touchEndX = 0;
+
+      carouselViewportEl.addEventListener("touchstart", (e) => {
+        if (e.changedTouches && e.changedTouches.length > 0) {
+          touchStartX = e.changedTouches[0].screenX;
+        }
+      }, { passive: true });
+
+      carouselViewportEl.addEventListener("touchend", (e) => {
+        if (e.changedTouches && e.changedTouches.length > 0) {
+          touchEndX = e.changedTouches[0].screenX;
+          const diffX = touchStartX - touchEndX;
+          if (Math.abs(diffX) > 35) {
+            if (diffX > 0) {
+              // Swipe a la izquierda -> Siguiente
+              setInfografiaSlide((currentInfografiaSlide + 1) % 2);
+            } else {
+              // Swipe a la derecha -> Anterior
+              setInfografiaSlide((currentInfografiaSlide - 1 + 2) % 2);
+            }
+          }
+        }
+      }, { passive: true });
+    }
+
     // Navegación de Meses
     if (btnPrevMonth) {
       btnPrevMonth.addEventListener("click", () => {
