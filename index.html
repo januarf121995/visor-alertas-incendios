@@ -74,13 +74,10 @@
     <!-- Layout Principal: 3 Columnas (Bloque Izq Infografía 1 | Mapa Central | Bloque Der Infografía 2) -->
     <div class="app-main-layout">
       
-      <!-- CAJA 1: Bloque Lateral Izquierdo (Espacio Vacío Infografía 1 para Diseñador Gráfico) -->
+      <!-- CAJA 1: Bloque Lateral Izquierdo (Infografía 1 - Tutorial de Uso) -->
       <aside class="sidebar-block left-block">
-        <div class="designer-box-vertical" id="boxInfografia1">
-          <calcite-icon icon="image" scale="l"></calcite-icon>
-          <span>[ Espacio Vacío para Infografía 1 ]</span>
-          <p>Reservado para que el <b>Diseñador Gráfico</b> inserte la infografía tutorial explicativa sobre el uso del visor.</p>
-          <small>Formato recomendado: PNG / JPG / SVG</small>
+        <div class="sidebar-infografia-card" id="boxInfografia1">
+          <img src="src/assets/infografia1.png" alt="Infografía 1 - Guía de Uso del Visor" class="infografia-img" />
         </div>
       </aside>
 
@@ -94,13 +91,10 @@
         </div>
       </main>
 
-      <!-- CAJA 2: Bloque Lateral Derecho (Espacio Vacío Infografía 2 para Diseñador Gráfico) -->
+      <!-- CAJA 2: Bloque Lateral Derecho (Infografía 2 - Metodología IDEAM & VIIRS) -->
       <aside class="sidebar-block right-block">
-        <div class="designer-box-vertical" id="boxInfografia2">
-          <calcite-icon icon="image" scale="l"></calcite-icon>
-          <span>[ Espacio Vacío para Infografía 2 ]</span>
-          <p>Reservado para que el <b>Diseñador Gráfico</b> inserte la infografía de metodología IDEAM y sensores VIIRS.</p>
-          <small>Formato recomendado: PNG / JPG / SVG</small>
+        <div class="sidebar-infografia-card" id="boxInfografia2">
+          <img src="src/assets/infografia2.png" alt="Infografía 2 - Metodología IDEAM y VIIRS" class="infografia-img" />
         </div>
       </aside>
 
@@ -157,43 +151,41 @@
 
           <!-- Pie del Calendario: Información y Botones de Acción -->
           <div class="calendar-footer">
-            <div class="calendar-selected-info">
-              <span id="txtSelectedDateRange">Fecha: Todo el periodo</span>
-            </div>
+            <span id="txtSelectedDateRange" class="calendar-selected-info">Fecha: Todo el periodo</span>
             <div class="calendar-footer-actions">
-              <button id="btnClearDateFilter" class="btn-glass-secondary">Limpiar</button>
-              <button id="btnApplyDateFilter" class="btn-glass-primary">Aplicar Filtro</button>
+              <button id="btnClearDateFilter" class="btn-glass-secondary">Limpiar Filtro</button>
+              <button id="btnApplyDateFilter" class="btn-glass-primary">Aplicar a Capa Satelital</button>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Modal Emergente Banner Carrusel de Infografías (Vista Móvil & Botón Guía) -->
+    <!-- Modal Emergente Banner Carrusel de Infografías (Móvil / Guía General) -->
     <div id="modalInfografias" class="glass-modal-overlay hidden">
       <div class="glass-modal-backdrop" id="btnCloseInfografiasBackdrop"></div>
       <div class="glass-infografia-container">
         <div class="glass-infografia-card">
           
-          <!-- Header del Modal -->
+          <!-- Header: Título y Botón Cerrar -->
           <div class="infografia-header-top">
             <div class="infografia-header-title-wrap">
               <calcite-icon icon="lightbulb" scale="s"></calcite-icon>
-              <span class="infografia-header-label">GUÍA E INFOGRAFÍAS DEL VISOR</span>
+              <span class="infografia-header-label">GUÍA & METODOLOGÍA DEL VISOR</span>
             </div>
-            <button id="btnCloseInfografias" class="calendar-icon-btn" title="Cerrar e ir al mapa">
+            <button id="btnCloseInfografias" class="calendar-icon-btn" title="Cerrar">
               <calcite-icon icon="x" scale="s"></calcite-icon>
             </button>
           </div>
 
-          <!-- Pestañas de Selección Superior -->
+          <!-- Tabs de Navegación del Carrusel -->
           <div class="infografia-tabs-row">
             <button id="btnTabInfografia1" class="infografia-tab-btn active">
-              <calcite-icon icon="image" scale="s"></calcite-icon>
-              <span>1. Tutorial de Uso</span>
+              <calcite-icon icon="question" scale="s"></calcite-icon>
+              <span>1. Guía de Uso</span>
             </button>
             <button id="btnTabInfografia2" class="infografia-tab-btn">
-              <calcite-icon icon="book" scale="s"></calcite-icon>
+              <calcite-icon icon="layer-search" scale="s"></calcite-icon>
               <span>2. Metodología IDEAM</span>
             </button>
           </div>
@@ -204,21 +196,15 @@
               
               <!-- Slide 1: Infografía 1 (Tutorial de Uso) -->
               <div class="infografia-slide">
-                <div class="designer-box-vertical popup-infografia-box" id="boxInfografia1Mobile">
-                  <calcite-icon icon="image" scale="l"></calcite-icon>
-                  <span>[ Espacio Vacío para Infografía 1 ]</span>
-                  <p>Reservado para que el <b>Diseñador Gráfico</b> inserte la infografía tutorial explicativa sobre el uso del visor.</p>
-                  <small>Formato recomendado: PNG / JPG / SVG</small>
+                <div class="sidebar-infografia-card popup-infografia-box" id="boxInfografia1Mobile">
+                  <img src="src/assets/infografia1.png" alt="Infografía 1 - Guía de Uso del Visor" class="infografia-img" />
                 </div>
               </div>
 
               <!-- Slide 2: Infografía 2 (Metodología IDEAM & VIIRS) -->
               <div class="infografia-slide">
-                <div class="designer-box-vertical popup-infografia-box" id="boxInfografia2Mobile">
-                  <calcite-icon icon="image" scale="l"></calcite-icon>
-                  <span>[ Espacio Vacío para Infografía 2 ]</span>
-                  <p>Reservado para que el <b>Diseñador Gráfico</b> inserte la infografía de metodología IDEAM y sensores VIIRS.</p>
-                  <small>Formato recomendado: PNG / JPG / SVG</small>
+                <div class="sidebar-infografia-card popup-infografia-box" id="boxInfografia2Mobile">
+                  <img src="src/assets/infografia2.png" alt="Infografía 2 - Metodología IDEAM y VIIRS" class="infografia-img" />
                 </div>
               </div>
 
