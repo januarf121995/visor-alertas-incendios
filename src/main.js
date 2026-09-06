@@ -1290,11 +1290,7 @@ require([
       featureWidget.graphic = null;
     }
     if (sheetContentContainer) {
-      sheetContentContainer.innerHTML = `
-        <div class="popup-placeholder">
-          <calcite-icon icon="cursor-click" scale="m"></calcite-icon>
-          <span>Selecciona un municipio en el mapa para cargar su Pop-up nativo de ArcGIS Online con todos los indicadores de alerta.</span>
-        </div>`;
+      sheetContentContainer.innerHTML = "";
     }
     if (view && view.popup) view.popup.close();
     showAlert("Vista Limpia", "Se restableció la visualización del mapa y el filtro de fechas.", "info");

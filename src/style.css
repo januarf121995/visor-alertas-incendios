@@ -103,11 +103,59 @@ calcite-combobox::part(container) {
   width: 100px;
 }
 
+/* Banner Explicativo de la App */
+.app-banner-help {
+  width: 100%;
+  background: linear-gradient(90deg, rgba(24, 24, 27, 0.96) 0%, rgba(28, 16, 12, 0.96) 50%, rgba(24, 24, 27, 0.96) 100%) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(249, 115, 22, 0.3) !important;
+  padding: 7px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+  position: relative;
+  z-index: 99;
+  box-sizing: border-box;
+}
+
+.banner-help-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #ffffff !important;
+  font-size: 13px;
+  text-align: center;
+}
+
+.banner-help-content calcite-icon {
+  color: #ff9500 !important;
+  flex-shrink: 0;
+}
+
+.banner-help-title {
+  color: #ff9500 !important;
+  font-weight: 800;
+  letter-spacing: -0.1px;
+}
+
+.banner-help-text {
+  color: #e4e4e7 !important;
+  font-weight: 500;
+}
+
+/* Indicador Pie de Mapa Adaptado para Móvil */
+.mobile-map-scroll-hint {
+  display: none;
+}
+
 /* Layout Principal 3 Columnas */
 .app-main-layout {
   display: flex;
-  height: calc(100vh - 52px);
-  min-height: 520px;
+  height: calc(100vh - 86px);
+  min-height: 500px;
   width: 100%;
   overflow: hidden;
   position: relative;
@@ -657,10 +705,55 @@ calcite-scrim:not([loading]),
   }
 
   .app-main-layout {
-    height: calc(100vh - 52px);
-    height: calc(100dvh - 52px);
+    height: calc(100vh - 86px);
+    height: calc(100dvh - 86px);
     width: 100%;
     min-height: 350px;
+  }
+
+  .app-banner-help {
+    padding: 6px 10px;
+  }
+
+  .banner-help-content {
+    font-size: 11.5px;
+    gap: 4px;
+  }
+
+  .mobile-map-scroll-hint {
+    display: flex !important;
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 35;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: rgba(13, 13, 15, 0.88) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(249, 115, 22, 0.4) !important;
+    border-radius: 20px;
+    padding: 6px 14px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6), 0 0 12px rgba(249, 115, 22, 0.25);
+    pointer-events: none;
+    max-width: 92vw;
+    box-sizing: border-box;
+  }
+
+  .mobile-map-scroll-hint .hint-gif {
+    height: 18px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  .mobile-map-scroll-hint span {
+    color: #ffedd5 !important;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+    letter-spacing: -0.1px;
   }
 
   .center-map-container {

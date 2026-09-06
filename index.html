@@ -62,6 +62,15 @@
       </div>
     </div>
 
+    <!-- Banner Explicativo de la App (Sobre infografías y mapa web) -->
+    <div class="app-banner-help">
+      <div class="banner-help-content">
+        <calcite-icon icon="cursor-click" scale="s"></calcite-icon>
+        <span class="banner-help-title">¿Cómo usar este visor?</span>
+        <span class="banner-help-text">Selecciona cualquier municipio para consultar su nivel de alerta y focos de calor detectados en tiempo real</span>
+      </div>
+    </div>
+
     <!-- Layout Principal: 3 Columnas (Bloque Izq Infografía 1 | Mapa Central | Bloque Der Infografía 2) -->
     <div class="app-main-layout">
       
@@ -78,6 +87,11 @@
       <!-- ÁREA CENTRAL: Contenedor del Mapa (#viewDiv) -->
       <main class="center-map-container">
         <div id="viewDiv"></div>
+        <!-- Indicador Pie de Mapa Adaptado para Móvil -->
+        <div class="mobile-map-scroll-hint">
+          <img src="src/assets/down-arrow-orange-4.gif" alt="Deslizar" class="hint-gif" />
+          <span>Desliza hacia abajo para ver los indicadores detallados</span>
+        </div>
       </main>
 
       <!-- CAJA 2: Bloque Lateral Derecho (Espacio Vacío Infografía 2 para Diseñador Gráfico) -->
@@ -102,12 +116,7 @@
           </div>
         </div>
         <!-- Contenedor donde ArcGIS JS SDK renderiza el Pop-up nativo del WebMap -->
-        <div id="sheetContentContainer" class="popup-box-content">
-          <div class="popup-placeholder">
-            <calcite-icon icon="cursor-click" scale="m"></calcite-icon>
-            <span>Selecciona un municipio en el mapa para cargar su Pop-up nativo de ArcGIS Online con todos los indicadores de alerta.</span>
-          </div>
-        </div>
+        <div id="sheetContentContainer" class="popup-box-content"></div>
       </div>
     </section>
 
