@@ -1268,7 +1268,7 @@ require([
       });
     }
 
-    // Detección de Desplazamiento (Scroll) para ocultar la cápsula flotante de pie de mapa
+    // Detección de Desplazamiento (Scroll / Rueda de Mouse / Trackpad / Teclado) para la versión Web Desktop y Móvil
     const scrollHintEl = document.querySelector(".mobile-map-scroll-hint");
     let hasDismissedScrollHint = false;
 
@@ -1283,21 +1283,35 @@ require([
       }, 400);
     };
 
-    const handleScrollCheck = () => {
-      const scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
-      const shellElement = document.querySelector("calcite-shell");
-      const shellScroll = shellElement ? shellElement.scrollTop : 0;
-
-      if (scrollY > 15 || shellScroll > 15) {
+    // 1. Detección de evento wheel (Rueda del mouse o gesto de scroll en trackpad para la versión Web Desktop)
+    const handleWheel = (e) => {
+      if (e && e.deltaY > 0) {
         dismissScrollHint();
       }
     };
+    window.addEventListener("wheel", handleWheel, { passive: true, capture: true });
+    document.addEventListener("wheel", handleWheel, { passive: true, capture: true });
 
-    window.addEventListener("scroll", handleScrollCheck, { passive: true });
-    document.addEventListener("scroll", handleScrollCheck, { passive: true });
+    // 2. Detección de evento scroll en fase de captura (Captura cualquier contenedor o componente web en el DOM)
+    const handleScrollCheck = () => {
+      dismissScrollHint();
+    };
+    window.addEventListener("scroll", handleScrollCheck, { passive: true, capture: true });
+    document.addEventListener("scroll", handleScrollCheck, { passive: true, capture: true });
+
     const shellElement = document.querySelector("calcite-shell");
-    if (shellElement) shellElement.addEventListener("scroll", handleScrollCheck, { passive: true });
+    if (shellElement) {
+      shellElement.addEventListener("scroll", handleScrollCheck, { passive: true, capture: true });
+    }
 
+    // 3. Detección de navegación por teclado (Flecha Abajo, AvPág, Barra Espaciadora)
+    window.addEventListener("keydown", (e) => {
+      if (e && (["ArrowDown", "PageDown", "Space"].includes(e.code) || ["ArrowDown", "PageDown", "Space"].includes(e.key))) {
+        dismissScrollHint();
+      }
+    }, { passive: true });
+
+    // 4. Clic directo sobre la cápsula flotante
     if (scrollHintEl) {
       scrollHintEl.addEventListener("click", () => {
         if (boxPopupDetails) {
