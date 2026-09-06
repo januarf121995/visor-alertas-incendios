@@ -764,6 +764,11 @@ calcite-scrim:not([loading]),
   .mobile-map-scroll-hint {
     bottom: 12px;
     padding: 5px 12px;
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transform: translateX(-50%) !important;
   }
 
   .center-map-container {

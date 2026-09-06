@@ -1268,16 +1268,19 @@ require([
       });
     }
 
-    // Detección de Desplazamiento (Scroll / Rueda de Mouse / Trackpad / Teclado) para la versión Web Desktop y Móvil
+    // Detección de Desplazamiento (Scroll / Rueda de Mouse / Trackpad / Teclado) para la versión Web Desktop
     const scrollHintEl = document.querySelector(".mobile-map-scroll-hint");
     let hasDismissedScrollHint = false;
 
     const dismissScrollHint = () => {
+      // EXCLUSIVO ESCRITORIO (>992px): La cápsula solo se remueve en la versión Web Escritorio
+      if (window.innerWidth <= 992) return;
+
       if (hasDismissedScrollHint || !scrollHintEl) return;
       hasDismissedScrollHint = true;
       scrollHintEl.classList.add("fade-out");
       setTimeout(() => {
-        if (scrollHintEl && scrollHintEl.parentNode) {
+        if (scrollHintEl && scrollHintEl.parentNode && window.innerWidth > 992) {
           scrollHintEl.style.display = "none";
         }
       }, 400);
@@ -1292,7 +1295,7 @@ require([
     window.addEventListener("wheel", handleWheel, { passive: true, capture: true });
     document.addEventListener("wheel", handleWheel, { passive: true, capture: true });
 
-    // 2. Detección de evento scroll en fase de captura (Captura cualquier contenedor o componente web en el DOM)
+    // 2. Detección de evento scroll en fase de captura (Captura cualquier contenedor en la versión Web Desktop)
     const handleScrollCheck = () => {
       dismissScrollHint();
     };
@@ -1304,14 +1307,14 @@ require([
       shellElement.addEventListener("scroll", handleScrollCheck, { passive: true, capture: true });
     }
 
-    // 3. Detección de navegación por teclado (Flecha Abajo, AvPág, Barra Espaciadora)
+    // 3. Detección de navegación por teclado (Flecha Abajo, AvPág, Barra Espaciadora en Escritorio)
     window.addEventListener("keydown", (e) => {
       if (e && (["ArrowDown", "PageDown", "Space"].includes(e.code) || ["ArrowDown", "PageDown", "Space"].includes(e.key))) {
         dismissScrollHint();
       }
     }, { passive: true });
 
-    // 4. Clic o Toque táctil directo sobre la cápsula flotante (Móvil y Escritorio)
+    // 4. Clic o Toque táctil directo sobre la cápsula flotante (Móvil: Desliza pantalla sin remover cápsula; Escritorio: Desliza y remueve)
     if (scrollHintEl) {
       const triggerScrollAndDismiss = (e) => {
         if (e) {
@@ -1334,7 +1337,10 @@ require([
           window.scrollTo({ top: document.body.scrollHeight || 1200, behavior: "smooth" });
         } catch(err) {}
 
-        dismissScrollHint();
+        // En versión escritorio se remueve; en versión móvil se mantiene siempre visible
+        if (window.innerWidth > 992) {
+          dismissScrollHint();
+        }
       };
 
       let isTouchHandled = false;
