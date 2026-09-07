@@ -429,7 +429,7 @@ calcite-combobox::part(container) {
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 500;
+  z-index: 2147483647 !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -447,9 +447,9 @@ calcite-combobox::part(container) {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(12, 4, 4, 0.78);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(8, 8, 10, 0.92) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 .glass-calendar-container {
@@ -860,7 +860,7 @@ calcite-scrim:not([loading]),
 
 .glass-infografia-container {
   position: relative;
-  z-index: 100000;
+  z-index: 2147483647 !important;
   width: 100%;
   max-width: 520px;
   padding: 8px;

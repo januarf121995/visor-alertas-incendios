@@ -114,90 +114,101 @@
       </div>
     </section>
 
-    <!-- Modal Emergente de Calendario Glassmorphism (Filtro por Fecha VIIRS ACQ_DATE) -->
-    <div id="modalCalendar" class="glass-modal-overlay hidden">
-      <div class="glass-modal-backdrop" id="btnCloseCalendarBackdrop"></div>
-      <div class="glass-calendar-container">
-        <div class="glass-calendar-card">
-          <!-- Header: Título y Botón Cerrar -->
-          <div class="calendar-header-top">
-            <div class="calendar-header-title-wrap">
-              <span class="calendar-header-label">FILTRAR FECHAS SATELITALES</span>
-            </div>
-            <button id="btnCloseCalendar" class="calendar-icon-btn" title="Cerrar">
-              <calcite-icon icon="x" scale="s"></calcite-icon>
-            </button>
+    <!-- Scrim de Carga -->
+    <calcite-scrim id="appLoader" loading text="Cargando WebMap y Pop-ups..."></calcite-scrim>
+
+    <!-- Alerta Toast -->
+    <calcite-alert id="appAlert" kind="info" icon="check-circle" auto-close auto-close-duration="medium">
+      <div slot="title" id="alertTitle">Notificación</div>
+      <div slot="message" id="alertMessage">Operación realizada con éxito.</div>
+    </calcite-alert>
+  </calcite-shell>
+
+  <!-- Modales Emergentes colocados en la raíz del body para superposición z-index absoluta sobre todos los componentes -->
+  <!-- Modal Emergente de Calendario Glassmorphism (Filtro por Fecha VIIRS ACQ_DATE) -->
+  <div id="modalCalendar" class="glass-modal-overlay hidden">
+    <div class="glass-modal-backdrop" id="btnCloseCalendarBackdrop"></div>
+    <div class="glass-calendar-container">
+      <div class="glass-calendar-card">
+        <!-- Header: Título y Botón Cerrar -->
+        <div class="calendar-header-top">
+          <div class="calendar-header-title-wrap">
+            <span class="calendar-header-label">FILTRAR FECHAS SATELITALES</span>
           </div>
+          <button id="btnCloseCalendar" class="calendar-icon-btn" title="Cerrar">
+            <calcite-icon icon="x" scale="s"></calcite-icon>
+          </button>
+        </div>
 
-          <!-- Insignia del Campo VIIRS ACQ_DATE -->
-          <div class="calendar-field-badge">
-            <calcite-icon icon="satellite" scale="s"></calcite-icon>
-            <span>Capa VIIRS &bull; Campo <b>ACQ_DATE</b> (UTC)</span>
+        <!-- Insignia del Campo VIIRS ACQ_DATE -->
+        <div class="calendar-field-badge">
+          <calcite-icon icon="satellite" scale="s"></calcite-icon>
+          <span>Capa VIIRS &bull; Campo <b>ACQ_DATE</b> (UTC)</span>
+        </div>
+
+        <!-- Navegación de Mes -->
+        <div class="calendar-month-nav">
+          <span id="calendarMonthTitle" class="calendar-month-title">Septiembre 2026</span>
+          <div class="calendar-nav-buttons">
+            <button id="btnPrevMonth" class="calendar-nav-btn" title="Mes Anterior">&lsaquo;</button>
+            <button id="btnNextMonth" class="calendar-nav-btn" title="Mes Siguiente">&rsaquo;</button>
           </div>
+        </div>
 
-          <!-- Navegación de Mes -->
-          <div class="calendar-month-nav">
-            <span id="calendarMonthTitle" class="calendar-month-title">Septiembre 2026</span>
-            <div class="calendar-nav-buttons">
-              <button id="btnPrevMonth" class="calendar-nav-btn" title="Mes Anterior">&lsaquo;</button>
-              <button id="btnNextMonth" class="calendar-nav-btn" title="Mes Siguiente">&rsaquo;</button>
-            </div>
-          </div>
+        <!-- Grid Carrusel de Días del Mes (Generado con JS) -->
+        <div id="calendarDaysGrid" class="calendar-days-grid scrollbar-hide"></div>
 
-          <!-- Grid Carrusel de Días del Mes (Generado con JS) -->
-          <div id="calendarDaysGrid" class="calendar-days-grid scrollbar-hide"></div>
+        <div class="calendar-divider"></div>
 
-          <div class="calendar-divider"></div>
-
-          <!-- Pie del Calendario: Información y Botones de Acción -->
-          <div class="calendar-footer">
-            <span id="txtSelectedDateRange" class="calendar-selected-info">Fecha: Todo el periodo</span>
-            <div class="calendar-footer-actions">
-              <button id="btnClearDateFilter" class="btn-glass-secondary">Limpiar Filtro</button>
-              <button id="btnApplyDateFilter" class="btn-glass-primary">Aplicar a Capa Satelital</button>
-            </div>
+        <!-- Pie del Calendario: Información y Botones de Acción -->
+        <div class="calendar-footer">
+          <span id="txtSelectedDateRange" class="calendar-selected-info">Fecha: Todo el periodo</span>
+          <div class="calendar-footer-actions">
+            <button id="btnClearDateFilter" class="btn-glass-secondary">Limpiar Filtro</button>
+            <button id="btnApplyDateFilter" class="btn-glass-primary">Aplicar a Capa Satelital</button>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Modal Emergente Banner Carrusel de Infografías (Móvil / Guía General) -->
-    <div id="modalInfografias" class="glass-modal-overlay hidden">
-      <div class="glass-modal-backdrop" id="btnCloseInfografiasBackdrop"></div>
-      <div class="glass-infografia-container">
-        <div class="glass-infografia-card">
-          
-          <!-- Botón Cerrar (X) Flotante -->
-          <button id="btnCloseInfografias" class="infografia-close-btn" title="Cerrar">
-            <calcite-icon icon="x" scale="m"></calcite-icon>
-          </button>
+  <!-- Modal Emergente Banner Carrusel de Infografías (Móvil / Guía General) -->
+  <div id="modalInfografias" class="glass-modal-overlay hidden">
+    <div class="glass-modal-backdrop" id="btnCloseInfografiasBackdrop"></div>
+    <div class="glass-infografia-container">
+      <div class="glass-infografia-card">
+        
+        <!-- Botón Cerrar (X) Flotante -->
+        <button id="btnCloseInfografias" class="infografia-close-btn" title="Cerrar">
+          <calcite-icon icon="x" scale="m"></calcite-icon>
+        </button>
 
-          <!-- Botón Flecha Izquierda Flotante -->
-          <button id="btnPrevInfografia" class="infografia-arrow-btn prev-arrow" title="Anterior">
-            <calcite-icon icon="chevron-left" scale="m"></calcite-icon>
-          </button>
+        <!-- Botón Flecha Izquierda Flotante -->
+        <button id="btnPrevInfografia" class="infografia-arrow-btn prev-arrow" title="Anterior">
+          <calcite-icon icon="chevron-left" scale="m"></calcite-icon>
+        </button>
 
-          <!-- Contenedor de Escenas de Infografía (1 a la vez) -->
-          <div class="infografia-scenes-container">
-            <!-- Escena 1: Infografía 1 (Tutorial de Uso) -->
-            <div id="sceneInfografia0" class="infografia-scene active">
-              <img src="src/assets/infografia1.png" alt="Infografía 1 - Guía de Uso del Visor" class="infografia-full-img" />
-            </div>
-
-            <!-- Escena 2: Infografía 2 (Metodología IDEAM & VIIRS) -->
-            <div id="sceneInfografia1" class="infografia-scene">
-              <img src="src/assets/infografia2.png" alt="Infografía 2 - Metodología IDEAM y VIIRS" class="infografia-full-img" />
-            </div>
+        <!-- Contenedor de Escenas de Infografía (1 a la vez) -->
+        <div class="infografia-scenes-container">
+          <!-- Escena 1: Infografía 1 (Tutorial de Uso) -->
+          <div id="sceneInfografia0" class="infografia-scene active">
+            <img src="src/assets/infografia1.png" alt="Infografía 1 - Guía de Uso del Visor" class="infografia-full-img" />
           </div>
 
-          <!-- Botón Flecha Derecha Flotante -->
-          <button id="btnNextInfografia" class="infografia-arrow-btn next-arrow" title="Siguiente">
-            <calcite-icon icon="chevron-right" scale="m"></calcite-icon>
-          </button>
-
+          <!-- Escena 2: Infografía 2 (Metodología IDEAM & VIIRS) -->
+          <div id="sceneInfografia1" class="infografia-scene">
+            <img src="src/assets/infografia2.png" alt="Infografía 2 - Metodología IDEAM y VIIRS" class="infografia-full-img" />
+          </div>
         </div>
+
+        <!-- Botón Flecha Derecha Flotante -->
+        <button id="btnNextInfografia" class="infografia-arrow-btn next-arrow" title="Siguiente">
+          <calcite-icon icon="chevron-right" scale="m"></calcite-icon>
+        </button>
+
       </div>
     </div>
+  </div>
 
     <!-- Scrim de Carga -->
     <calcite-scrim id="appLoader" loading text="Cargando WebMap y Pop-ups..."></calcite-scrim>
