@@ -177,24 +177,16 @@
             <calcite-icon icon="chevron-left" scale="m"></calcite-icon>
           </button>
 
-          <!-- Área Carrusel Deslizable -->
-          <div class="infografia-carousel-viewport">
-            <div id="infografiaCarouselTrack" class="infografia-carousel-track slide-0">
-              
-              <!-- Slide 1: Infografía 1 (Tutorial de Uso) -->
-              <div class="infografia-slide">
-                <div class="sidebar-infografia-card popup-infografia-box" id="boxInfografia1Mobile">
-                  <img src="src/assets/infografia1.png" alt="Infografía 1 - Guía de Uso del Visor" class="infografia-img" />
-                </div>
-              </div>
+          <!-- Contenedor de Escenas de Infografía (1 a la vez) -->
+          <div class="infografia-scenes-container">
+            <!-- Escena 1: Infografía 1 (Tutorial de Uso) -->
+            <div id="sceneInfografia0" class="infografia-scene active">
+              <img src="src/assets/infografia1.png" alt="Infografía 1 - Guía de Uso del Visor" class="infografia-full-img" />
+            </div>
 
-              <!-- Slide 2: Infografía 2 (Metodología IDEAM & VIIRS) -->
-              <div class="infografia-slide">
-                <div class="sidebar-infografia-card popup-infografia-box" id="boxInfografia2Mobile">
-                  <img src="src/assets/infografia2.png" alt="Infografía 2 - Metodología IDEAM y VIIRS" class="infografia-img" />
-                </div>
-              </div>
-
+            <!-- Escena 2: Infografía 2 (Metodología IDEAM & VIIRS) -->
+            <div id="sceneInfografia1" class="infografia-scene">
+              <img src="src/assets/infografia2.png" alt="Infografía 2 - Metodología IDEAM y VIIRS" class="infografia-full-img" />
             </div>
           </div>
 

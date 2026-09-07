@@ -862,8 +862,8 @@ calcite-scrim:not([loading]),
   position: relative;
   z-index: 100000;
   width: 100%;
-  max-width: 540px;
-  padding: 10px;
+  max-width: 520px;
+  padding: 8px;
   box-sizing: border-box;
 }
 
@@ -871,17 +871,20 @@ calcite-scrim:not([loading]),
   background: rgba(18, 18, 20, 0.96);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1.5px solid rgba(249, 115, 22, 0.45);
+  border: 1.5px solid rgba(249, 115, 22, 0.5);
   border-radius: 20px;
-  padding: 12px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(249, 115, 22, 0.25);
+  padding: 8px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9), 0 0 35px rgba(249, 115, 22, 0.3);
   position: relative;
+  width: 100%;
+  height: auto;
+  max-height: 90vh;
+  max-height: 90dvh;
+  overflow: hidden;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
-  max-height: 92vh;
-  max-height: 92dvh;
-  overflow: hidden;
 }
 
 /* Botón de Cierre (X) Flotante */
@@ -889,18 +892,18 @@ calcite-scrim:not([loading]),
   position: absolute;
   top: 14px;
   right: 14px;
-  z-index: 30;
-  background: rgba(0, 0, 0, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   color: #ffffff;
   border-radius: 50%;
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -910,7 +913,7 @@ calcite-scrim:not([loading]),
 
 .infografia-close-btn:hover,
 .infografia-close-btn:active {
-  background: rgba(239, 68, 68, 0.85);
+  background: rgba(239, 68, 68, 0.9);
   border-color: #ef4444;
   transform: scale(1.1);
 }
@@ -920,20 +923,20 @@ calcite-scrim:not([loading]),
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 30;
-  background: rgba(24, 24, 27, 0.8);
-  border: 1.5px solid rgba(249, 115, 22, 0.6);
+  z-index: 50;
+  background: rgba(24, 24, 27, 0.85);
+  border: 1.5px solid rgba(249, 115, 22, 0.7);
   color: #ff9500;
   border-radius: 50%;
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -943,7 +946,7 @@ calcite-scrim:not([loading]),
 
 .infografia-arrow-btn:hover,
 .infografia-arrow-btn:active {
-  background: rgba(249, 115, 22, 0.9);
+  background: rgba(249, 115, 22, 0.95);
   border-color: #ff9500;
   transform: translateY(-50%) scale(1.12);
 }
@@ -954,96 +957,77 @@ calcite-scrim:not([loading]),
 }
 
 .infografia-arrow-btn.prev-arrow {
-  left: 14px;
+  left: 12px;
 }
 
 .infografia-arrow-btn.next-arrow {
-  right: 14px;
+  right: 12px;
 }
 
-/* Viewport y Carrusel */
-.infografia-carousel-viewport {
+/* Contenedor y Escenas Individuales */
+.infografia-scenes-container {
   width: 100%;
-  max-height: 86vh;
-  max-height: 86dvh;
-  overflow: hidden;
-  border-radius: 14px;
   position: relative;
   display: flex;
   align-items: center;
-}
-
-.infografia-carousel-track {
-  display: flex;
-  width: 200%;
-  height: 100%;
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.infografia-carousel-track.slide-0 {
-  transform: translateX(0%);
-}
-
-.infografia-carousel-track.slide-1 {
-  transform: translateX(-50%);
-}
-
-.infografia-slide {
-  width: 50%;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
   justify-content: center;
-  padding: 0;
 }
 
-.popup-infografia-box {
+.infografia-scene {
+  display: none;
   width: 100%;
-  max-height: 84vh;
-  max-height: 84dvh;
-  display: flex;
   align-items: center;
   justify-content: center;
+  transition: opacity 0.3s ease;
 }
 
-.popup-infografia-box .infografia-img {
+.infografia-scene.active {
+  display: flex;
+}
+
+.infografia-full-img {
+  width: 100%;
+  height: auto;
   max-height: 84vh;
   max-height: 84dvh;
-  width: auto;
-  max-width: 100%;
   object-fit: contain;
-  border-radius: 12px;
+  border-radius: 14px;
   display: block;
 }
 
 @media (max-width: 640px) {
   .glass-infografia-container {
-    max-width: 96vw;
-    padding: 4px;
+    max-width: 98vw;
+    padding: 2px;
   }
 
   .glass-infografia-card {
-    padding: 8px;
+    padding: 4px;
     border-radius: 16px;
   }
 
+  .infografia-full-img {
+    max-height: 86vh;
+    max-height: 86dvh;
+  }
+
   .infografia-arrow-btn {
-    width: 38px;
-    height: 38px;
+    width: 40px;
+    height: 40px;
   }
 
   .infografia-arrow-btn.prev-arrow {
-    left: 8px;
+    left: 6px;
   }
 
   .infografia-arrow-btn.next-arrow {
-    right: 8px;
+    right: 6px;
   }
 
   .infografia-close-btn {
-    width: 34px;
-    height: 34px;
-    top: 8px;
-    right: 8px;
+    width: 36px;
+    height: 36px;
+    top: 6px;
+    right: 6px;
   }
 }

@@ -901,6 +901,19 @@ require([
     if (infografiaCarouselTrack) {
       infografiaCarouselTrack.className = `infografia-carousel-track slide-${index}`;
     }
+
+    const scene0 = document.getElementById("sceneInfografia0");
+    const scene1 = document.getElementById("sceneInfografia1");
+    if (scene0 && scene1) {
+      if (index === 0) {
+        scene0.classList.add("active");
+        scene1.classList.remove("active");
+      } else {
+        scene0.classList.remove("active");
+        scene1.classList.add("active");
+      }
+    }
+
     if (btnTabInfografia1 && btnTabInfografia2) {
       if (index === 0) {
         btnTabInfografia1.classList.add("active");
@@ -1138,27 +1151,27 @@ require([
     }
 
     // Soporte para gestos táctiles (Swipe) en la ventana emergente de infografías
-    const carouselViewportEl = document.querySelector(".infografia-carousel-viewport");
-    if (carouselViewportEl) {
+    const scenesContainerEl = document.querySelector(".infografia-scenes-container");
+    if (scenesContainerEl) {
       let touchStartX = 0;
       let touchEndX = 0;
 
-      carouselViewportEl.addEventListener("touchstart", (e) => {
+      scenesContainerEl.addEventListener("touchstart", (e) => {
         if (e.changedTouches && e.changedTouches.length > 0) {
           touchStartX = e.changedTouches[0].screenX;
         }
       }, { passive: true });
 
-      carouselViewportEl.addEventListener("touchend", (e) => {
+      scenesContainerEl.addEventListener("touchend", (e) => {
         if (e.changedTouches && e.changedTouches.length > 0) {
           touchEndX = e.changedTouches[0].screenX;
           const diffX = touchStartX - touchEndX;
           if (Math.abs(diffX) > 35) {
             if (diffX > 0) {
-              // Swipe a la izquierda -> Siguiente
+              // Swipe a la izquierda -> Siguiente escena
               setInfografiaSlide((currentInfografiaSlide + 1) % 2);
             } else {
-              // Swipe a la derecha -> Anterior
+              // Swipe a la derecha -> Escena anterior
               setInfografiaSlide((currentInfografiaSlide - 1 + 2) % 2);
             }
           }
