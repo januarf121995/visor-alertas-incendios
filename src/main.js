@@ -946,13 +946,22 @@ require([
       municipioName = dept ? `${name}, ${dept}` : name;
     }
 
-    let dateFilterLabel = "Todos los registros VIIRS";
+    let dateFilterLabel = "";
     if (calendarSelectedStart && !calendarSelectedEnd) {
-      dateFilterLabel = calendarSelectedStart.toLocaleDateString("es-CO", { day: '2-digit', month: 'short', year: 'numeric' });
+      const formatted = calendarSelectedStart.toLocaleDateString("es-CO", { day: '2-digit', month: 'long', year: 'numeric' });
+      dateFilterLabel = `Fecha Única: ${formatted}`;
     } else if (calendarSelectedStart && calendarSelectedEnd) {
-      const sFmt = calendarSelectedStart.toLocaleDateString("es-CO", { day: '2-digit', month: 'short' });
+      const sFmt = calendarSelectedStart.toLocaleDateString("es-CO", { day: '2-digit', month: 'short', year: 'numeric' });
       const eFmt = calendarSelectedEnd.toLocaleDateString("es-CO", { day: '2-digit', month: 'short', year: 'numeric' });
-      dateFilterLabel = `${sFmt} al ${eFmt}`;
+      dateFilterLabel = `Rango Filtrado: ${sFmt} al ${eFmt}`;
+    } else if (viirsMinDate && viirsMaxDate) {
+      const minFmt = viirsMinDate.toLocaleDateString("es-CO", { day: '2-digit', month: 'short', year: 'numeric' });
+      const maxFmt = viirsMaxDate.toLocaleDateString("es-CO", { day: '2-digit', month: 'short', year: 'numeric' });
+      dateFilterLabel = `Periodo Completo VIIRS: ${minFmt} al ${maxFmt}`;
+    } else if (txtSelectedDateRange && txtSelectedDateRange.textContent.trim()) {
+      dateFilterLabel = txtSelectedDateRange.textContent.trim().replace(/^Fecha:\s*/i, "").replace(/^Rango:\s*/i, "");
+    } else {
+      dateFilterLabel = "Todos los registros VIIRS en capa";
     }
 
     // 2. Captura del Mapa Web
@@ -1015,6 +1024,19 @@ require([
           .meta-item { display: flex; flex-direction: column; }
           .meta-label { font-size: 7.5pt; font-weight: 700; color: #64748b; text-transform: uppercase; }
           .meta-val { font-size: 9.5pt; font-weight: 700; color: #0f172a; margin-top: 2px; }
+
+          .date-banner-capsule {
+            background: #fff7ed;
+            border: 1.5px solid #f97316;
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+          }
+          .date-banner-label { font-size: 9.5pt; font-weight: 800; color: #c2410c; text-transform: uppercase; }
+          .date-banner-val { font-size: 10.5pt; font-weight: 800; color: #9a3412; background: #ffedd5; padding: 3px 10px; border-radius: 4px; border: 1px solid #fdba74; }
           
           /* Overrides limpios para tarjetas clonadas */
           .designer-box-horizontal, .sidebar-legend-card { border: 1px solid #cbd5e1 !important; border-radius: 8px !important; padding: 12px !important; margin-bottom: 12px !important; background: #ffffff !important; color: #0f172a !important; }
@@ -1052,13 +1074,18 @@ require([
             </div>
             <div class="meta-item">
               <span class="meta-label">FILTRO VIIRS SATELITAL:</span>
-              <span class="meta-val">${dateFilterLabel}</span>
+              <span class="meta-val" style="color: #c2410c !important;">📅 ${dateFilterLabel}</span>
             </div>
             <div class="meta-item">
               <span class="meta-label">FECHA DE EMISIÓN:</span>
               <span class="meta-val">${emissionDate}</span>
             </div>
           </div>
+        </div>
+
+        <div class="date-banner-capsule">
+          <span class="date-banner-label">🗓️ Rango de Fechas Satelitales (VIIRS) Seleccionado en Mapa:</span>
+          <span class="date-banner-val">${dateFilterLabel}</span>
         </div>
 
         ${mapImgHtml}
