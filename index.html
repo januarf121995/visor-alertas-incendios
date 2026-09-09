@@ -160,10 +160,97 @@
             </div>
           </div>
 
-          <!-- Pestaña 3: Guía de Uso e Infografía Tutorial -->
+          <!-- Pestaña 3: Guía de Uso del Visor (HTML/CSS Nativo Estilizado) -->
           <div id="tabContentGuide" class="sidebar-tab-content">
-            <div class="sidebar-infografia-card">
-              <img src="src/assets/infografia1.png" alt="Guía de Uso del Visor" class="infografia-img" />
+            <div class="sidebar-guide-card">
+              
+              <!-- Encabezado del Panel Guía -->
+              <div class="guide-card-header">
+                <calcite-icon icon="lightbulb" scale="s"></calcite-icon>
+                <span>GUÍA RÁPIDA DE USO & MONITOREO</span>
+              </div>
+
+              <p class="guide-intro-text">
+                Esta herramienta monitorea en tiempo real las condiciones de riesgo de incendio en Colombia integrando dos fuentes oficiales:
+              </p>
+
+              <!-- Bloque 1: Fuentes Oficiales -->
+              <div class="guide-section-box">
+                <div class="guide-section-title">
+                  <calcite-icon icon="layers" scale="s"></calcite-icon>
+                  <span>FUENTES DE INFORMACIÓN OFICIALES</span>
+                </div>
+                
+                <div class="guide-feature-item">
+                  <div class="guide-feature-badge badge-nasa">
+                    <calcite-icon icon="satellite" scale="s"></calcite-icon> NASA VIIRS
+                  </div>
+                  <div class="guide-feature-body">
+                    <strong>Puntos de calor (NASA):</strong> Detecciones satelitales (sensor VIIRS) con su respectivo nivel de confianza térmico.
+                  </div>
+                </div>
+
+                <div class="guide-feature-item">
+                  <div class="guide-feature-badge badge-ideam">
+                    <calcite-icon icon="fire" scale="s"></calcite-icon> IDEAM
+                  </div>
+                  <div class="guide-feature-body">
+                    <strong>Niveles de alerta (IDEAM):</strong> Clasificación del riesgo por municipio (<span class="badge-dot dot-yellow">🟡 Baja</span>, <span class="badge-dot dot-orange">🟠 Media</span>, <span class="badge-dot dot-red">🔴 Alta</span>).
+                  </div>
+                </div>
+              </div>
+
+              <!-- Bloque 2: Cómo explorar los datos -->
+              <div class="guide-section-box">
+                <div class="guide-section-title">
+                  <calcite-icon icon="compass" scale="s"></calcite-icon>
+                  <span>CÓMO EXPLORAR LOS DATOS</span>
+                </div>
+
+                <div class="guide-step-item">
+                  <div class="step-num">1</div>
+                  <div class="step-content">
+                    <strong>Búsqueda territorial:</strong> Escribe o selecciona tu municipio en el buscador superior para hacer zoom automático y consultar su nivel de alerta actual.
+                  </div>
+                </div>
+
+                <div class="guide-step-item">
+                  <div class="step-num">2</div>
+                  <div class="step-content">
+                    <strong>Ventana temporal:</strong> El mapa muestra por defecto los puntos de calor de los últimos 7 días. Usa el botón <span class="step-tag"><calcite-icon icon="calendar" scale="s"></calcite-icon> Fechas VIIRS</span> para filtrar un rango específico dentro de ese periodo, incluyendo el día de consulta.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Bloque 3: Herramientas y paneles -->
+              <div class="guide-section-box">
+                <div class="guide-section-title">
+                  <calcite-icon icon="apps" scale="s"></calcite-icon>
+                  <span>HERRAMIENTAS Y PANELES</span>
+                </div>
+
+                <div class="guide-tool-row">
+                  <div class="tool-icon-wrap"><calcite-icon icon="information" scale="s"></calcite-icon></div>
+                  <div class="tool-desc">
+                    <strong>Resultados:</strong> Abre la vista detallada con el balance de alertas del municipio o zona seleccionada y la cantidad de puntos de calor detectados.
+                  </div>
+                </div>
+
+                <div class="guide-tool-row">
+                  <div class="tool-icon-wrap"><calcite-icon icon="legend" scale="s"></calcite-icon></div>
+                  <div class="tool-desc">
+                    <strong>Leyenda:</strong> Explica la simbología del mapa (código de colores de las alertas IDEAM y categorías de confianza de los focos de calor).
+                  </div>
+                </div>
+
+                <div class="guide-tool-row">
+                  <div class="tool-icon-wrap"><calcite-icon icon="export" scale="s"></calcite-icon></div>
+                  <div class="tool-desc">
+                    <strong>Reporte PDF:</strong> Permite exportar un informe técnico consolidado y descargable, ideal para entidades, comités de gestión del riesgo y usuarios que requieren generar reportes oficiales con validez operativa.
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
 
