@@ -999,7 +999,7 @@ require([
     if (chkIncludeMetadata && chkIncludeMetadata.checked && originalLegendCard) {
       legendHtml = `
         <div style="margin-bottom: 20px; page-break-inside: avoid;">
-          <div style="font-size: 10.5pt; font-weight: 800; color: #0f172a; border-bottom: 1.5px solid #cbd5e1; padding-bottom: 4px; margin-bottom: 10px; text-transform: uppercase;">🗓️ LEYENDA Y MATRIZ DE ALERTAS POR INCENDIO</div>
+          <div style="font-size: 10.5pt; font-weight: 800; color: #0f172a; border-bottom: 1.5px solid #cbd5e1; padding-bottom: 4px; margin-bottom: 10px; text-transform: uppercase;">🗺️ LEYENDA DEL MAPA</div>
           <div class="cloned-legend">${originalLegendCard.innerHTML}</div>
         </div>
       `;
