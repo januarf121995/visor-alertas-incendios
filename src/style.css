@@ -1280,3 +1280,193 @@ calcite-scrim:not([loading]),
     right: 6px;
   }
 }
+
+/* Modal Emergente de Exportar Reporte */
+.glass-report-container {
+  max-width: 500px;
+}
+
+.report-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.report-option-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.report-option-item:hover {
+  background: rgba(249, 115, 22, 0.12);
+  border-color: rgba(249, 115, 22, 0.4);
+}
+
+.report-option-item input[type="checkbox"] {
+  accent-color: #f97316;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  cursor: pointer;
+}
+
+.report-option-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.option-title {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.report-option-info small {
+  font-size: 10.5px;
+  color: #a1a1aa;
+}
+
+.print-report-header {
+  display: none !important;
+}
+
+#printMapScreenshotContainer {
+  display: none !important;
+}
+
+/* REGLAS DE IMPRESIÓN Y EXPORTACIÓN A PDF (@media print) */
+@media print {
+  body, html {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt;
+  }
+
+  /* Ocultar elementos innecesarios de UI durante la impresión */
+  .app-header-bar,
+  .app-banner-help,
+  .sidebar-search-box,
+  .sidebar-tabs-row,
+  .mobile-map-scroll-hint,
+  .glass-modal-overlay,
+  calcite-alert,
+  calcite-scrim,
+  .infografia-arrow-btn,
+  .infografia-close-btn,
+  .btn-glass-primary,
+  #btnOpenReportSidebar {
+    display: none !important;
+  }
+
+  .print-report-header {
+    display: flex !important;
+    flex-direction: column;
+    border-bottom: 2px solid #ea580c;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+  }
+
+  .print-title-main {
+    font-size: 15pt;
+    font-weight: 800;
+    color: #ea580c;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .print-subtitle-main {
+    font-size: 9.5pt;
+    color: #4b5563;
+    margin-top: 3px;
+  }
+
+  .instant-app-container {
+    height: auto !important;
+    display: block !important;
+  }
+
+  .instant-app-sidebar {
+    width: 100% !important;
+    max-width: 100% !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .sidebar-tab-content {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .sidebar-legend-card,
+  .designer-box-horizontal {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #cccccc !important;
+    box-shadow: none !important;
+    margin-bottom: 16px !important;
+  }
+
+  .popup-box-header {
+    border-bottom: 1px solid #e4e4e7 !important;
+    color: #000000 !important;
+  }
+
+  .popup-title-group span {
+    color: #000000 !important;
+  }
+
+  .matrix-item {
+    background: #f4f4f5 !important;
+    border: 1px solid #e4e4e7 !important;
+    color: #000000 !important;
+  }
+
+  .matrix-label {
+    color: #000000 !important;
+  }
+
+  #printMapScreenshotContainer {
+    display: block !important;
+    width: 100%;
+    text-align: center;
+    margin: 16px 0;
+    page-break-inside: avoid;
+  }
+
+  .print-map-img {
+    width: 100%;
+    max-height: 480px;
+    object-fit: contain;
+    border: 1px solid #d4d4d8;
+    border-radius: 8px;
+  }
+
+  .instant-app-map-area {
+    display: none !important;
+  }
+
+  /* Modificadores de Selección de Opciones de Reporte */
+  body.print-hide-map #printMapScreenshotContainer {
+    display: none !important;
+  }
+
+  body.print-hide-indicators #tabContentResults {
+    display: none !important;
+  }
+
+  body.print-hide-metadata #tabContentLegend {
+    display: none !important;
+  }
+}

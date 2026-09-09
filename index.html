@@ -29,6 +29,7 @@
       </div>
 
       <div class="header-controls">
+        <calcite-action id="btnOpenReport" icon="export" text="Reporte" scale="s" kind="brand"></calcite-action>
         <calcite-action id="btnOpenCalendar" icon="calendar" text="Fechas VIIRS" scale="s" kind="brand"></calcite-action>
         <calcite-action id="btnDetectGPS" icon="gps" text="GPS" scale="s" kind="brand"></calcite-action>
         <calcite-action id="btnResetAll" icon="reset" text="Reset" scale="s"></calcite-action>
@@ -37,6 +38,12 @@
 
     <!-- Contenedor Principal ArcGIS Instant App (Zone Lookup Layout) -->
     <div class="instant-app-container">
+
+      <!-- Header Exclusivo para Impresión PDF -->
+      <div id="printReportHeader" class="print-report-header">
+        <div class="print-title-main">🔥 REPORTE TERRITORIAL DE MONITOREO DE ALERTAS E INCENDIOS</div>
+        <div class="print-subtitle-main">República de Colombia &bull; Fuentes Oficiales: IDEAM / NASA VIIRS &bull; Generado el <span id="printDateStamp"></span></div>
+      </div>
 
       <!-- Panel Lateral Izquierdo Fijo/Flotante de Resultados & Búsqueda (Zone Lookup Sidebar) -->
       <aside class="instant-app-sidebar" id="instantAppSidebar">
@@ -82,6 +89,9 @@
                   <calcite-icon icon="information" scale="s"></calcite-icon>
                   <span id="popupBoxTitle">INDICADORES DE ALERTA Y POP-UP WEBMAP</span>
                 </div>
+                <button id="btnOpenReportSidebar" class="btn-glass-primary" title="Exportar Ficha de Alerta a PDF">
+                  <calcite-icon icon="export" scale="s"></calcite-icon> Reporte PDF
+                </button>
               </div>
               <div id="sheetContentContainer" class="popup-box-content"></div>
             </div>
@@ -317,6 +327,70 @@
         <button id="btnNextInfografia" class="infografia-arrow-btn next-arrow" title="Siguiente">
           <calcite-icon icon="chevron-right" scale="m"></calcite-icon>
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Emergente de Exportar Reporte PDF (Patrón ArcGIS Instant App) -->
+  <div id="modalReport" class="glass-modal-overlay hidden">
+    <div class="glass-modal-backdrop" id="btnCloseReportBackdrop"></div>
+    <div class="glass-calendar-container glass-report-container">
+      <div class="glass-calendar-card glass-report-card">
+        
+        <div class="calendar-header-top">
+          <div class="calendar-header-title-wrap">
+            <calcite-icon icon="export" scale="s"></calcite-icon>
+            <span class="calendar-header-label">GENERAR Y EXPORTAR REPORTE PDF</span>
+          </div>
+          <button id="btnCloseReport" class="calendar-icon-btn" title="Cerrar">
+            <calcite-icon icon="x" scale="s"></calcite-icon>
+          </button>
+        </div>
+
+        <div class="calendar-field-badge">
+          <calcite-icon icon="file-pdf" scale="s"></calcite-icon>
+          <span>Reporte Ejecutivo Territorial &bull; Ficha de Alerta</span>
+        </div>
+
+        <!-- Opciones de Configuración del Reporte -->
+        <div class="report-options-list">
+          <label class="report-option-item">
+            <input type="checkbox" id="chkIncludeMap" checked />
+            <div class="report-option-info">
+              <span class="option-title">📷 Captura Visual del Mapa Web</span>
+              <small>Generar captura de pantalla en alta resolución con el municipio seleccionado.</small>
+            </div>
+          </label>
+
+          <label class="report-option-item">
+            <input type="checkbox" id="chkIncludeIndicators" checked />
+            <div class="report-option-info">
+              <span class="option-title">📊 Ficha de Indicadores & Pop-up Nativo</span>
+              <small>Incluir la tabla detallada de alertas IDEAM, conteo VIIRS y datos DANE.</small>
+            </div>
+          </label>
+
+          <label class="report-option-item">
+            <input type="checkbox" id="chkIncludeMetadata" checked />
+            <div class="report-option-info">
+              <span class="option-title">🗓️ Rango de Fechas Satelitales y Leyenda</span>
+              <small>Incluir los filtros de fecha activos y fuentes oficiales (IDEAM / NASA VIIRS).</small>
+            </div>
+          </label>
+        </div>
+
+        <div class="calendar-divider"></div>
+
+        <div class="calendar-footer">
+          <span class="calendar-selected-info">Listo para exportar a PDF o imprimir</span>
+          <div class="calendar-footer-actions">
+            <button id="btnCancelReport" class="btn-glass-secondary">Cancelar</button>
+            <button id="btnExportPDF" class="btn-glass-primary">
+              <calcite-icon icon="print" scale="s"></calcite-icon> Exportar PDF / Imprimir
+            </button>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>

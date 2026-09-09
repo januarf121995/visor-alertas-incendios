@@ -79,6 +79,19 @@ require([
   const btnClearDateFilter = document.getElementById("btnClearDateFilter");
   const btnApplyDateFilter = document.getElementById("btnApplyDateFilter");
 
+  // Elementos del Modal Emergente de Exportar Reporte PDF
+  const modalReport = document.getElementById("modalReport");
+  const btnOpenReport = document.getElementById("btnOpenReport");
+  const btnOpenReportSidebar = document.getElementById("btnOpenReportSidebar");
+  const btnCloseReport = document.getElementById("btnCloseReport");
+  const btnCloseReportBackdrop = document.getElementById("btnCloseReportBackdrop");
+  const btnCancelReport = document.getElementById("btnCancelReport");
+  const btnExportPDF = document.getElementById("btnExportPDF");
+  const chkIncludeMap = document.getElementById("chkIncludeMap");
+  const chkIncludeIndicators = document.getElementById("chkIncludeIndicators");
+  const chkIncludeMetadata = document.getElementById("chkIncludeMetadata");
+  const printDateStamp = document.getElementById("printDateStamp");
+
   // Estado del Calendario Glassmorphism (VIIRS ACQ_DATE)
   let calendarCurrentMonth = new Date(2026, 8, 1); // Septiembre 2026
   let calendarSelectedStart = null;
@@ -898,6 +911,84 @@ require([
     }
   }
 
+  // --- FUNCIONALIDAD DE EXPORTACIÓN DE REPORTE PDF (ESTILO ARCGIS INSTANT APP) ---
+  function openReportModal() {
+    if (modalReport) {
+      modalReport.classList.remove("hidden");
+      modalReport.style.display = "flex";
+    }
+  }
+
+  function closeReportModal() {
+    if (modalReport) {
+      modalReport.classList.add("hidden");
+      modalReport.style.display = "none";
+    }
+  }
+
+  async function exportReportPDF() {
+    if (!view) return;
+
+    showAlert("Generando Reporte", "Preparando captura de pantalla de alta resolución e impresión...", "info");
+    closeReportModal();
+
+    if (printDateStamp) {
+      const now = new Date();
+      printDateStamp.textContent = now.toLocaleDateString("es-CO", { 
+        year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+      });
+    }
+
+    // Crear o recuperar el contenedor de captura de mapa para la versión de impresión
+    let printMapContainer = document.getElementById("printMapScreenshotContainer");
+    if (!printMapContainer) {
+      printMapContainer = document.createElement("div");
+      printMapContainer.id = "printMapScreenshotContainer";
+      printMapContainer.className = "print-map-container";
+      
+      const sidebarEl = document.getElementById("instantAppSidebar");
+      if (sidebarEl && sidebarEl.parentNode) {
+        sidebarEl.parentNode.insertBefore(printMapContainer, sidebarEl);
+      } else {
+        document.body.appendChild(printMapContainer);
+      }
+    }
+
+    try {
+      // 1. Captura de pantalla del mapa con ESRI MapView.takeScreenshot()
+      if (chkIncludeMap && chkIncludeMap.checked) {
+        const screenshot = await view.takeScreenshot({ format: "png", width: 1200, height: 800 });
+        printMapContainer.innerHTML = `<img src="${screenshot.dataUrl}" alt="Mapa Territorial" class="print-map-img" />`;
+        document.body.classList.remove("print-hide-map");
+      } else {
+        printMapContainer.innerHTML = "";
+        document.body.classList.add("print-hide-map");
+      }
+
+      // 2. Aplicar preferencias de indicadores y leyenda/metadata
+      if (chkIncludeIndicators && !chkIncludeIndicators.checked) {
+        document.body.classList.add("print-hide-indicators");
+      } else {
+        document.body.classList.remove("print-hide-indicators");
+      }
+
+      if (chkIncludeMetadata && !chkIncludeMetadata.checked) {
+        document.body.classList.add("print-hide-metadata");
+      } else {
+        document.body.classList.remove("print-hide-metadata");
+      }
+
+      // 3. Ejecutar Impresión (Diálogo del Navegador a PDF)
+      setTimeout(() => {
+        window.print();
+      }, 400);
+
+    } catch (err) {
+      console.error("Error al capturar mapa para reporte:", err);
+      showAlert("Error de Captura", "No se pudo tomar la instantánea del mapa para el reporte.", "danger");
+    }
+  }
+
   // --- FUNCIONALIDAD DEL BANNER CARRUSEL DE INFOGRAFÍAS (MÓVIL & GUÍA) ---
   function openInfografiasModal() {
     if (modalInfografias) {
@@ -1163,6 +1254,26 @@ require([
     }
     if (btnCloseCalendarBackdrop) {
       btnCloseCalendarBackdrop.addEventListener("click", closeCalendarModal);
+    }
+
+    // Modal Emergente de Exportar Reporte PDF
+    if (btnOpenReport) {
+      btnOpenReport.addEventListener("click", openReportModal);
+    }
+    if (btnOpenReportSidebar) {
+      btnOpenReportSidebar.addEventListener("click", openReportModal);
+    }
+    if (btnCloseReport) {
+      btnCloseReport.addEventListener("click", closeReportModal);
+    }
+    if (btnCloseReportBackdrop) {
+      btnCloseReportBackdrop.addEventListener("click", closeReportModal);
+    }
+    if (btnCancelReport) {
+      btnCancelReport.addEventListener("click", closeReportModal);
+    }
+    if (btnExportPDF) {
+      btnExportPDF.addEventListener("click", exportReportPDF);
     }
 
     // Modal Emergente Banner Carrusel de Infografías
