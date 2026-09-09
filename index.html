@@ -42,6 +42,34 @@
       <!-- Panel Lateral Izquierdo Fijo/Flotante de Resultados & Búsqueda (Zone Lookup Sidebar) -->
       <aside class="instant-app-sidebar" id="instantAppSidebar">
         
+        <!-- Encabezado Oficial y Captura de Mapa para Impresión PDF -->
+        <div id="printReportHeader" class="print-report-header">
+          <div class="print-header-row">
+            <div class="print-title-group">
+              <h1 class="print-title-main">🔥 REPORTE TERRITORIAL DE MONITOREO DE ALERTAS E INCENDIOS</h1>
+              <p class="print-subtitle-main">República de Colombia &bull; Fuentes Oficiales: IDEAM / NASA VIIRS &bull; Sistema de Información Geográfica</p>
+            </div>
+            <div class="print-badge-stamp">REPORTE OFICIAL</div>
+          </div>
+          
+          <div class="print-meta-grid">
+            <div class="print-meta-item">
+              <span class="print-meta-label">MUNICIPIO / ZONA:</span>
+              <span id="printMunicipioName" class="print-meta-val">Colombia (Vista General)</span>
+            </div>
+            <div class="print-meta-item">
+              <span class="print-meta-label">FILTRO VIIRS SATELITAL:</span>
+              <span id="printDateFilterRange" class="print-meta-val">Todos los registros</span>
+            </div>
+            <div class="print-meta-item">
+              <span class="print-meta-label">FECHA DE EMISIÓN:</span>
+              <span id="printDateStamp" class="print-meta-val">--</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="printMapScreenshotContainer" class="print-map-container"></div>
+
         <!-- Sección 1: Buscador de Municipio Principal -->
         <div class="sidebar-search-box">
           <label class="search-label">BUSCAR MUNICIPIO O ZONA DE INTERÉS</label>
@@ -388,46 +416,6 @@
 
       </div>
     </div>
-  </div>
-
-  <!-- CONTENEDOR EXCLUSIVO PARA IMPRESIÓN Y EXPORTACIÓN A PDF -->
-  <div id="printReportArea" class="print-only">
-    
-    <!-- Encabezado Oficial del Reporte PDF -->
-    <div class="print-header-banner">
-      <div class="print-header-row">
-        <div class="print-title-group">
-          <h1 class="print-title-main">🔥 REPORTE TERRITORIAL DE MONITOREO DE ALERTAS E INCENDIOS</h1>
-          <p class="print-subtitle-main">República de Colombia &bull; Fuentes Oficiales: IDEAM / NASA VIIRS &bull; Sistema de Información Geográfica</p>
-        </div>
-        <div class="print-badge-stamp">REPORTE OFICIAL</div>
-      </div>
-      
-      <div class="print-meta-grid">
-        <div class="print-meta-item">
-          <span class="print-meta-label">MUNICIPIO / ZONA:</span>
-          <span id="printMunicipioName" class="print-meta-val">Colombia (Vista General)</span>
-        </div>
-        <div class="print-meta-item">
-          <span class="print-meta-label">FILTRO VIIRS SATELITAL:</span>
-          <span id="printDateFilterRange" class="print-meta-val">Todos los registros</span>
-        </div>
-        <div class="print-meta-item">
-          <span class="print-meta-label">FECHA DE EMISIÓN:</span>
-          <span id="printDateStamp" class="print-meta-val">--</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Captura Visual de Mapa Web -->
-    <div id="printMapScreenshotContainer" class="print-section"></div>
-
-    <!-- Ficha de Indicadores & Pop-up Nativo del Municipio -->
-    <div id="printIndicatorsSection" class="print-section"></div>
-
-    <!-- Leyenda y Matriz de Alertas por Incendio -->
-    <div id="printLegendSection" class="print-section"></div>
-
   </div>
 
   <script src="src/main.js"></script>

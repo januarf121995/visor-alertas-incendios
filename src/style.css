@@ -1351,7 +1351,8 @@ calcite-scrim:not([loading]),
   color: #a1a1aa;
 }
 
-.print-only {
+.print-report-header,
+.print-map-container {
   display: none !important;
 }
 
@@ -1362,39 +1363,49 @@ calcite-scrim:not([loading]),
     margin: 10mm;
   }
 
-  html, body {
-    background: #ffffff !important;
-    color: #0f172a !important;
-    font-family: system-ui, -apple-system, sans-serif !important;
-    font-size: 10pt !important;
+  html, 
+  body, 
+  calcite-shell, 
+  .instant-app-container, 
+  .instant-app-sidebar, 
+  .sidebar-scroll-area {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
     height: auto !important;
     min-height: auto !important;
     max-height: none !important;
     overflow: visible !important;
     position: static !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    border: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
-  /* Ocultar interfaz de la app en pantalla durante la impresión */
-  calcite-shell,
+  /* Ocultar elementos UI interactivos */
   .app-header-bar,
-  .instant-app-container,
+  .app-banner-help,
+  .sidebar-search-box,
+  .sidebar-tabs-row,
+  .mobile-map-scroll-hint,
   .glass-modal-overlay,
   calcite-alert,
-  calcite-scrim {
+  calcite-scrim,
+  .instant-app-map-area,
+  #tabContentGuide,
+  .infografia-arrow-btn,
+  .infografia-close-btn,
+  .btn-glass-primary,
+  #btnOpenReportSidebar {
     display: none !important;
   }
 
-  /* Mostrar exclusivamente la plantilla de reporte */
-  #printReportArea {
+  /* Encabezado Oficial de Impresión */
+  .print-report-header {
     display: block !important;
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    background: #ffffff !important;
-    color: #0f172a !important;
-  }
-
-  .print-header-banner {
     border-bottom: 2.5px solid #ea580c;
     padding-bottom: 10px;
     margin-bottom: 16px;
@@ -1462,20 +1473,13 @@ calcite-scrim:not([loading]),
     margin-top: 2px;
   }
 
-  .print-section {
-    margin-bottom: 18px;
+  /* Captura de mapa */
+  .print-map-container {
+    display: block !important;
+    width: 100%;
+    margin-bottom: 16px;
+    text-align: center;
     page-break-inside: avoid;
-  }
-
-  .print-section-title {
-    font-size: 10.5pt;
-    font-weight: 800;
-    color: #0f172a;
-    border-bottom: 1.5px solid #cbd5e1;
-    padding-bottom: 4px;
-    margin-bottom: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.2px;
   }
 
   .print-map-img {
@@ -1486,8 +1490,44 @@ calcite-scrim:not([loading]),
     border-radius: 8px;
   }
 
-  /* Estilos para el contenido clonado dentro de #printReportArea */
-  #printReportArea * {
+  /* Pestañas de contenido visibles en impresión */
+  .sidebar-tab-content {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .designer-box-horizontal,
+  .sidebar-legend-card {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: none !important;
+    margin-bottom: 16px !important;
+    border-radius: 8px !important;
+    padding: 12px !important;
+    page-break-inside: avoid;
+  }
+
+  .popup-box-header,
+  .legend-card-header {
+    border-bottom: 1px solid #e2e8f0 !important;
+    padding-bottom: 6px !important;
+    margin-bottom: 10px !important;
+    color: #0f172a !important;
+  }
+
+  .popup-title-group span,
+  .legend-card-header span {
+    color: #0f172a !important;
+    font-weight: 800 !important;
+  }
+
+  /* Forzar texto oscuro y visibilidad dentro de los indicadores y leyendas */
+  #tabContentResults *,
+  #tabContentLegend * {
     color: #0f172a !important;
     background-color: transparent !important;
     box-shadow: none !important;
@@ -1496,44 +1536,33 @@ calcite-scrim:not([loading]),
     overflow: visible !important;
   }
 
-  #printReportArea .designer-box-horizontal,
-  #printReportArea .sidebar-legend-card {
-    border: 1px solid #cbd5e1 !important;
-    border-radius: 8px !important;
-    padding: 12px !important;
-    margin-bottom: 12px !important;
-    background: #ffffff !important;
-  }
-
-  #printReportArea .popup-box-header,
-  #printReportArea .legend-card-header {
-    border-bottom: 1px solid #e2e8f0 !important;
-    padding-bottom: 6px !important;
-    margin-bottom: 10px !important;
-  }
-
-  #printReportArea .popup-title-group span,
-  #printReportArea .legend-card-header span {
-    color: #0f172a !important;
-    font-weight: 800 !important;
-    font-size: 10.5pt !important;
-  }
-
-  #printReportArea .matrix-item {
+  .matrix-item {
     background: #f8fafc !important;
     border: 1px solid #e2e8f0 !important;
     border-radius: 6px !important;
     padding: 8px 10px !important;
   }
 
-  #printReportArea .matrix-label {
+  .matrix-label {
     color: #0f172a !important;
     font-weight: 700 !important;
   }
 
-  #printReportArea .btn-glass-primary,
-  #printReportArea .infografia-close-btn,
-  #printReportArea button {
+  /* Ocultar elementos si el usuario desmarcó las casillas correspondientes */
+  body.print-hide-map .print-map-container {
+    display: none !important;
+  }
+
+  body.print-hide-indicators #tabContentResults {
+    display: none !important;
+  }
+
+  body.print-hide-metadata #tabContentLegend {
+    display: none !important;
+  }
+
+  /* Ocultar barras de scroll */
+  ::-webkit-scrollbar {
     display: none !important;
   }
 }

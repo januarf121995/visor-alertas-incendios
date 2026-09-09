@@ -932,9 +932,6 @@ require([
     showAlert("Generando Reporte", "Preparando captura de pantalla de alta resolución e impresión PDF...", "info");
     closeReportModal();
 
-    const printArea = document.getElementById("printReportArea");
-    if (!printArea) return;
-
     // 1. Fecha y hora de emisión
     const printDateStampEl = document.getElementById("printDateStamp");
     if (printDateStampEl) {
@@ -971,68 +968,52 @@ require([
       }
     }
 
-    try {
-      // 4. Captura de mapa (si está activa la casilla)
-      const printMapScreenshotContainer = document.getElementById("printMapScreenshotContainer");
-      if (printMapScreenshotContainer) {
-        if (chkIncludeMap && chkIncludeMap.checked) {
-          printMapScreenshotContainer.style.display = "block";
+    // 4. Modificadores de la página en función de las opciones del usuario
+    if (chkIncludeIndicators && !chkIncludeIndicators.checked) {
+      document.body.classList.add("print-hide-indicators");
+    } else {
+      document.body.classList.remove("print-hide-indicators");
+    }
+
+    if (chkIncludeMetadata && !chkIncludeMetadata.checked) {
+      document.body.classList.add("print-hide-metadata");
+    } else {
+      document.body.classList.remove("print-hide-metadata");
+    }
+
+    // 5. Captura de pantalla del mapa
+    const printMapContainer = document.getElementById("printMapScreenshotContainer");
+    if (printMapContainer) {
+      if (chkIncludeMap && chkIncludeMap.checked) {
+        document.body.classList.remove("print-hide-map");
+        try {
           const screenshot = await view.takeScreenshot({ format: "png", width: 1200, height: 800 });
+          const img = new Image();
+          img.className = "print-map-img";
+          img.alt = "Mapa Territorial";
+          
           await new Promise((resolve) => {
-            const img = new Image();
             img.onload = resolve;
             img.onerror = resolve;
-            img.className = "print-map-img";
             img.src = screenshot.dataUrl;
-            printMapScreenshotContainer.innerHTML = "";
-            printMapScreenshotContainer.appendChild(img);
           });
-        } else {
-          printMapScreenshotContainer.style.display = "none";
-          printMapScreenshotContainer.innerHTML = "";
+
+          printMapContainer.innerHTML = "";
+          printMapContainer.appendChild(img);
+        } catch (err) {
+          console.warn("No se pudo realizar la captura de pantalla del mapa:", err);
+          printMapContainer.innerHTML = "";
         }
+      } else {
+        document.body.classList.add("print-hide-map");
+        printMapContainer.innerHTML = "";
       }
-
-      // 5. Clonar Ficha de Indicadores & Pop-up Arcade (si está activa la casilla)
-      const printIndicatorsSection = document.getElementById("printIndicatorsSection");
-      if (printIndicatorsSection) {
-        if (chkIncludeIndicators && chkIncludeIndicators.checked && sheetContentContainer && sheetContentContainer.innerHTML.trim() !== "") {
-          printIndicatorsSection.style.display = "block";
-          printIndicatorsSection.innerHTML = `
-            <div class="print-section-title">📊 INDICADORES TERRITORIALES Y POP-UP NATIVO</div>
-            <div class="print-cloned-content">${sheetContentContainer.innerHTML}</div>
-          `;
-        } else {
-          printIndicatorsSection.style.display = "none";
-          printIndicatorsSection.innerHTML = "";
-        }
-      }
-
-      // 6. Clonar Leyenda & Matriz de Alertas por Incendio (si está activa la casilla)
-      const printLegendSection = document.getElementById("printLegendSection");
-      const originalLegendCard = document.querySelector("#tabContentLegend .sidebar-legend-card");
-      if (printLegendSection) {
-        if (chkIncludeMetadata && chkIncludeMetadata.checked && originalLegendCard) {
-          printLegendSection.style.display = "block";
-          printLegendSection.innerHTML = `
-            <div class="print-section-title">🗓️ LEYENDA Y MATRIZ DE ALERTAS POR INCENDIO</div>
-            <div class="print-cloned-content">${originalLegendCard.innerHTML}</div>
-          `;
-        } else {
-          printLegendSection.style.display = "none";
-          printLegendSection.innerHTML = "";
-        }
-      }
-
-      // 7. Lanzar diálogo de impresión a PDF
-      setTimeout(() => {
-        window.print();
-      }, 300);
-
-    } catch (err) {
-      console.error("Error al generar reporte PDF:", err);
-      showAlert("Error de Captura", "No se pudo tomar la captura de pantalla del mapa para el reporte.", "danger");
     }
+
+    // 6. Lanzar la impresión del navegador
+    setTimeout(() => {
+      window.print();
+    }, 250);
   }
 
   // --- FUNCIONALIDAD DEL BANNER CARRUSEL DE INFOGRAFÍAS (MÓVIL & GUÍA) ---
