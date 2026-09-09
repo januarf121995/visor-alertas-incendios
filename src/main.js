@@ -133,14 +133,24 @@ require([
 
   function getFeatureDept(attrs) {
     if (!attrs) return "";
-    const raw = attrs.DEPARTAMEN || attrs.DEPARTAMENTO || attrs.DPTO_CNMBR || attrs.DEPARTMENT || attrs.NAME_1 || attrs.DEPTO || attrs.NOM_DEPT || attrs.NOM_DEPTO || attrs.DPTO_NAME || attrs.NOM_DPTO || "";
+    const raw = attrs.nombre_dpt || attrs.DEPARTAMEN || attrs.DEPARTAMENTO || attrs.DPTO_CNMBR || attrs.DEPARTMENT || attrs.NAME_1 || attrs.DEPTO || attrs.NOM_DEPT || attrs.NOM_DEPTO || attrs.DPTO_NAME || attrs.NOM_DPTO || "";
     return toTitleCase(raw);
   }
 
   function getFeatureMpio(attrs) {
     if (!attrs) return "Municipio";
-    const raw = attrs.MUNICIPIO || attrs.MPIO_CNMBR || attrs.NAME || attrs.NAME_2 || attrs.NOMBRE_MUNICIPIO || attrs.NOM_MUN || attrs.NOMBRE || attrs.NOM_MPIO || "Municipio";
+    const raw = attrs.nombre_mpi || attrs.nombre_cab || attrs.MUNICIPIO || attrs.MPIO_CNMBR || attrs.NAME || attrs.NAME_2 || attrs.NOMBRE_MUNICIPIO || attrs.NOM_MUN || attrs.NOMBRE || attrs.NOM_MPIO || "Municipio";
     return toTitleCase(raw);
+  }
+
+  function getFeatureId(attrs) {
+    if (!attrs) return null;
+    if (attrs.OBJECTID !== undefined && attrs.OBJECTID !== null) return attrs.OBJECTID;
+    if (attrs.FID !== undefined && attrs.FID !== null) return attrs.FID;
+    if (attrs.mpios !== undefined && attrs.mpios !== null) return attrs.mpios;
+    if (attrs.ID !== undefined && attrs.ID !== null) return attrs.ID;
+    if (attrs.id !== undefined && attrs.id !== null) return attrs.id;
+    return null;
   }
 
   /**
@@ -305,8 +315,8 @@ require([
       const title = layer.title || "";
       const id = layer.id || "";
 
-      // 1. Capa de Municipios Oficial (Layer 4: "Municipios Colombia", ID: 1a069e22854-layer-204)
-      if (id === "1a069e22854-layer-204" || (title === "Municipios Colombia" && !title.includes("expresiones"))) {
+      // 1. Capa de Municipios Oficial (Layer: "Municipios_COL_2025", ID: 1a08877a77e-layer-8 / 1a069e22854-layer-204)
+      if (id === "1a08877a77e-layer-8" || id === "1a069e22854-layer-204" || title.includes("Municipios_COL_2025") || (layer.url && layer.url.includes("Municipios_COL_2025")) || (title.includes("Municipios") && !title.includes("expresiones"))) {
         municipiosLayer = layer;
         municipiosLayer.outFields = ["*"];
       } 
@@ -324,7 +334,11 @@ require([
 
     // Fallbacks de seguridad si por alguna razón no coincidió por id o título exacto
     if (!municipiosLayer) {
-      municipiosLayer = webMap.layers.find(l => l !== maskLayer && l !== selectionLayer && (l.title || "").includes("Municipios Colombia") && !l.title.includes("expresiones"));
+      municipiosLayer = webMap.layers.find(l => l !== maskLayer && l !== selectionLayer && (
+        (l.title || "").includes("Municipios_COL_2025") ||
+        (l.url || "").includes("Municipios_COL_2025") ||
+        ((l.title || "").includes("Municipios") && !(l.title || "").includes("expresiones"))
+      ));
     }
     if (!viirsLayer) {
       viirsLayer = webMap.layers.find(l => l !== maskLayer && l !== selectionLayer && (l.title || "").includes("Satellite (VIIRS)"));
@@ -424,7 +438,8 @@ require([
       if (activeIdeamFeatures.length > 0) {
         const matches = allMunicipiosFeatures.filter(mpio => {
           const mpioAttrs = mpio.attributes || {};
-          const mpioIdStr = String(mpioAttrs.ID || mpioAttrs.COD_DANE || mpioAttrs.OBJECTID || "").trim().padStart(5, '0');
+          const rawDane = mpioAttrs.mpios || mpioAttrs.COD_DANE || mpioAttrs.MPIO_CDPMP || mpioAttrs.ID || mpioAttrs.OBJECTID || mpioAttrs.FID || "";
+          const mpioIdStr = String(rawDane).trim().padStart(5, '0');
 
           // A. Coincidencia por Código DANE
           if (mpioIdStr && activeDaneCodes.has(mpioIdStr)) {
@@ -433,7 +448,7 @@ require([
           }
 
           // B. Coincidencia por Nombre
-          const mpioName = String(mpioAttrs.NAME || mpioAttrs.NAME_2 || mpioAttrs.NOMBRE_MUNICIPIO || mpioAttrs.MPIO_CNMBR || "").toLowerCase().trim();
+          const mpioName = String(getFeatureMpio(mpioAttrs)).toLowerCase().trim();
           if (mpioName && activeNames.has(mpioName)) {
             mpio.attributes._alertLevel = activeNames.get(mpioName);
             return true;
@@ -1592,9 +1607,9 @@ require([
       const objectId = Number(valStr);
       if (isNaN(objectId)) return;
 
-      const foundFeature = allMunicipiosFeatures.find(f => f.attributes && (f.attributes.OBJECTID === objectId || Number(f.attributes.OBJECTID) === objectId));
+      const foundFeature = allMunicipiosFeatures.find(f => f.attributes && (getFeatureId(f.attributes) === objectId || Number(getFeatureId(f.attributes)) === objectId || String(getFeatureId(f.attributes)) === String(valStr)));
       if (foundFeature) {
-        console.log(`Activando selección desde combobox: ${foundFeature.attributes.NAME || objectId}`);
+        console.log(`Activando selección desde combobox: ${getFeatureMpio(foundFeature.attributes)} (${objectId})`);
         selectMunicipality(foundFeature, true);
       }
     };
