@@ -929,63 +929,109 @@ require([
   async function exportReportPDF() {
     if (!view) return;
 
-    showAlert("Generando Reporte", "Preparando captura de pantalla de alta resolución e impresión...", "info");
+    showAlert("Generando Reporte", "Preparando captura de pantalla de alta resolución e impresión PDF...", "info");
     closeReportModal();
 
-    if (printDateStamp) {
+    const printArea = document.getElementById("printReportArea");
+    if (!printArea) return;
+
+    // 1. Fecha y hora de emisión
+    const printDateStampEl = document.getElementById("printDateStamp");
+    if (printDateStampEl) {
       const now = new Date();
-      printDateStamp.textContent = now.toLocaleDateString("es-CO", { 
+      printDateStampEl.textContent = now.toLocaleDateString("es-CO", { 
         year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
       });
     }
 
-    // Crear o recuperar el contenedor de captura de mapa para la versión de impresión
-    let printMapContainer = document.getElementById("printMapScreenshotContainer");
-    if (!printMapContainer) {
-      printMapContainer = document.createElement("div");
-      printMapContainer.id = "printMapScreenshotContainer";
-      printMapContainer.className = "print-map-container";
-      
-      const sidebarEl = document.getElementById("instantAppSidebar");
-      if (sidebarEl && sidebarEl.parentNode) {
-        sidebarEl.parentNode.insertBefore(printMapContainer, sidebarEl);
+    // 2. Nombre del municipio seleccionado
+    const printMunicipioNameEl = document.getElementById("printMunicipioName");
+    if (printMunicipioNameEl) {
+      if (currentSelectedFeature && currentSelectedFeature.attributes) {
+        const attrs = currentSelectedFeature.attributes;
+        const name = attrs.NAME || attrs.MUNICIP || attrs.NOM_MUNICI || "Municipio Seleccionado";
+        const dept = attrs.DEPARTMENT || attrs.DEPARTAMEN || "";
+        printMunicipioNameEl.textContent = dept ? `${name}, ${dept}` : name;
       } else {
-        document.body.appendChild(printMapContainer);
+        printMunicipioNameEl.textContent = "Colombia (Vista General)";
+      }
+    }
+
+    // 3. Rango de fechas del filtro VIIRS
+    const printDateFilterRangeEl = document.getElementById("printDateFilterRange");
+    if (printDateFilterRangeEl) {
+      if (!calendarSelectedStart) {
+        printDateFilterRangeEl.textContent = "Todos los registros VIIRS";
+      } else if (!calendarSelectedEnd) {
+        printDateFilterRangeEl.textContent = calendarSelectedStart.toLocaleDateString("es-CO", { day: '2-digit', month: 'short', year: 'numeric' });
+      } else {
+        const sFmt = calendarSelectedStart.toLocaleDateString("es-CO", { day: '2-digit', month: 'short' });
+        const eFmt = calendarSelectedEnd.toLocaleDateString("es-CO", { day: '2-digit', month: 'short', year: 'numeric' });
+        printDateFilterRangeEl.textContent = `${sFmt} al ${eFmt}`;
       }
     }
 
     try {
-      // 1. Captura de pantalla del mapa con ESRI MapView.takeScreenshot()
-      if (chkIncludeMap && chkIncludeMap.checked) {
-        const screenshot = await view.takeScreenshot({ format: "png", width: 1200, height: 800 });
-        printMapContainer.innerHTML = `<img src="${screenshot.dataUrl}" alt="Mapa Territorial" class="print-map-img" />`;
-        document.body.classList.remove("print-hide-map");
-      } else {
-        printMapContainer.innerHTML = "";
-        document.body.classList.add("print-hide-map");
+      // 4. Captura de mapa (si está activa la casilla)
+      const printMapScreenshotContainer = document.getElementById("printMapScreenshotContainer");
+      if (printMapScreenshotContainer) {
+        if (chkIncludeMap && chkIncludeMap.checked) {
+          printMapScreenshotContainer.style.display = "block";
+          const screenshot = await view.takeScreenshot({ format: "png", width: 1200, height: 800 });
+          await new Promise((resolve) => {
+            const img = new Image();
+            img.onload = resolve;
+            img.onerror = resolve;
+            img.className = "print-map-img";
+            img.src = screenshot.dataUrl;
+            printMapScreenshotContainer.innerHTML = "";
+            printMapScreenshotContainer.appendChild(img);
+          });
+        } else {
+          printMapScreenshotContainer.style.display = "none";
+          printMapScreenshotContainer.innerHTML = "";
+        }
       }
 
-      // 2. Aplicar preferencias de indicadores y leyenda/metadata
-      if (chkIncludeIndicators && !chkIncludeIndicators.checked) {
-        document.body.classList.add("print-hide-indicators");
-      } else {
-        document.body.classList.remove("print-hide-indicators");
+      // 5. Clonar Ficha de Indicadores & Pop-up Arcade (si está activa la casilla)
+      const printIndicatorsSection = document.getElementById("printIndicatorsSection");
+      if (printIndicatorsSection) {
+        if (chkIncludeIndicators && chkIncludeIndicators.checked && sheetContentContainer && sheetContentContainer.innerHTML.trim() !== "") {
+          printIndicatorsSection.style.display = "block";
+          printIndicatorsSection.innerHTML = `
+            <div class="print-section-title">📊 INDICADORES TERRITORIALES Y POP-UP NATIVO</div>
+            <div class="print-cloned-content">${sheetContentContainer.innerHTML}</div>
+          `;
+        } else {
+          printIndicatorsSection.style.display = "none";
+          printIndicatorsSection.innerHTML = "";
+        }
       }
 
-      if (chkIncludeMetadata && !chkIncludeMetadata.checked) {
-        document.body.classList.add("print-hide-metadata");
-      } else {
-        document.body.classList.remove("print-hide-metadata");
+      // 6. Clonar Leyenda & Matriz de Alertas por Incendio (si está activa la casilla)
+      const printLegendSection = document.getElementById("printLegendSection");
+      const originalLegendCard = document.querySelector("#tabContentLegend .sidebar-legend-card");
+      if (printLegendSection) {
+        if (chkIncludeMetadata && chkIncludeMetadata.checked && originalLegendCard) {
+          printLegendSection.style.display = "block";
+          printLegendSection.innerHTML = `
+            <div class="print-section-title">🗓️ LEYENDA Y MATRIZ DE ALERTAS POR INCENDIO</div>
+            <div class="print-cloned-content">${originalLegendCard.innerHTML}</div>
+          `;
+        } else {
+          printLegendSection.style.display = "none";
+          printLegendSection.innerHTML = "";
+        }
       }
 
-      // 3. Ejecutar Impresión (Diálogo del Navegador a PDF)
+      // 7. Lanzar diálogo de impresión a PDF
       setTimeout(() => {
         window.print();
-      }, 400);
+      }, 300);
 
     } catch (err) {
-      console.error("Error al capturar mapa para reporte:", err);
-      showAlert("Error de Captura", "No se pudo tomar la instantánea del mapa para el reporte.", "danger");
+      console.error("Error al generar reporte PDF:", err);
+      showAlert("Error de Captura", "No se pudo tomar la captura de pantalla del mapa para el reporte.", "danger");
     }
   }
 

@@ -1351,138 +1351,189 @@ calcite-scrim:not([loading]),
   color: #a1a1aa;
 }
 
-.print-report-header {
-  display: none !important;
-}
-
-#printMapScreenshotContainer {
+.print-only {
   display: none !important;
 }
 
 /* REGLAS DE IMPRESIÓN Y EXPORTACIÓN A PDF (@media print) */
 @media print {
-  body, html {
-    background: #ffffff !important;
-    color: #000000 !important;
-    font-size: 11pt;
+  @page {
+    size: letter portrait;
+    margin: 10mm;
   }
 
-  /* Ocultar elementos innecesarios de UI durante la impresión */
+  html, body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-family: system-ui, -apple-system, sans-serif !important;
+    font-size: 10pt !important;
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    position: static !important;
+  }
+
+  /* Ocultar interfaz de la app en pantalla durante la impresión */
+  calcite-shell,
   .app-header-bar,
-  .app-banner-help,
-  .sidebar-search-box,
-  .sidebar-tabs-row,
-  .mobile-map-scroll-hint,
+  .instant-app-container,
   .glass-modal-overlay,
   calcite-alert,
-  calcite-scrim,
-  .infografia-arrow-btn,
-  .infografia-close-btn,
-  .btn-glass-primary,
-  #btnOpenReportSidebar {
+  calcite-scrim {
     display: none !important;
   }
 
-  .print-report-header {
-    display: flex !important;
-    flex-direction: column;
-    border-bottom: 2px solid #ea580c;
-    padding-bottom: 8px;
+  /* Mostrar exclusivamente la plantilla de reporte */
+  #printReportArea {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+  }
+
+  .print-header-banner {
+    border-bottom: 2.5px solid #ea580c;
+    padding-bottom: 10px;
     margin-bottom: 16px;
+  }
+
+  .print-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
   }
 
   .print-title-main {
     font-size: 15pt;
     font-weight: 800;
-    color: #ea580c;
+    color: #c2410c;
+    margin: 0 0 4px 0;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
   }
 
   .print-subtitle-main {
+    font-size: 8.5pt;
+    color: #475569;
+    margin: 0;
+  }
+
+  .print-badge-stamp {
+    background: #fff7ed;
+    border: 1px solid #f97316;
+    color: #c2410c;
+    font-size: 8pt;
+    font-weight: 800;
+    padding: 4px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  .print-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-top: 12px;
+  }
+
+  .print-meta-item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .print-meta-label {
+    font-size: 7.5pt;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+  }
+
+  .print-meta-val {
     font-size: 9.5pt;
-    color: #4b5563;
-    margin-top: 3px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-top: 2px;
   }
 
-  .instant-app-container {
-    height: auto !important;
-    display: block !important;
-  }
-
-  .instant-app-sidebar {
-    width: 100% !important;
-    max-width: 100% !important;
-    background: #ffffff !important;
-    color: #000000 !important;
-    border: none !important;
-    box-shadow: none !important;
-  }
-
-  .sidebar-tab-content {
-    display: block !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-  }
-
-  .sidebar-legend-card,
-  .designer-box-horizontal {
-    background: #ffffff !important;
-    color: #000000 !important;
-    border: 1px solid #cccccc !important;
-    box-shadow: none !important;
-    margin-bottom: 16px !important;
-  }
-
-  .popup-box-header {
-    border-bottom: 1px solid #e4e4e7 !important;
-    color: #000000 !important;
-  }
-
-  .popup-title-group span {
-    color: #000000 !important;
-  }
-
-  .matrix-item {
-    background: #f4f4f5 !important;
-    border: 1px solid #e4e4e7 !important;
-    color: #000000 !important;
-  }
-
-  .matrix-label {
-    color: #000000 !important;
-  }
-
-  #printMapScreenshotContainer {
-    display: block !important;
-    width: 100%;
-    text-align: center;
-    margin: 16px 0;
+  .print-section {
+    margin-bottom: 18px;
     page-break-inside: avoid;
+  }
+
+  .print-section-title {
+    font-size: 10.5pt;
+    font-weight: 800;
+    color: #0f172a;
+    border-bottom: 1.5px solid #cbd5e1;
+    padding-bottom: 4px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.2px;
   }
 
   .print-map-img {
     width: 100%;
-    max-height: 480px;
+    max-height: 420px;
     object-fit: contain;
-    border: 1px solid #d4d4d8;
+    border: 1px solid #cbd5e1;
     border-radius: 8px;
   }
 
-  .instant-app-map-area {
-    display: none !important;
+  /* Estilos para el contenido clonado dentro de #printReportArea */
+  #printReportArea * {
+    color: #0f172a !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    max-height: none !important;
+    overflow: visible !important;
   }
 
-  /* Modificadores de Selección de Opciones de Reporte */
-  body.print-hide-map #printMapScreenshotContainer {
-    display: none !important;
+  #printReportArea .designer-box-horizontal,
+  #printReportArea .sidebar-legend-card {
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    padding: 12px !important;
+    margin-bottom: 12px !important;
+    background: #ffffff !important;
   }
 
-  body.print-hide-indicators #tabContentResults {
-    display: none !important;
+  #printReportArea .popup-box-header,
+  #printReportArea .legend-card-header {
+    border-bottom: 1px solid #e2e8f0 !important;
+    padding-bottom: 6px !important;
+    margin-bottom: 10px !important;
   }
 
-  body.print-hide-metadata #tabContentLegend {
+  #printReportArea .popup-title-group span,
+  #printReportArea .legend-card-header span {
+    color: #0f172a !important;
+    font-weight: 800 !important;
+    font-size: 10.5pt !important;
+  }
+
+  #printReportArea .matrix-item {
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 6px !important;
+    padding: 8px 10px !important;
+  }
+
+  #printReportArea .matrix-label {
+    color: #0f172a !important;
+    font-weight: 700 !important;
+  }
+
+  #printReportArea .btn-glass-primary,
+  #printReportArea .infografia-close-btn,
+  #printReportArea button {
     display: none !important;
   }
 }
