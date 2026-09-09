@@ -729,8 +729,12 @@ require([
         featureWidget.graphic = feature;
       }
 
-      if (boxPopupDetails && window.innerWidth <= 992) {
-        boxPopupDetails.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      // Activar pestaña de Resultados en el panel lateral Instant App
+      activateSidebarTab("results");
+
+      const sidebarEl = document.getElementById("instantAppSidebar");
+      if (sidebarEl && window.innerWidth <= 992) {
+        sidebarEl.classList.remove("collapsed-mobile");
       }
     } catch (err) {
       console.warn("No se pudo renderizar el pop-up nativo:", err);
@@ -1103,6 +1107,24 @@ require([
     showAlert("Filtro Aplicado", `VIIRS (ACQ_DATE) filtrado para: ${dateLabel}`, "success");
   }
 
+  function activateSidebarTab(tabName) {
+    const btnResults = document.getElementById("btnTabResults");
+    const btnLegend = document.getElementById("btnTabLegend");
+    const btnGuide = document.getElementById("btnTabGuide");
+
+    const contentResults = document.getElementById("tabContentResults");
+    const contentLegend = document.getElementById("tabContentLegend");
+    const contentGuide = document.getElementById("tabContentGuide");
+
+    if (btnResults) btnResults.classList.toggle("active", tabName === "results");
+    if (btnLegend) btnLegend.classList.toggle("active", tabName === "legend");
+    if (btnGuide) btnGuide.classList.toggle("active", tabName === "guide");
+
+    if (contentResults) contentResults.classList.toggle("active", tabName === "results");
+    if (contentLegend) contentLegend.classList.toggle("active", tabName === "legend");
+    if (contentGuide) contentGuide.classList.toggle("active", tabName === "guide");
+  }
+
   /**
    * 5. Listeners de Eventos
    */
@@ -1110,6 +1132,27 @@ require([
     btnDetectGPS.addEventListener("click", () => {
       detectGPSAndFocus(true);
     });
+
+    // Pestañas del Panel Lateral Instant App (Resultados / Leyenda / Guía)
+    const btnTabResults = document.getElementById("btnTabResults");
+    const btnTabLegend = document.getElementById("btnTabLegend");
+    const btnTabGuide = document.getElementById("btnTabGuide");
+    const btnToggleSidebar = document.getElementById("btnToggleSidebar");
+    const sidebarEl = document.getElementById("instantAppSidebar");
+
+    if (btnTabResults) btnTabResults.addEventListener("click", () => activateSidebarTab("results"));
+    if (btnTabLegend) btnTabLegend.addEventListener("click", () => activateSidebarTab("legend"));
+    if (btnTabGuide) btnTabGuide.addEventListener("click", () => activateSidebarTab("guide"));
+
+    if (btnToggleSidebar && sidebarEl) {
+      btnToggleSidebar.addEventListener("click", () => {
+        if (window.innerWidth <= 992) {
+          sidebarEl.classList.toggle("collapsed-mobile");
+        } else {
+          sidebarEl.classList.toggle("collapsed");
+        }
+      });
+    }
 
     // Abrir/Cerrar Modal Emergente de Calendario Glassmorphism
     if (btnOpenCalendar) {

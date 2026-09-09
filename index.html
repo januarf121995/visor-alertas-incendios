@@ -13,256 +13,83 @@
   <link rel="stylesheet" href="https://js.arcgis.com/4.31/esri/themes/dark/main.css" />
   <script src="https://js.arcgis.com/4.31/"></script>
 
-  <!-- Estilos Personalizados -->
+  <!-- Estilos Personalizados - Patrón ArcGIS Instant App Zone Lookup -->
   <link rel="stylesheet" href="src/style.css" />
 </head>
 
 <body class="calcite-mode-dark">
   <calcite-shell content-behind class="calcite-mode-dark">
-    <!-- Encabezado / Barra Superior de Controles -->
+
+    <!-- Header Superior de la App Estilo ArcGIS Instant App -->
     <div slot="header" class="app-header-bar">
       <div class="header-brand">
+        <calcite-action id="btnToggleSidebar" icon="hamburger" text="Menu" scale="s" class="mobile-menu-btn"></calcite-action>
         <calcite-icon icon="fire" scale="s"></calcite-icon>
         <span class="header-title">Monitoreo de Incendios & Puntos de Calor</span>
       </div>
 
       <div class="header-controls">
-        <!-- Buscador Combobox de Municipios -->
-        <calcite-combobox 
-          id="selectMunicipio" 
-          placeholder="Buscar municipio..." 
-          selection-mode="single"
-          overlay-positioning="fixed"
-          clear-button-disabled="false"
-          scale="s"
-          class="header-combobox">
-        </calcite-combobox>
-
-        <!-- Botón Filtro Calendario (VIIRS ACQ_DATE) -->
-        <calcite-action 
-          id="btnOpenCalendar" 
-          icon="calendar" 
-          text="Fechas VIIRS" 
-          scale="s" 
-          kind="brand">
-        </calcite-action>
-
-        <!-- Botón Guía e Infografías (Vista Móvil / Guía General) -->
-        <calcite-action 
-          id="btnOpenInfografias" 
-          icon="lightbulb" 
-          text="Infografías" 
-          scale="s" 
-          kind="brand">
-        </calcite-action>
-
-        <!-- Botones de Acción -->
+        <calcite-action id="btnOpenCalendar" icon="calendar" text="Fechas VIIRS" scale="s" kind="brand"></calcite-action>
         <calcite-action id="btnDetectGPS" icon="gps" text="GPS" scale="s" kind="brand"></calcite-action>
         <calcite-action id="btnResetAll" icon="reset" text="Reset" scale="s"></calcite-action>
       </div>
     </div>
 
-    <!-- Banner Explicativo de la App (Sobre infografías y mapa web) -->
-    <div class="app-banner-help">
-      <div class="banner-help-content">
-        <calcite-icon icon="cursor-click" scale="s"></calcite-icon>
-        <span class="banner-help-title">¿Cómo usar este visor?</span>
-        <span class="banner-help-text">Selecciona cualquier municipio para consultar su nivel de alerta y focos de calor detectados en tiempo real</span>
-      </div>
-    </div>
+    <!-- Contenedor Principal ArcGIS Instant App (Zone Lookup Layout) -->
+    <div class="instant-app-container">
 
-    <!-- Layout Principal: 3 Columnas (Bloque Izq Infografía 1 | Mapa Central | Bloque Der Infografía 2) -->
-    <div class="app-main-layout">
-      
-      <!-- CAJA 1: Bloque Lateral Izquierdo (Infografía 1 - Tutorial de Uso) -->
-      <aside class="sidebar-block left-block">
-        <div class="sidebar-infografia-card" id="boxInfografia1">
-          <img src="src/assets/infografia1.png" alt="Infografía 1 - Guía de Uso del Visor" class="infografia-img" />
+      <!-- Panel Lateral Izquierdo Fijo/Flotante de Resultados & Búsqueda (Zone Lookup Sidebar) -->
+      <aside class="instant-app-sidebar" id="instantAppSidebar">
+        
+        <!-- Sección 1: Buscador de Municipio Principal -->
+        <div class="sidebar-search-box">
+          <label class="search-label">BUSCAR MUNICIPIO O ZONA DE INTERÉS</label>
+          <calcite-combobox 
+            id="selectMunicipio" 
+            placeholder="Buscar municipio en Colombia..." 
+            selection-mode="single"
+            overlay-positioning="fixed"
+            clear-button-disabled="false"
+            scale="m"
+            class="sidebar-combobox">
+          </calcite-combobox>
         </div>
-      </aside>
 
-      <!-- ÁREA CENTRAL: Contenedor del Mapa (#viewDiv) -->
-      <main class="center-map-container">
-        <div id="viewDiv"></div>
-        <!-- Indicador Pie de Mapa Adaptado para Móvil -->
-        <div class="mobile-map-scroll-hint">
-          <img src="src/assets/down-arrow-orange-4.gif" alt="Deslizar" class="hint-gif" />
-          <span>Desliza hacia abajo para ver los indicadores detallados</span>
-        </div>
-      </main>
-
-      <!-- CAJA 2: Bloque Lateral Derecho (Leyenda del Mapa & Matriz de Alertas) -->
-      <aside class="sidebar-block right-block">
-        <div class="sidebar-legend-card" id="boxInfografia2">
-          
-          <!-- Encabezado de Leyenda -->
-          <div class="legend-card-header">
-            <calcite-icon icon="legend" scale="s"></calcite-icon>
-            <span>LEYENDA DEL MAPA & NIVELES DE ALERTA</span>
-          </div>
-
-          <!-- Matriz Animada de Emojis y Variación Térmica -->
-          <div class="legend-matrix-section">
-            <div class="matrix-section-title">MATRIZ DE ALERTAS POR INCENDIO</div>
-            
-            <div class="matrix-grid">
-              <div class="matrix-item item-red">
-                <span class="emoji-bounce">🔴</span>
-                <div class="matrix-info">
-                  <span class="matrix-label">Alerta Alta / Roja</span>
-                  <small>Probabilidad Muy Alta</small>
-                </div>
-              </div>
-
-              <div class="matrix-item item-orange">
-                <span class="emoji-bounce delay-1">🟠</span>
-                <div class="matrix-info">
-                  <span class="matrix-label">Alerta Media / Naranja</span>
-                  <small>Probabilidad Moderada</small>
-                </div>
-              </div>
-
-              <div class="matrix-item item-yellow">
-                <span class="emoji-bounce delay-2">🟡</span>
-                <div class="matrix-info">
-                  <span class="matrix-label">Alerta Baja / Amarilla</span>
-                  <small>Probabilidad Baja</small>
-                </div>
-              </div>
-
-              <div class="matrix-item item-green">
-                <span class="emoji-bounce delay-3">🟢</span>
-                <div class="matrix-info">
-                  <span class="matrix-label">Sin Alerta / Verde</span>
-                  <small>Condiciones Normales</small>
-                </div>
-              </div>
-            </div>
-
-            <!-- Variación de Focos VIIRS: Color, Tamaño y Transparencia -->
-            <div class="matrix-section-title" style="margin-top: 10px;">FOCOS DE CALOR VIIRS (SATELITAL)</div>
-            <div class="viirs-variations-card">
-              <div class="viirs-var-item">
-                <span class="viirs-dot dot-active"></span>
-                <span>Zona Activa (100% Opacidad, Brillo Térmico)</span>
-              </div>
-              <div class="viirs-var-item">
-                <span class="viirs-dot dot-dimmed"></span>
-                <span>Resto del País (35% Opacidad, Atenuado)</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="legend-divider"></div>
-
-          <!-- Widget Nativo de Leyenda ArcGIS JS SDK -->
-          <div class="legend-widget-container">
-            <div id="legendWidgetDiv"></div>
-          </div>
-
-        </div>
-      </aside>
-
-    </div>
-
-    <!-- CAJA 3: Pop-up Nativo del WebMap (Sección Horizontal Ubicada Debajo de Todos los Elementos de la App) -->
-    <section id="boxPopupDetails" class="bottom-popup-section">
-      <div class="designer-box-horizontal">
-        <div class="popup-box-header">
-          <div class="popup-title-group">
+        <!-- Navegación por Pestañas Calcite del Panel Lateral -->
+        <div class="sidebar-tabs-row">
+          <button id="btnTabResults" class="sidebar-tab-btn active">
             <calcite-icon icon="information" scale="s"></calcite-icon>
-            <span id="popupBoxTitle">INDICADORES DE ALERTA Y POP-UP WEBMAP DE ARCGIS ONLINE</span>
-          </div>
-        </div>
-        <!-- Contenedor donde ArcGIS JS SDK renderiza el Pop-up nativo del WebMap -->
-        <div id="sheetContentContainer" class="popup-box-content"></div>
-      </div>
-    </section>
-
-    <!-- Scrim de Carga -->
-    <calcite-scrim id="appLoader" loading text="Cargando WebMap y Pop-ups..."></calcite-scrim>
-
-    <!-- Alerta Toast -->
-    <calcite-alert id="appAlert" kind="info" icon="check-circle" auto-close auto-close-duration="medium">
-      <div slot="title" id="alertTitle">Notificación</div>
-      <div slot="message" id="alertMessage">Operación realizada con éxito.</div>
-    </calcite-alert>
-  </calcite-shell>
-
-  <!-- Modales Emergentes colocados en la raíz del body para superposición z-index absoluta sobre todos los componentes -->
-  <!-- Modal Emergente de Calendario Glassmorphism (Filtro por Fecha VIIRS ACQ_DATE) -->
-  <div id="modalCalendar" class="glass-modal-overlay hidden">
-    <div class="glass-modal-backdrop" id="btnCloseCalendarBackdrop"></div>
-    <div class="glass-calendar-container">
-      <div class="glass-calendar-card">
-        <!-- Header: Título y Botón Cerrar -->
-        <div class="calendar-header-top">
-          <div class="calendar-header-title-wrap">
-            <span class="calendar-header-label">FILTRAR FECHAS SATELITALES</span>
-          </div>
-          <button id="btnCloseCalendar" class="calendar-icon-btn" title="Cerrar">
-            <calcite-icon icon="x" scale="s"></calcite-icon>
+            <span>Resultados</span>
+          </button>
+          <button id="btnTabLegend" class="sidebar-tab-btn">
+            <calcite-icon icon="legend" scale="s"></calcite-icon>
+            <span>Leyenda</span>
+          </button>
+          <button id="btnTabGuide" class="sidebar-tab-btn">
+            <calcite-icon icon="lightbulb" scale="s"></calcite-icon>
+            <span>Guía de Uso</span>
           </button>
         </div>
 
-        <!-- Insignia del Campo VIIRS ACQ_DATE -->
-        <div class="calendar-field-badge">
-          <calcite-icon icon="satellite" scale="s"></calcite-icon>
-          <span>Capa VIIRS &bull; Campo <b>ACQ_DATE</b> (UTC)</span>
-        </div>
-
-        <!-- Navegación de Mes -->
-        <div class="calendar-month-nav">
-          <span id="calendarMonthTitle" class="calendar-month-title">Septiembre 2026</span>
-          <div class="calendar-nav-buttons">
-            <button id="btnPrevMonth" class="calendar-nav-btn" title="Mes Anterior">&lsaquo;</button>
-            <button id="btnNextMonth" class="calendar-nav-btn" title="Mes Siguiente">&rsaquo;</button>
-          </div>
-        </div>
-
-        <!-- Grid Carrusel de Días del Mes (Generado con JS) -->
-        <div id="calendarDaysGrid" class="calendar-days-grid scrollbar-hide"></div>
-
-        <div class="calendar-divider"></div>
-
-        <!-- Pie del Calendario: Información y Botones de Acción -->
-        <div class="calendar-footer">
-          <span id="txtSelectedDateRange" class="calendar-selected-info">Fecha: Todo el periodo</span>
-          <div class="calendar-footer-actions">
-            <button id="btnClearDateFilter" class="btn-glass-secondary">Limpiar Filtro</button>
-            <button id="btnApplyDateFilter" class="btn-glass-primary">Aplicar a Capa Satelital</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Emergente Banner Carrusel de Infografías (Móvil / Guía General) -->
-  <div id="modalInfografias" class="glass-modal-overlay hidden">
-    <div class="glass-modal-backdrop" id="btnCloseInfografiasBackdrop"></div>
-    <div class="glass-infografia-container">
-      <div class="glass-infografia-card">
-        
-        <!-- Botón Cerrar (X) Flotante -->
-        <button id="btnCloseInfografias" class="infografia-close-btn" title="Cerrar">
-          <calcite-icon icon="x" scale="m"></calcite-icon>
-        </button>
-
-        <!-- Botón Flecha Izquierda Flotante -->
-        <button id="btnPrevInfografia" class="infografia-arrow-btn prev-arrow" title="Anterior">
-          <calcite-icon icon="chevron-left" scale="m"></calcite-icon>
-        </button>
-
-        <!-- Contenedor de Escenas de Infografía (1 a la vez) -->
-        <div class="infografia-scenes-container">
-          <!-- Escena 1: Infografía 1 (Tutorial de Uso) -->
-          <div id="sceneInfografia0" class="infografia-scene active">
-            <img src="src/assets/infografia1.png" alt="Infografía 1 - Guía de Uso del Visor" class="infografia-full-img" />
+        <!-- Área Scrollable de Contenido de Pestañas -->
+        <div class="sidebar-scroll-area">
+          
+          <!-- Pestaña 1: Resultados / Ficha del Municipio / Pop-up Arcade (Caja 3) -->
+          <div id="tabContentResults" class="sidebar-tab-content active">
+            <div class="designer-box-horizontal">
+              <div class="popup-box-header">
+                <div class="popup-title-group">
+                  <calcite-icon icon="information" scale="s"></calcite-icon>
+                  <span id="popupBoxTitle">INDICADORES DE ALERTA Y POP-UP WEBMAP</span>
+                </div>
+              </div>
+              <div id="sheetContentContainer" class="popup-box-content"></div>
+            </div>
           </div>
 
-          <!-- Escena 2: Leyenda del Mapa & Matriz de Alertas -->
-          <div id="sceneInfografia1" class="infografia-scene">
-            <div class="sidebar-legend-card mobile-legend-card">
+          <!-- Pestaña 2: Leyenda del Mapa & Matriz de Alertas -->
+          <div id="tabContentLegend" class="sidebar-tab-content">
+            <div class="sidebar-legend-card">
               
               <div class="legend-card-header">
                 <calcite-icon icon="legend" scale="s"></calcite-icon>
@@ -310,6 +137,168 @@
                 <div class="viirs-variations-card">
                   <div class="viirs-var-item">
                     <span class="viirs-dot dot-active"></span>
+                    <span>Zona Activa (100% Opacidad, Brillo Térmico)</span>
+                  </div>
+                  <div class="viirs-var-item">
+                    <span class="viirs-dot dot-dimmed"></span>
+                    <span>Resto del País (35% Opacidad, Atenuado)</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="legend-divider"></div>
+
+              <div class="legend-widget-container">
+                <div id="legendWidgetDiv"></div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Pestaña 3: Guía de Uso e Infografía Tutorial -->
+          <div id="tabContentGuide" class="sidebar-tab-content">
+            <div class="sidebar-infografia-card">
+              <img src="src/assets/infografia1.png" alt="Guía de Uso del Visor" class="infografia-img" />
+            </div>
+          </div>
+
+        </div>
+
+      </aside>
+
+      <!-- Área Principal de Mapa (Pantalla Completa Instant App) -->
+      <main class="instant-app-map-area">
+        
+        <!-- Banner Explicativo de Ayuda -->
+        <div class="app-banner-help">
+          <div class="banner-help-content">
+            <calcite-icon icon="cursor-click" scale="s"></calcite-icon>
+            <span class="banner-help-title">¿Cómo usar este visor?</span>
+            <span class="banner-help-text">Busca o selecciona cualquier municipio para consultar su nivel de alerta y focos de calor en tiempo real</span>
+          </div>
+        </div>
+
+        <!-- Contenedor del Mapa #viewDiv -->
+        <div id="viewDiv"></div>
+
+        <!-- Indicador Pie de Mapa Móvil -->
+        <div class="mobile-map-scroll-hint">
+          <img src="src/assets/down-arrow-orange-4.gif" alt="Deslizar" class="hint-gif" />
+          <span>Toca o desliza para ver los resultados en el panel</span>
+        </div>
+
+      </main>
+
+    </div>
+
+    <!-- Scrim de Carga -->
+    <calcite-scrim id="appLoader" loading text="Cargando WebMap y Pop-ups..."></calcite-scrim>
+
+    <!-- Alerta Toast -->
+    <calcite-alert id="appAlert" kind="info" icon="check-circle" auto-close auto-close-duration="medium">
+      <div slot="title" id="alertTitle">Notificación</div>
+      <div slot="message" id="alertMessage">Operación realizada con éxito.</div>
+    </calcite-alert>
+
+  </calcite-shell>
+
+  <!-- Modales Emergentes colocados en la raíz del body para superposición z-index absoluta -->
+  <div id="modalCalendar" class="glass-modal-overlay hidden">
+    <div class="glass-modal-backdrop" id="btnCloseCalendarBackdrop"></div>
+    <div class="glass-calendar-container">
+      <div class="glass-calendar-card">
+        <div class="calendar-header-top">
+          <div class="calendar-header-title-wrap">
+            <span class="calendar-header-label">FILTRAR FECHAS SATELITALES</span>
+          </div>
+          <button id="btnCloseCalendar" class="calendar-icon-btn" title="Cerrar">
+            <calcite-icon icon="x" scale="s"></calcite-icon>
+          </button>
+        </div>
+
+        <div class="calendar-field-badge">
+          <calcite-icon icon="satellite" scale="s"></calcite-icon>
+          <span>Capa VIIRS &bull; Campo <b>ACQ_DATE</b> (UTC)</span>
+        </div>
+
+        <div class="calendar-month-nav">
+          <span id="calendarMonthTitle" class="calendar-month-title">Septiembre 2026</span>
+          <div class="calendar-nav-buttons">
+            <button id="btnPrevMonth" class="calendar-nav-btn" title="Mes Anterior">&lsaquo;</button>
+            <button id="btnNextMonth" class="calendar-nav-btn" title="Mes Siguiente">&rsaquo;</button>
+          </div>
+        </div>
+
+        <div id="calendarDaysGrid" class="calendar-days-grid scrollbar-hide"></div>
+        <div class="calendar-divider"></div>
+
+        <div class="calendar-footer">
+          <span id="txtSelectedDateRange" class="calendar-selected-info">Fecha: Todo el periodo</span>
+          <div class="calendar-footer-actions">
+            <button id="btnClearDateFilter" class="btn-glass-secondary">Limpiar Filtro</button>
+            <button id="btnApplyDateFilter" class="btn-glass-primary">Aplicar a Capa Satelital</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalInfografias" class="glass-modal-overlay hidden">
+    <div class="glass-modal-backdrop" id="btnCloseInfografiasBackdrop"></div>
+    <div class="glass-infografia-container">
+      <div class="glass-infografia-card">
+        <button id="btnCloseInfografias" class="infografia-close-btn" title="Cerrar">
+          <calcite-icon icon="x" scale="m"></calcite-icon>
+        </button>
+        <button id="btnPrevInfografia" class="infografia-arrow-btn prev-arrow" title="Anterior">
+          <calcite-icon icon="chevron-left" scale="m"></calcite-icon>
+        </button>
+        <div class="infografia-scenes-container">
+          <div id="sceneInfografia0" class="infografia-scene active">
+            <img src="src/assets/infografia1.png" alt="Infografía 1 - Guía de Uso del Visor" class="infografia-full-img" />
+          </div>
+          <div id="sceneInfografia1" class="infografia-scene">
+            <div class="sidebar-legend-card mobile-legend-card">
+              <div class="legend-card-header">
+                <calcite-icon icon="legend" scale="s"></calcite-icon>
+                <span>LEYENDA DEL MAPA & NIVELES DE ALERTA</span>
+              </div>
+              <div class="legend-matrix-section">
+                <div class="matrix-section-title">MATRIZ DE ALERTAS POR INCENDIO</div>
+                <div class="matrix-grid">
+                  <div class="matrix-item item-red">
+                    <span class="emoji-bounce">🔴</span>
+                    <div class="matrix-info">
+                      <span class="matrix-label">Alerta Alta / Roja</span>
+                      <small>Probabilidad Muy Alta</small>
+                    </div>
+                  </div>
+                  <div class="matrix-item item-orange">
+                    <span class="emoji-bounce delay-1">🟠</span>
+                    <div class="matrix-info">
+                      <span class="matrix-label">Alerta Media / Naranja</span>
+                      <small>Probabilidad Moderada</small>
+                    </div>
+                  </div>
+                  <div class="matrix-item item-yellow">
+                    <span class="emoji-bounce delay-2">🟡</span>
+                    <div class="matrix-info">
+                      <span class="matrix-label">Alerta Baja / Amarilla</span>
+                      <small>Probabilidad Baja</small>
+                    </div>
+                  </div>
+                  <div class="matrix-item item-green">
+                    <span class="emoji-bounce delay-3">🟢</span>
+                    <div class="matrix-info">
+                      <span class="matrix-label">Sin Alerta / Verde</span>
+                      <small>Condiciones Normales</small>
+                    </div>
+                  </div>
+                </div>
+                <div class="matrix-section-title" style="margin-top: 10px;">FOCOS DE CALOR VIIRS (SATELITAL)</div>
+                <div class="viirs-variations-card">
+                  <div class="viirs-var-item">
+                    <span class="viirs-dot dot-active"></span>
                     <span>Zona Activa (100% Opacidad)</span>
                   </div>
                   <div class="viirs-var-item">
@@ -318,22 +307,16 @@
                   </div>
                 </div>
               </div>
-
               <div class="legend-divider"></div>
-
               <div class="legend-widget-container">
                 <div id="legendWidgetDivMobile"></div>
               </div>
-
             </div>
           </div>
         </div>
-
-        <!-- Botón Flecha Derecha Flotante -->
         <button id="btnNextInfografia" class="infografia-arrow-btn next-arrow" title="Siguiente">
           <calcite-icon icon="chevron-right" scale="m"></calcite-icon>
         </button>
-
       </div>
     </div>
   </div>
