@@ -245,8 +245,8 @@ require([
   }
 
   function dismissLoader() {
-    const el = document.getElementById("appLoader");
-    if (el) {
+    const elements = document.querySelectorAll("#appLoader, calcite-scrim");
+    elements.forEach(el => {
       el.loading = false;
       el.hidden = true;
       el.style.display = "none";
@@ -255,7 +255,7 @@ require([
       try {
         if (el.parentNode) el.parentNode.removeChild(el);
       } catch (e) {}
-    }
+    });
   }
 
   /**
