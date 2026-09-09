@@ -39,12 +39,6 @@
     <!-- Contenedor Principal ArcGIS Instant App (Zone Lookup Layout) -->
     <div class="instant-app-container">
 
-      <!-- Header Exclusivo para Impresión PDF -->
-      <div id="printReportHeader" class="print-report-header">
-        <div class="print-title-main">🔥 REPORTE TERRITORIAL DE MONITOREO DE ALERTAS E INCENDIOS</div>
-        <div class="print-subtitle-main">República de Colombia &bull; Fuentes Oficiales: IDEAM / NASA VIIRS &bull; Generado el <span id="printDateStamp"></span></div>
-      </div>
-
       <!-- Panel Lateral Izquierdo Fijo/Flotante de Resultados & Búsqueda (Zone Lookup Sidebar) -->
       <aside class="instant-app-sidebar" id="instantAppSidebar">
         
@@ -74,7 +68,11 @@
           </button>
           <button id="btnTabGuide" class="sidebar-tab-btn">
             <calcite-icon icon="lightbulb" scale="s"></calcite-icon>
-            <span>Guía de Uso</span>
+            <span>Guía</span>
+          </button>
+          <button id="btnOpenReportSidebar" class="sidebar-tab-btn tab-btn-report" title="Generar y Exportar Reporte PDF">
+            <calcite-icon icon="export" scale="s"></calcite-icon>
+            <span>Reporte PDF</span>
           </button>
         </div>
 
@@ -89,9 +87,6 @@
                   <calcite-icon icon="information" scale="s"></calcite-icon>
                   <span id="popupBoxTitle">INDICADORES DE ALERTA Y POP-UP WEBMAP</span>
                 </div>
-                <button id="btnOpenReportSidebar" class="btn-glass-primary" title="Exportar Ficha de Alerta a PDF">
-                  <calcite-icon icon="export" scale="s"></calcite-icon> Reporte PDF
-                </button>
               </div>
               <div id="sheetContentContainer" class="popup-box-content"></div>
             </div>
@@ -393,6 +388,12 @@
 
       </div>
     </div>
+  </div>
+
+  <!-- Header Exclusivo para Impresión PDF -->
+  <div id="printReportHeader" class="print-report-header">
+    <div class="print-title-main">🔥 REPORTE TERRITORIAL DE MONITOREO DE ALERTAS E INCENDIOS</div>
+    <div class="print-subtitle-main">República de Colombia &bull; Fuentes Oficiales: IDEAM / NASA VIIRS &bull; Generado el <span id="printDateStamp"></span></div>
   </div>
 
   <script src="src/main.js"></script>
