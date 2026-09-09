@@ -724,7 +724,7 @@ require([
       const dept = feature.attributes.DEPARTMENT || feature.attributes.NAME_1 || feature.attributes.DEPTO || "";
       const fullName = dept ? `${name} (${dept})` : name;
       if (popupBoxTitle) {
-        popupBoxTitle.textContent = `INDICADORES DE ALERTA - ${fullName.toUpperCase()}`;
+        popupBoxTitle.textContent = `Estado de la alerta por incendios - ${fullName.toUpperCase()}`;
       }
 
       if (municipiosLayer) {
@@ -1699,7 +1699,7 @@ require([
     selectedOutlineGraphic.geometry = null;
     selectMunicipio.value = [];
     if (popupBoxTitle) {
-      popupBoxTitle.textContent = "INDICADORES DE ALERTA Y POP-UP WEBMAP DE ARCGIS ONLINE";
+      popupBoxTitle.textContent = "Estado de la alerta por incendios";
     }
     if (featureWidget) {
       featureWidget.graphic = null;
