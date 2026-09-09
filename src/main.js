@@ -484,7 +484,7 @@ require([
         const deptText = (dept && dept.toLowerCase() !== "colombia") ? ` - ${dept}` : "";
         const label = `${name}${deptText}${alertText}`;
         return {
-          id: attrs.OBJECTID,
+          id: getFeatureId(attrs),
           name: name,
           dept: dept,
           alertLvl: alertLvl || 0,
@@ -649,11 +649,12 @@ require([
     if (!feature) return null;
     if (feature.geometry) return feature.geometry;
 
-    const objId = feature.attributes ? (feature.attributes.OBJECTID || feature.attributes.id) : null;
+    const objId = feature.attributes ? getFeatureId(feature.attributes) : null;
     if (objId !== null && objId !== undefined && municipiosLayer) {
       try {
+        const oidField = (municipiosLayer && municipiosLayer.objectIdField) ? municipiosLayer.objectIdField : 'FID';
         const q = municipiosLayer.createQuery();
-        q.objectIds = [Number(objId)];
+        q.where = `${oidField} = ${objId}`;
         q.returnGeometry = true;
         q.outFields = ["*"];
 
@@ -677,7 +678,7 @@ require([
 
   async function getAdjacentNeighbors(targetFeature) {
     if (!targetFeature || !targetFeature.attributes) return [];
-    const targetId = targetFeature.attributes.OBJECTID || targetFeature.attributes.id;
+    const targetId = getFeatureId(targetFeature.attributes);
     if (targetId && adjacencyCache.has(targetId)) {
       return adjacencyCache.get(targetId);
     }
@@ -690,7 +691,7 @@ require([
       q.geometry = targetGeom;
       q.spatialRelationship = "touches";
       q.returnGeometry = true;
-      q.outFields = ["OBJECTID", "NAME", "NAME_2"];
+      q.outFields = ["*"];
 
       let res = null;
       if (municipiosLayerView) {
@@ -714,7 +715,7 @@ require([
    */
   async function getHoverUnionGeom(hoverFeature) {
     if (!hoverFeature || !hoverFeature.attributes) return null;
-    const hoverId = hoverFeature.attributes.OBJECTID || hoverFeature.attributes.id;
+    const hoverId = getFeatureId(hoverFeature.attributes);
     if (hoverId && hoverUnionCache.has(hoverId)) {
       return hoverUnionCache.get(hoverId);
     }
@@ -745,7 +746,7 @@ require([
 
     // FIJAR Selección de Municipio Activo
     currentSelectedFeature = feature;
-    const targetId = feature.attributes.OBJECTID;
+    const targetId = getFeatureId(feature.attributes);
     currentActiveId = targetId;
 
     // Fijar el Borde Resaltado Naranja de Selección únicamente en el municipio SELECCIONADO
@@ -817,8 +818,8 @@ require([
    * Previsualización Dinámica al Pasar el Mouse (Hover) / Selección Combinada - Ultra Rápida (60 FPS)
    */
   async function applyHoverPreview(hoverFeature = null) {
-    const hoverId = hoverFeature && hoverFeature.attributes ? (hoverFeature.attributes.OBJECTID || hoverFeature.attributes.id) : null;
-    const selectedId = currentSelectedFeature && currentSelectedFeature.attributes ? (currentSelectedFeature.attributes.OBJECTID || currentSelectedFeature.attributes.id) : null;
+    const hoverId = hoverFeature && hoverFeature.attributes ? getFeatureId(hoverFeature.attributes) : null;
+    const selectedId = currentSelectedFeature && currentSelectedFeature.attributes ? getFeatureId(currentSelectedFeature.attributes) : null;
 
     // DEDUPLICACIÓN DE ALTO RENDIMIENTO: Si el ID de hover no ha cambiado respecto a la última llamada, cancelar para evitar latencia
     const currentHoverKey = `${selectedId || 'none'}_${hoverId || 'none'}`;
