@@ -813,6 +813,20 @@ require([
   }
 
   function initWidgets() {
+    if (document.getElementById("legendWidgetDiv")) {
+      new Legend({
+        container: "legendWidgetDiv",
+        view: view
+      });
+    }
+
+    if (document.getElementById("legendWidgetDivMobile")) {
+      new Legend({
+        container: "legendWidgetDivMobile",
+        view: view
+      });
+    }
+
     if (document.getElementById("timeSliderDiv")) {
       timeSlider = new TimeSlider({
         container: "timeSliderDiv",
