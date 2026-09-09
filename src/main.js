@@ -314,9 +314,10 @@ require([
 
       const title = layer.title || "";
       const id = layer.id || "";
+      const isArcadeExpr = title.toLowerCase().includes("expresiones");
 
-      // 1. Capa de Municipios Oficial (Layer: "Municipios_COL_2025", ID: 1a08877a77e-layer-8 / 1a069e22854-layer-204)
-      if (id === "1a08877a77e-layer-8" || id === "1a069e22854-layer-204" || title.includes("Municipios_COL_2025") || (layer.url && layer.url.includes("Municipios_COL_2025")) || (title.includes("Municipios") && !title.includes("expresiones"))) {
+      // 1. Capa de Municipios Oficial ("Municipios_COL_2025", ID: 1a08877a77e-layer-8)
+      if (!isArcadeExpr && (id === "1a08877a77e-layer-8" || id === "1a068ad9b7a-layer-12" || id === "1a069e22854-layer-204" || title === "Municipios_COL_2025" || title === "Municipios Colombia" || (layer.url && layer.url.includes("Municipios_COL_2025")))) {
         municipiosLayer = layer;
         municipiosLayer.outFields = ["*"];
       } 
@@ -334,10 +335,10 @@ require([
 
     // Fallbacks de seguridad si por alguna razón no coincidió por id o título exacto
     if (!municipiosLayer) {
-      municipiosLayer = webMap.layers.find(l => l !== maskLayer && l !== selectionLayer && (
+      municipiosLayer = webMap.layers.find(l => l !== maskLayer && l !== selectionLayer && !(l.title || "").toLowerCase().includes("expresiones") && (
         (l.title || "").includes("Municipios_COL_2025") ||
         (l.url || "").includes("Municipios_COL_2025") ||
-        ((l.title || "").includes("Municipios") && !(l.title || "").includes("expresiones"))
+        (l.title || "").includes("Municipios")
       ));
     }
     if (!viirsLayer) {
@@ -532,14 +533,19 @@ require([
         const lon = position.coords.longitude;
         console.log(`GPS Coordenadas recibidas: Latitud ${lat}, Longitud ${lon}`);
 
-        if (!municipiosLayer) return;
-
         try {
           const userPointWGS = new Point({
             longitude: lon,
             latitude: lat,
             spatialReference: { wkid: 4326 }
           });
+
+          // Centrado inmediato del MapView en la posición GPS del usuario
+          if (view) {
+            view.goTo({ center: userPointWGS, zoom: 12 }, { duration: 1200 });
+          }
+
+          if (!municipiosLayer) return;
 
           const spatialQuery = municipiosLayer.createQuery();
           spatialQuery.geometry = userPointWGS;
@@ -552,7 +558,7 @@ require([
             res = await municipiosLayer.queryFeatures(spatialQuery);
           } catch (e) {
             if (municipiosLayerView) {
-              res = await municipiosLayerView.queryFeatures(spatialQuery);
+              try { res = await municipiosLayerView.queryFeatures(spatialQuery); } catch(err) {}
             }
           }
 
@@ -568,14 +574,12 @@ require([
           }
 
           if (matchedMpio) {
-            const name = matchedMpio.attributes.NAME || matchedMpio.attributes.NAME_2 || "Ubicación Actual";
+            const name = getFeatureMpio(matchedMpio.attributes);
             console.log(`Municipio por GPS enfocado: ${name}`);
             await selectMunicipality(matchedMpio, true);
             showAlert("GPS Localizado", `Se enfocó automáticamente el municipio de tu ubicación (${name}).`, "success");
           } else {
-            if (userInitiated) {
-              showAlert("Fuera de Cobertura", "Tus coordenadas GPS se encuentran fuera de Colombia.", "info");
-            }
+            showAlert("Ubicación Centrada", "Se centró el mapa en tu ubicación GPS actual.", "info");
           }
         } catch (err) {
           console.warn("Error al procesar consulta espacial de GPS:", err);
@@ -583,8 +587,11 @@ require([
       },
       (err) => {
         console.warn("GPS no autorizado o inalcanzable:", err.message);
+        if (userInitiated) {
+          showAlert("Permiso GPS Denegado", "Por favor habilita la ubicación en tu navegador.", "warning");
+        }
       },
-      { enableHighAccuracy: false, timeout: 6000, maximumAge: 60000 }
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
     );
   }
 
