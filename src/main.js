@@ -121,6 +121,28 @@ require([
 
   let currentInfografiaSlide = 0;
 
+  function toTitleCase(str) {
+    if (!str) return "";
+    return String(str)
+      .trim()
+      .toLowerCase()
+      .split(/\s+/)
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
+  }
+
+  function getFeatureDept(attrs) {
+    if (!attrs) return "";
+    const raw = attrs.DEPARTAMEN || attrs.DEPARTAMENTO || attrs.DPTO_CNMBR || attrs.DEPARTMENT || attrs.NAME_1 || attrs.DEPTO || attrs.NOM_DEPT || attrs.NOM_DEPTO || attrs.DPTO_NAME || attrs.NOM_DPTO || "";
+    return toTitleCase(raw);
+  }
+
+  function getFeatureMpio(attrs) {
+    if (!attrs) return "Municipio";
+    const raw = attrs.MUNICIPIO || attrs.MPIO_CNMBR || attrs.NAME || attrs.NAME_2 || attrs.NOMBRE_MUNICIPIO || attrs.NOM_MUN || attrs.NOMBRE || attrs.NOM_MPIO || "Municipio";
+    return toTitleCase(raw);
+  }
+
   /**
    * 1. Inicialización Principal
    */
@@ -439,11 +461,11 @@ require([
 
       const municipiosList = filteredFeatures.map(f => {
         const attrs = f.attributes || {};
-        const name = attrs.NAME || attrs.NAME_2 || attrs.NOMBRE_MUNICIPIO || attrs.MPIO_CNMBR || "Municipio";
-        const dept = attrs.DEPARTMENT || attrs.NAME_1 || attrs.DEPTO || attrs.DPTO_CNMBR || "";
+        const name = getFeatureMpio(attrs);
+        const dept = getFeatureDept(attrs);
         const alertLvl = attrs._alertLevel;
         const alertText = alertLvl ? ` - ${getAlertBadge(alertLvl)}` : "";
-        const deptText = (dept && dept !== "Colombia") ? ` - ${dept}` : "";
+        const deptText = (dept && dept.toLowerCase() !== "colombia") ? ` - ${dept}` : "";
         const label = `${name}${deptText}${alertText}`;
         return {
           id: attrs.OBJECTID,
@@ -722,11 +744,11 @@ require([
 
     // CAJA 3: Renderizar Pop-up Nativo del WebMap de ArcGIS Online (Arcade) del municipio SELECCIONADO
     try {
-      const name = feature.attributes.NAME || feature.attributes.NAME_2 || "Municipio";
-      const dept = feature.attributes.DEPARTMENT || feature.attributes.NAME_1 || feature.attributes.DEPTO || "";
-      const fullName = dept ? `${name} (${dept})` : name;
+      const name = getFeatureMpio(feature.attributes);
+      const dept = getFeatureDept(feature.attributes);
+      const fullName = (dept && dept.toLowerCase() !== "colombia") ? `${name} - ${dept}` : name;
       if (popupBoxTitle) {
-        popupBoxTitle.textContent = `Estado de la alerta por incendios - ${fullName.toUpperCase()}`;
+        popupBoxTitle.textContent = `Estado de la alerta por incendios - ${fullName}`;
       }
 
       if (municipiosLayer) {
@@ -943,9 +965,9 @@ require([
     let municipioName = "Colombia (Vista General)";
     if (currentSelectedFeature && currentSelectedFeature.attributes) {
       const attrs = currentSelectedFeature.attributes;
-      const name = attrs.NAME || attrs.MUNICIP || attrs.NOM_MUNICI || "Municipio Seleccionado";
-      const dept = attrs.DEPARTMENT || attrs.DEPARTAMEN || "";
-      municipioName = dept ? `${name}, ${dept}` : name;
+      const name = getFeatureMpio(attrs);
+      const dept = getFeatureDept(attrs);
+      municipioName = (dept && dept.toLowerCase() !== "colombia") ? `${name} - ${dept}` : name;
     }
 
     let dateFilterLabel = "";
