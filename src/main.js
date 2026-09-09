@@ -1188,27 +1188,11 @@ require([
 
     calendarDaysGrid.innerHTML = "";
 
-    // A. Encabezados de Días de la Semana (Dom, Lun, Mar, Mié, Jue, Vie, Sáb)
-    const dayLabels = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
-    const weekdaysRow = document.createElement("div");
-    weekdaysRow.className = "calendar-weekdays-row";
-    dayLabels.forEach(lbl => {
-      const hdr = document.createElement("div");
-      hdr.className = "calendar-weekday-hdr";
-      hdr.textContent = lbl;
-      weekdaysRow.appendChild(hdr);
-    });
-    calendarDaysGrid.appendChild(weekdaysRow);
-
-    // B. Grid Completo Mensual de Días (7 columnas)
-    const daysContainer = document.createElement("div");
-    daysContainer.className = "calendar-days-grid";
-
     // Celdas vacías iniciales antes del día 1 del mes
     for (let i = 0; i < startDayOfWeek; i++) {
       const emptyDiv = document.createElement("div");
       emptyDiv.className = "calendar-day-empty";
-      daysContainer.appendChild(emptyDiv);
+      calendarDaysGrid.appendChild(emptyDiv);
     }
 
     // Tiempos límites de la capa VIIRS para restringir selección fuera de rango
@@ -1266,10 +1250,9 @@ require([
         });
       }
 
-      daysContainer.appendChild(dayBtn);
+      calendarDaysGrid.appendChild(dayBtn);
     }
 
-    calendarDaysGrid.appendChild(daysContainer);
     updateSelectedDateText();
   }
 

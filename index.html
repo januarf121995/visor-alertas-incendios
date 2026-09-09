@@ -25,13 +25,15 @@
       <div class="header-brand">
         <calcite-action id="btnToggleSidebar" icon="hamburger" text="Menu" scale="s" class="mobile-menu-btn"></calcite-action>
         <calcite-icon icon="fire" scale="s"></calcite-icon>
-        <span class="header-title">Monitoreo de Incendios & Puntos de Calor</span>
+        <span class="header-title">Monitoreo de alertas por incendios - IDEAM y puntos de calor detectados satelitalmente en su municipio</span>
       </div>
 
       <div class="header-controls">
         <calcite-action id="btnOpenReport" icon="export" text="Reporte" scale="s" kind="brand"></calcite-action>
         <calcite-action id="btnOpenCalendar" icon="calendar" text="Fechas VIIRS" scale="s" kind="brand"></calcite-action>
-        <calcite-action id="btnDetectGPS" icon="gps" text="GPS" scale="s" kind="brand"></calcite-action>
+        <calcite-action id="btnDetectGPS" text="GPS" scale="s" kind="brand">
+          <img src="src/assets/gps-pin.png" slot="icon" class="header-gps-icon" alt="GPS" />
+        </calcite-action>
         <calcite-action id="btnResetAll" icon="reset" text="Reset" scale="s"></calcite-action>
       </div>
     </div>
@@ -44,7 +46,7 @@
         
         <!-- Sección 1: Buscador de Municipio Principal -->
         <div class="sidebar-search-box">
-          <label class="search-label">BUSCAR MUNICIPIO O ZONA DE INTERÉS</label>
+          <label class="search-label">MONITOREE EL ESTADO DE LOS MUNICIPIOS CON ALERTAS POR INCENDIOS ACTIVAS | IDEAM</label>
           <calcite-combobox 
             id="selectMunicipio" 
             placeholder="Buscar municipio en Colombia..." 
@@ -60,7 +62,7 @@
         <div class="sidebar-tabs-row">
           <button id="btnTabResults" class="sidebar-tab-btn active">
             <calcite-icon icon="information" scale="s"></calcite-icon>
-            <span>Resultados</span>
+            <span>Estado de la alerta</span>
           </button>
           <button id="btnTabLegend" class="sidebar-tab-btn">
             <calcite-icon icon="legend" scale="s"></calcite-icon>
@@ -183,7 +185,7 @@
                 <div class="guide-tool-row">
                   <div class="tool-icon-wrap"><calcite-icon icon="information" scale="s"></calcite-icon></div>
                   <div class="tool-desc">
-                    <strong>Resultados:</strong> Abre la vista detallada con el balance de alertas del municipio o zona seleccionada y la cantidad de puntos de calor detectados.
+                    <strong>Estado de la alerta:</strong> Abre la vista detallada con el balance de alertas del municipio o zona seleccionada y la cantidad de puntos de calor detectados.
                   </div>
                 </div>
 
@@ -252,24 +254,25 @@
       <div class="glass-calendar-card">
         <div class="calendar-header-top">
           <div class="calendar-header-title-wrap">
-            <span class="calendar-header-label">FILTRAR FECHAS SATELITALES</span>
+            <span class="calendar-header-label">Filtre las fechas del monitoreo</span>
           </div>
           <button id="btnCloseCalendar" class="calendar-icon-btn" title="Cerrar">
             <calcite-icon icon="x" scale="s"></calcite-icon>
           </button>
         </div>
 
-        <div class="calendar-field-badge">
-          <calcite-icon icon="satellite" scale="s"></calcite-icon>
-          <span>Capa VIIRS &bull; Campo <b>ACQ_DATE</b> (UTC)</span>
-        </div>
-
         <div class="calendar-month-nav">
           <span id="calendarMonthTitle" class="calendar-month-title">Septiembre 2026</span>
-          <div class="calendar-nav-buttons">
-            <button id="btnPrevMonth" class="calendar-nav-btn" title="Mes Anterior">&lsaquo;</button>
-            <button id="btnNextMonth" class="calendar-nav-btn" title="Mes Siguiente">&rsaquo;</button>
-          </div>
+        </div>
+
+        <div class="calendar-weekdays-row">
+          <div class="calendar-weekday-hdr">Dom</div>
+          <div class="calendar-weekday-hdr">Lun</div>
+          <div class="calendar-weekday-hdr">Mar</div>
+          <div class="calendar-weekday-hdr">Mié</div>
+          <div class="calendar-weekday-hdr">Jue</div>
+          <div class="calendar-weekday-hdr">Vie</div>
+          <div class="calendar-weekday-hdr">Sáb</div>
         </div>
 
         <div id="calendarDaysGrid" class="calendar-days-grid scrollbar-hide"></div>
@@ -279,7 +282,7 @@
           <span id="txtSelectedDateRange" class="calendar-selected-info">Fecha: Todo el periodo</span>
           <div class="calendar-footer-actions">
             <button id="btnClearDateFilter" class="btn-glass-secondary">Limpiar Filtro</button>
-            <button id="btnApplyDateFilter" class="btn-glass-primary">Aplicar a Capa Satelital</button>
+            <button id="btnApplyDateFilter" class="btn-glass-primary">Aplicar Filtro</button>
           </div>
         </div>
       </div>
