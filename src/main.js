@@ -431,24 +431,26 @@ require([
 
       // 4. Formatear y poblar combobox
       const getAlertBadge = (lvl) => {
-        if (lvl === 3) return "🔴 Alerta Alta (Roja)";
-        if (lvl === 2) return "🟠 Alerta Media (Naranja)";
-        if (lvl === 1) return "🟡 Alerta Baja (Amarilla)";
-        return "⚠️ Con Alerta IDEAM";
+        if (lvl === 3) return "🔴 Alerta Alta";
+        if (lvl === 2) return "🟠 Alerta Media";
+        if (lvl === 1) return "🟡 Alerta Baja";
+        return "⚠️ Con Alerta";
       };
 
       const municipiosList = filteredFeatures.map(f => {
         const attrs = f.attributes || {};
         const name = attrs.NAME || attrs.NAME_2 || attrs.NOMBRE_MUNICIPIO || attrs.MPIO_CNMBR || "Municipio";
-        const dept = attrs.DEPARTMENT || attrs.NAME_1 || attrs.DEPTO || attrs.DPTO_CNMBR || "Colombia";
+        const dept = attrs.DEPARTMENT || attrs.NAME_1 || attrs.DEPTO || attrs.DPTO_CNMBR || "";
         const alertLvl = attrs._alertLevel;
         const alertText = alertLvl ? ` - ${getAlertBadge(alertLvl)}` : "";
+        const deptText = (dept && dept !== "Colombia") ? ` - ${dept}` : "";
+        const label = `${name}${deptText}${alertText}`;
         return {
           id: attrs.OBJECTID,
           name: name,
           dept: dept,
           alertLvl: alertLvl || 0,
-          label: `${name} (${dept})${alertText}`,
+          label: label,
           feature: f
         };
       }).sort((a, b) => a.name.localeCompare(b.name, 'es'));
