@@ -929,91 +929,170 @@ require([
   async function exportReportPDF() {
     if (!view) return;
 
-    showAlert("Generando Reporte", "Preparando captura de pantalla de alta resolución e impresión PDF...", "info");
+    showAlert("Generando Reporte", "Preparando captura de pantalla e impresión PDF...", "info");
     closeReportModal();
 
-    // 1. Fecha y hora de emisión
-    const printDateStampEl = document.getElementById("printDateStamp");
-    if (printDateStampEl) {
-      const now = new Date();
-      printDateStampEl.textContent = now.toLocaleDateString("es-CO", { 
-        year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
-      });
+    // 1. Recopilar Metadatos
+    const now = new Date();
+    const emissionDate = now.toLocaleDateString("es-CO", { 
+      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+    });
+
+    let municipioName = "Colombia (Vista General)";
+    if (currentSelectedFeature && currentSelectedFeature.attributes) {
+      const attrs = currentSelectedFeature.attributes;
+      const name = attrs.NAME || attrs.MUNICIP || attrs.NOM_MUNICI || "Municipio Seleccionado";
+      const dept = attrs.DEPARTMENT || attrs.DEPARTAMEN || "";
+      municipioName = dept ? `${name}, ${dept}` : name;
     }
 
-    // 2. Nombre del municipio seleccionado
-    const printMunicipioNameEl = document.getElementById("printMunicipioName");
-    if (printMunicipioNameEl) {
-      if (currentSelectedFeature && currentSelectedFeature.attributes) {
-        const attrs = currentSelectedFeature.attributes;
-        const name = attrs.NAME || attrs.MUNICIP || attrs.NOM_MUNICI || "Municipio Seleccionado";
-        const dept = attrs.DEPARTMENT || attrs.DEPARTAMEN || "";
-        printMunicipioNameEl.textContent = dept ? `${name}, ${dept}` : name;
-      } else {
-        printMunicipioNameEl.textContent = "Colombia (Vista General)";
-      }
+    let dateFilterLabel = "Todos los registros VIIRS";
+    if (calendarSelectedStart && !calendarSelectedEnd) {
+      dateFilterLabel = calendarSelectedStart.toLocaleDateString("es-CO", { day: '2-digit', month: 'short', year: 'numeric' });
+    } else if (calendarSelectedStart && calendarSelectedEnd) {
+      const sFmt = calendarSelectedStart.toLocaleDateString("es-CO", { day: '2-digit', month: 'short' });
+      const eFmt = calendarSelectedEnd.toLocaleDateString("es-CO", { day: '2-digit', month: 'short', year: 'numeric' });
+      dateFilterLabel = `${sFmt} al ${eFmt}`;
     }
 
-    // 3. Rango de fechas del filtro VIIRS
-    const printDateFilterRangeEl = document.getElementById("printDateFilterRange");
-    if (printDateFilterRangeEl) {
-      if (!calendarSelectedStart) {
-        printDateFilterRangeEl.textContent = "Todos los registros VIIRS";
-      } else if (!calendarSelectedEnd) {
-        printDateFilterRangeEl.textContent = calendarSelectedStart.toLocaleDateString("es-CO", { day: '2-digit', month: 'short', year: 'numeric' });
-      } else {
-        const sFmt = calendarSelectedStart.toLocaleDateString("es-CO", { day: '2-digit', month: 'short' });
-        const eFmt = calendarSelectedEnd.toLocaleDateString("es-CO", { day: '2-digit', month: 'short', year: 'numeric' });
-        printDateFilterRangeEl.textContent = `${sFmt} al ${eFmt}`;
-      }
-    }
-
-    // 4. Modificadores de la página en función de las opciones del usuario
-    if (chkIncludeIndicators && !chkIncludeIndicators.checked) {
-      document.body.classList.add("print-hide-indicators");
-    } else {
-      document.body.classList.remove("print-hide-indicators");
-    }
-
-    if (chkIncludeMetadata && !chkIncludeMetadata.checked) {
-      document.body.classList.add("print-hide-metadata");
-    } else {
-      document.body.classList.remove("print-hide-metadata");
-    }
-
-    // 5. Captura de pantalla del mapa
-    const printMapContainer = document.getElementById("printMapScreenshotContainer");
-    if (printMapContainer) {
-      if (chkIncludeMap && chkIncludeMap.checked) {
-        document.body.classList.remove("print-hide-map");
-        try {
-          const screenshot = await view.takeScreenshot({ format: "png", width: 1200, height: 800 });
-          const img = new Image();
-          img.className = "print-map-img";
-          img.alt = "Mapa Territorial";
-          
-          await new Promise((resolve) => {
-            img.onload = resolve;
-            img.onerror = resolve;
-            img.src = screenshot.dataUrl;
-          });
-
-          printMapContainer.innerHTML = "";
-          printMapContainer.appendChild(img);
-        } catch (err) {
-          console.warn("No se pudo realizar la captura de pantalla del mapa:", err);
-          printMapContainer.innerHTML = "";
+    // 2. Captura del Mapa Web
+    let mapImgHtml = "";
+    if (chkIncludeMap && chkIncludeMap.checked) {
+      try {
+        const screenshot = await view.takeScreenshot({ format: "png", width: 1200, height: 800 });
+        if (screenshot && screenshot.dataUrl) {
+          mapImgHtml = `
+            <div style="margin-bottom: 20px; page-break-inside: avoid;">
+              <div style="font-size: 10.5pt; font-weight: 800; color: #0f172a; border-bottom: 1.5px solid #cbd5e1; padding-bottom: 4px; margin-bottom: 10px; text-transform: uppercase;">📷 CAPTURA VISUAL DEL MAPA WEB</div>
+              <img src="${screenshot.dataUrl}" style="width:100%; max-height:440px; object-fit:contain; border:1px solid #cbd5e1; border-radius:8px;" />
+            </div>
+          `;
         }
-      } else {
-        document.body.classList.add("print-hide-map");
-        printMapContainer.innerHTML = "";
+      } catch (err) {
+        console.warn("Error tomando instantánea del mapa:", err);
       }
     }
 
-    // 6. Lanzar la impresión del navegador
+    // 3. Ficha de Indicadores / Arcade Pop-up
+    let indicatorsHtml = "";
+    if (chkIncludeIndicators && chkIncludeIndicators.checked && sheetContentContainer && sheetContentContainer.innerHTML.trim() !== "") {
+      indicatorsHtml = `
+        <div style="margin-bottom: 20px; page-break-inside: avoid;">
+          <div style="font-size: 10.5pt; font-weight: 800; color: #0f172a; border-bottom: 1.5px solid #cbd5e1; padding-bottom: 4px; margin-bottom: 10px; text-transform: uppercase;">📊 INDICADORES TERRITORIALES Y POP-UP NATIVO</div>
+          <div class="cloned-indicators">${sheetContentContainer.innerHTML}</div>
+        </div>
+      `;
+    }
+
+    // 4. Leyenda & Matriz de Alertas
+    let legendHtml = "";
+    const originalLegendCard = document.querySelector("#tabContentLegend .sidebar-legend-card");
+    if (chkIncludeMetadata && chkIncludeMetadata.checked && originalLegendCard) {
+      legendHtml = `
+        <div style="margin-bottom: 20px; page-break-inside: avoid;">
+          <div style="font-size: 10.5pt; font-weight: 800; color: #0f172a; border-bottom: 1.5px solid #cbd5e1; padding-bottom: 4px; margin-bottom: 10px; text-transform: uppercase;">🗓️ LEYENDA Y MATRIZ DE ALERTAS POR INCENDIO</div>
+          <div class="cloned-legend">${originalLegendCard.innerHTML}</div>
+        </div>
+      `;
+    }
+
+    // 5. Construcción del HTML Aislado del Documento de Impresión
+    const printDocHtml = `
+      <!DOCTYPE html>
+      <html lang="es">
+      <head>
+        <meta charset="UTF-8">
+        <title>Reporte Territorial - Visor de Alertas de Incendio</title>
+        <style>
+          @page { size: letter portrait; margin: 12mm 10mm; }
+          body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #0f172a; background: #ffffff; margin: 0; padding: 12px; font-size: 10.5pt; line-height: 1.45; }
+          .report-header { border-bottom: 2.5px solid #ea580c; padding-bottom: 10px; margin-bottom: 18px; }
+          .header-row { display: flex; justify-content: space-between; align-items: flex-start; }
+          .title-main { font-size: 15pt; font-weight: 800; color: #c2410c; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 0.3px; }
+          .subtitle-main { font-size: 8.5pt; color: #475569; margin: 0; }
+          .badge-stamp { background: #fff7ed; border: 1px solid #ea580c; color: #c2410c; font-size: 8pt; font-weight: 800; padding: 4px 8px; border-radius: 4px; white-space: nowrap; text-transform: uppercase; }
+          .meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; margin-top: 12px; }
+          .meta-item { display: flex; flex-direction: column; }
+          .meta-label { font-size: 7.5pt; font-weight: 700; color: #64748b; text-transform: uppercase; }
+          .meta-val { font-size: 9.5pt; font-weight: 700; color: #0f172a; margin-top: 2px; }
+          
+          /* Overrides limpios para tarjetas clonadas */
+          .designer-box-horizontal, .sidebar-legend-card { border: 1px solid #cbd5e1 !important; border-radius: 8px !important; padding: 12px !important; margin-bottom: 12px !important; background: #ffffff !important; color: #0f172a !important; }
+          .popup-box-header, .legend-card-header { border-bottom: 1px solid #e2e8f0 !important; padding-bottom: 6px !important; margin-bottom: 10px !important; color: #0f172a !important; }
+          .popup-title-group span, .legend-card-header span { color: #0f172a !important; font-weight: 800 !important; font-size: 11pt !important; }
+          .matrix-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 10px 0; }
+          .matrix-item { background: #f8fafc !important; border: 1px solid #e2e8f0 !important; border-radius: 6px !important; padding: 8px 10px !important; display: flex; align-items: center; gap: 8px; }
+          .matrix-label { color: #0f172a !important; font-weight: 700 !important; font-size: 10pt !important; }
+          .matrix-info small { color: #64748b !important; font-size: 8.5pt !important; }
+          .emoji-bounce { font-size: 16pt; }
+          .viirs-variations-card { background: #f8fafc !important; border: 1px solid #e2e8f0 !important; border-radius: 6px !important; padding: 8px 12px !important; margin-top: 8px; }
+          .viirs-var-item { display: flex; align-items: center; gap: 8px; font-size: 9pt; color: #334155 !important; margin: 4px 0; }
+          .viirs-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+          .dot-active { background: #f97316 !important; }
+          .dot-dimmed { background: #94a3b8 !important; }
+
+          /* Forzar modo claro de alta visibilidad para todo el contenido clonado */
+          * { color: #0f172a !important; background-color: transparent !important; text-shadow: none !important; box-shadow: none !important; max-height: none !important; overflow: visible !important; }
+          button, .btn-glass-primary, .infografia-close-btn, calcite-icon { display: none !important; }
+        </style>
+      </head>
+      <body>
+        <div class="report-header">
+          <div class="header-row">
+            <div>
+              <h1 class="title-main">🔥 REPORTE TERRITORIAL DE MONITOREO DE ALERTAS E INCENDIOS</h1>
+              <p class="subtitle-main">República de Colombia &bull; Fuentes Oficiales: IDEAM / NASA VIIRS &bull; Sistema de Información Geográfica</p>
+            </div>
+            <div class="badge-stamp">REPORTE OFICIAL</div>
+          </div>
+          <div class="meta-grid">
+            <div class="meta-item">
+              <span class="meta-label">MUNICIPIO / ZONA:</span>
+              <span class="meta-val">${municipioName}</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">FILTRO VIIRS SATELITAL:</span>
+              <span class="meta-val">${dateFilterLabel}</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">FECHA DE EMISIÓN:</span>
+              <span class="meta-val">${emissionDate}</span>
+            </div>
+          </div>
+        </div>
+
+        ${mapImgHtml}
+        ${indicatorsHtml}
+        ${legendHtml}
+      </body>
+      </html>
+    `;
+
+    // 6. Crear o reutilizar Iframe Oculto para Impresión Aislada
+    let printIframe = document.getElementById("hiddenPrintIframe");
+    if (!printIframe) {
+      printIframe = document.createElement("iframe");
+      printIframe.id = "hiddenPrintIframe";
+      printIframe.style.position = "fixed";
+      printIframe.style.right = "0";
+      printIframe.style.bottom = "0";
+      printIframe.style.width = "0";
+      printIframe.style.height = "0";
+      printIframe.style.border = "none";
+      printIframe.style.visibility = "hidden";
+      document.body.appendChild(printIframe);
+    }
+
+    const printDoc = printIframe.contentWindow.document;
+    printDoc.open();
+    printDoc.write(printDocHtml);
+    printDoc.close();
+
+    // 7. Esperar a que la imagen cargue y disparar diálogo de impresión
     setTimeout(() => {
-      window.print();
-    }, 250);
+      printIframe.contentWindow.focus();
+      printIframe.contentWindow.print();
+    }, 450);
   }
 
   // --- FUNCIONALIDAD DEL BANNER CARRUSEL DE INFOGRAFÍAS (MÓVIL & GUÍA) ---
