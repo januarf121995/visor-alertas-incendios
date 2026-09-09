@@ -174,25 +174,35 @@
                 Esta herramienta monitorea en tiempo real las condiciones de riesgo de incendio en Colombia integrando dos fuentes oficiales:
               </p>
 
-              <!-- Bloque 1: Fuentes Oficiales -->
+              <!-- Bloque 1: Fuentes Oficiales con Logos Oficiales e Hipervínculos -->
               <div class="guide-section-box">
                 <div class="guide-section-title">
                   <calcite-icon icon="layers" scale="s"></calcite-icon>
                   <span>FUENTES DE INFORMACIÓN OFICIALES</span>
                 </div>
                 
+                <!-- NASA VIIRS Logo Link -->
                 <div class="guide-feature-item">
-                  <div class="guide-feature-badge badge-nasa">
-                    <calcite-icon icon="satellite" scale="s"></calcite-icon> NASA VIIRS
+                  <div class="logo-badge-container">
+                    <a href="https://firms.modaps.eosdis.nasa.gov/" target="_blank" rel="noopener noreferrer" class="logo-link-btn logo-nasa-btn" title="Ir a NASA FIRMS (Portal Oficial)">
+                      <img src="https://firms.modaps.eosdis.nasa.gov/images/nasa_logo.png" alt="NASA Logo" class="official-logo-img" onerror="this.style.display='none'" />
+                      <span>NASA VIIRS</span>
+                      <calcite-icon icon="launch" scale="s"></calcite-icon>
+                    </a>
                   </div>
                   <div class="guide-feature-body">
-                    <strong>Puntos de calor (NASA):</strong> Detecciones satelitales (sensor VIIRS) con su respectivo nivel de confianza térmico.
+                    <strong>Puntos de calor (NASA):</strong> Detecciones satelitales (sensor VIIRS) con su respectivo nivel de confianza.
                   </div>
                 </div>
 
+                <!-- IDEAM Logo Link -->
                 <div class="guide-feature-item">
-                  <div class="guide-feature-badge badge-ideam">
-                    <calcite-icon icon="fire" scale="s"></calcite-icon> IDEAM
+                  <div class="logo-badge-container">
+                    <a href="https://visualizador.ideam.gov.co/portal/apps/storymaps/stories/45607ec722e54f2a8988bbb77e4dbe5d" target="_blank" rel="noopener noreferrer" class="logo-link-btn logo-ideam-btn" title="Ir al Portal Oficial de Alertas IDEAM">
+                      <img src="https://www.ideam.gov.co/documents/20182/0/logo-ideam.png" alt="IDEAM Logo" class="official-logo-img" onerror="this.style.display='none'" />
+                      <span>IDEAM COLOMBIA</span>
+                      <calcite-icon icon="launch" scale="s"></calcite-icon>
+                    </a>
                   </div>
                   <div class="guide-feature-body">
                     <strong>Niveles de alerta (IDEAM):</strong> Clasificación del riesgo por municipio (<span class="badge-dot dot-yellow">🟡 Baja</span>, <span class="badge-dot dot-orange">🟠 Media</span>, <span class="badge-dot dot-red">🔴 Alta</span>).
@@ -217,7 +227,7 @@
                 <div class="guide-step-item">
                   <div class="step-num">2</div>
                   <div class="step-content">
-                    <strong>Ventana temporal:</strong> El mapa muestra por defecto los puntos de calor de los últimos 7 días. Usa el botón <span class="step-tag"><calcite-icon icon="calendar" scale="s"></calcite-icon> Fechas VIIRS</span> para filtrar un rango específico dentro de ese periodo, incluyendo el día de consulta.
+                    <strong>Consultar diferentes fechas:</strong> El mapa muestra los puntos de calor de los últimos 7 días. Usa el botón <span class="step-icon-btn" title="Filtrar por fechas satelitales"><calcite-icon icon="calendar" scale="s"></calcite-icon></span> para filtrar los puntos de calor detectados durante ese periodo, incluyendo el día de hoy.
                   </div>
                 </div>
               </div>

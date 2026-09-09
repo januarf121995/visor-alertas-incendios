@@ -525,13 +525,13 @@ calcite-combobox::part(container) {
    PANEL DE GUÍA DE USO NATIVO (HTML/CSS OBSIDIAN GLASSMORPHISM)
    ========================================================================== */
 .sidebar-guide-card {
-  background: rgba(18, 18, 20, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(18, 18, 20, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 14px;
-  padding: 14px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
   box-sizing: border-box;
 }
 
@@ -539,13 +539,13 @@ calcite-combobox::part(container) {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 12px;
+  font-size: 13.5px;
   font-weight: 800;
   color: #ff9500;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding-bottom: 10px;
 }
 
 .guide-card-header calcite-icon {
@@ -553,27 +553,27 @@ calcite-combobox::part(container) {
 }
 
 .guide-intro-text {
-  font-size: 11.5px;
-  line-height: 1.45;
-  color: #e4e4e7;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #f4f4f5;
   margin: 0;
 }
 
 .guide-section-box {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .guide-section-title {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   color: #f97316;
   text-transform: uppercase;
@@ -587,41 +587,73 @@ calcite-combobox::part(container) {
 .guide-feature-item {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
-.guide-feature-badge {
+.logo-badge-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+.logo-link-btn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 10px;
+  gap: 8px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 11.5px;
   font-weight: 800;
-  padding: 3px 8px;
-  border-radius: 6px;
-  width: fit-content;
-  text-transform: uppercase;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-.guide-feature-badge calcite-icon {
+.logo-nasa-btn {
+  background: rgba(11, 61, 145, 0.3);
+  border: 1px solid rgba(59, 130, 246, 0.45);
+  color: #93c5fd;
+}
+
+.logo-nasa-btn:hover {
+  background: rgba(11, 61, 145, 0.6);
+  border-color: #3b82f6;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.logo-ideam-btn {
+  background: rgba(0, 105, 92, 0.3);
+  border: 1px solid rgba(45, 212, 191, 0.45);
+  color: #5eead4;
+}
+
+.logo-ideam-btn:hover {
+  background: rgba(0, 105, 92, 0.6);
+  border-color: #14b8a6;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(45, 212, 191, 0.3);
+}
+
+.official-logo-img {
+  height: 20px;
+  width: auto;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.logo-link-btn calcite-icon {
   color: inherit !important;
-}
-
-.badge-nasa {
-  background: rgba(59, 130, 246, 0.18);
-  color: #60a5fa;
-  border: 1px solid rgba(59, 130, 246, 0.35);
-}
-
-.badge-ideam {
-  background: rgba(249, 115, 22, 0.18);
-  color: #fb923c;
-  border: 1px solid rgba(249, 115, 22, 0.35);
+  opacity: 0.8;
 }
 
 .guide-feature-body {
-  font-size: 11px;
-  line-height: 1.4;
-  color: #d4d4d8;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #e4e4e7;
 }
 
 .guide-step-item {
@@ -633,10 +665,10 @@ calcite-combobox::part(container) {
 .step-num {
   background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
   color: #ffffff;
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 800;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -646,25 +678,25 @@ calcite-combobox::part(container) {
 }
 
 .step-content {
-  font-size: 11px;
-  line-height: 1.4;
-  color: #d4d4d8;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #e4e4e7;
 }
 
-.step-tag {
+.step-icon-btn {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
-  background: rgba(249, 115, 22, 0.2);
-  border: 1px solid rgba(249, 115, 22, 0.4);
-  color: #ffedd5;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 1px 6px;
-  border-radius: 4px;
+  justify-content: center;
+  background: rgba(249, 115, 22, 0.25);
+  border: 1px solid #f97316;
+  color: #ff9500;
+  padding: 3px 6px;
+  border-radius: 6px;
+  vertical-align: middle;
+  margin: 0 2px;
 }
 
-.step-tag calcite-icon {
+.step-icon-btn calcite-icon {
   color: #ff9500 !important;
 }
 
@@ -676,9 +708,9 @@ calcite-combobox::part(container) {
 
 .tool-icon-wrap {
   background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 6px;
-  padding: 5px;
+  padding: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -692,13 +724,13 @@ calcite-combobox::part(container) {
 }
 
 .tool-desc {
-  font-size: 11px;
-  line-height: 1.4;
-  color: #d4d4d8;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #e4e4e7;
 }
 
 .badge-dot {
-  font-size: 10px;
+  font-size: 11px;
   white-space: nowrap;
 }
 
