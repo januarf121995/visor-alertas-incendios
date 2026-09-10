@@ -1585,6 +1585,291 @@ calcite-scrim:not([loading]),
   color: #a1a1aa;
 }
 
+/* ==========================================================================
+   VISTA MÓVIL Y COMPONENTES REDISEÑADOS (< 768px)
+   ========================================================================== */
+
+/* Botón Flotante sobre el Mapa en Móvil */
+.mobile-floating-menu-btn {
+  display: none;
+  position: absolute;
+  bottom: 24px;
+  left: 16px;
+  z-index: 25;
+  background: rgba(18, 18, 20, 0.92);
+  border: 1px solid rgba(249, 115, 22, 0.6);
+  border-radius: 30px;
+  color: #ffffff;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 15px rgba(249, 115, 22, 0.3);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mobile-floating-menu-btn calcite-icon {
+  color: #f97316 !important;
+}
+
+.mobile-floating-menu-btn:hover,
+.mobile-floating-menu-btn:active {
+  background: rgba(249, 115, 22, 0.25);
+  border-color: #f97316;
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.8), 0 0 20px rgba(249, 115, 22, 0.5);
+}
+
+/* Indicador Scroll Mapa Móvil */
+.mobile-map-scroll-hint {
+  display: none;
+  position: absolute;
+  bottom: 6px;
+  right: 12px;
+  z-index: 15;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 4px 10px;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #e4e4e7;
+  backdrop-filter: blur(8px);
+}
+
+.mobile-map-scroll-hint .hint-gif {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+}
+
+/* Modal Ventana Emergente de Herramientas Móviles */
+.glass-tools-container {
+  width: 90vw;
+  max-width: 400px;
+  z-index: 1001;
+  margin: auto;
+  position: relative;
+}
+
+.glass-tools-card {
+  background: rgba(18, 18, 20, 0.95);
+  border: 1px solid rgba(249, 115, 22, 0.4);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(249, 115, 22, 0.2);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tools-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding-bottom: 12px;
+}
+
+.tools-header-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #f97316;
+}
+
+.tools-header-title-wrap calcite-icon {
+  color: #f97316 !important;
+}
+
+.tools-header-label {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+.mobile-tools-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobile-tool-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: 14px 16px;
+  color: #ffffff;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.mobile-tool-action-btn:hover,
+.mobile-tool-action-btn:active {
+  background: rgba(249, 115, 22, 0.18);
+  border-color: rgba(249, 115, 22, 0.5);
+  transform: translateX(4px);
+}
+
+.tool-action-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(249, 115, 22, 0.15);
+  border: 1px solid rgba(249, 115, 22, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.tool-action-icon calcite-icon {
+  color: #f97316 !important;
+}
+
+.tool-action-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.tool-action-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.tool-action-info small {
+  font-size: 11px;
+  color: #a1a1aa;
+}
+
+.action-arrow {
+  color: #71717a !important;
+  transition: transform 0.2s ease;
+}
+
+.mobile-tool-action-btn:hover .action-arrow {
+  color: #f97316 !important;
+  transform: translateX(3px);
+}
+
+.mobile-tool-action-btn.action-btn-highlight {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.2), rgba(234, 88, 12, 0.3));
+  border-color: rgba(249, 115, 22, 0.5);
+}
+
+/* Media Query Responsivo para Dispositivos Móviles (<= 768px) */
+@media (max-width: 768px) {
+  html, body {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+  }
+
+  calcite-shell {
+    height: auto !important;
+    min-height: 100vh;
+    overflow-y: auto !important;
+  }
+
+  .instant-app-container {
+    flex-direction: column !important;
+    height: auto !important;
+    overflow-y: visible !important;
+    overflow-x: hidden !important;
+  }
+
+  /* El mapa se posiciona en la parte superior ocupando aprox 52vh */
+  .instant-app-map-area {
+    width: 100% !important;
+    height: 52vh !important;
+    height: 52dvh !important;
+    position: relative !important;
+    flex-shrink: 0 !important;
+    border-bottom: 2px solid rgba(249, 115, 22, 0.3);
+  }
+
+  #viewDiv {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  /* Botón Flotante Activo en Mapa Móvil */
+  .mobile-floating-menu-btn {
+    display: flex !important;
+  }
+
+  .mobile-map-scroll-hint {
+    display: flex !important;
+  }
+
+  /* Panel de Búsqueda y Resultados Fluye Abajo como Sección Escrolable */
+  .instant-app-sidebar {
+    width: 100% !important;
+    position: static !important;
+    flex: none !important;
+    height: auto !important;
+    max-height: none !important;
+    border-right: none !important;
+    padding: 16px !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: #0d0d0f !important;
+    overflow-y: visible !important;
+  }
+
+  /* Ocultar Pestañas en Móvil ya que las herramientas están en la Ventana Emergente Flotante */
+  .sidebar-tabs-row {
+    display: none !important;
+  }
+
+  .sidebar-scroll-area {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* La sección Estado de la Alerta siempre se mantiene visible abajo */
+  #tabContentResults {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    height: auto !important;
+    position: static !important;
+  }
+
+  .app-header-bar {
+    padding: 8px 12px !important;
+  }
+
+  .header-title {
+    font-size: 11px !important;
+    line-height: 1.3 !important;
+  }
+
+  .header-controls calcite-action {
+    scale: s !important;
+  }
+}
+
 .print-report-header,
 .print-map-container {
   display: none !important;

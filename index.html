@@ -224,6 +224,12 @@
         <!-- Contenedor del Mapa #viewDiv -->
         <div id="viewDiv"></div>
 
+        <!-- Botón Flotante sobre el Mapa en Móvil -->
+        <button id="btnMobileFloatingMenu" class="mobile-floating-menu-btn" title="Herramientas y Paneles">
+          <calcite-icon icon="layers" scale="m"></calcite-icon>
+          <span>Herramientas</span>
+        </button>
+
         <!-- Indicador Pie de Mapa Móvil -->
         <div class="mobile-map-scroll-hint">
           <img src="src/assets/down-arrow-orange-4.gif" alt="Deslizar" class="hint-gif" />
@@ -287,6 +293,91 @@
     </div>
   </div>
 
+  <!-- Modal Emergente 1: Ventana Emergente de Herramientas Móvil -->
+  <div id="modalMobileTools" class="glass-modal-overlay hidden">
+    <div class="glass-modal-backdrop" id="btnCloseMobileToolsBackdrop"></div>
+    <div class="glass-tools-container">
+      <div class="glass-tools-card">
+        <div class="tools-header-top">
+          <div class="tools-header-title-wrap">
+            <calcite-icon icon="apps" scale="s"></calcite-icon>
+            <span class="tools-header-label">HERRAMIENTAS Y PANELES</span>
+          </div>
+          <button id="btnCloseMobileTools" class="calendar-icon-btn" title="Cerrar">
+            <calcite-icon icon="x" scale="s"></calcite-icon>
+          </button>
+        </div>
+        <div class="mobile-tools-grid">
+          <button id="btnMobileActionLegend" class="mobile-tool-action-btn">
+            <div class="tool-action-icon"><calcite-icon icon="legend" scale="m"></calcite-icon></div>
+            <div class="tool-action-info">
+              <span class="tool-action-title">Leyenda del Mapa</span>
+              <small>Simbología y niveles de alerta IDEAM</small>
+            </div>
+            <calcite-icon icon="chevron-right" scale="s" class="action-arrow"></calcite-icon>
+          </button>
+          <button id="btnMobileActionGuide" class="mobile-tool-action-btn">
+            <div class="tool-action-icon"><calcite-icon icon="lightbulb" scale="m"></calcite-icon></div>
+            <div class="tool-action-info">
+              <span class="tool-action-title">Guía de Uso</span>
+              <small>Instrucciones y enlaces oficiales IDEAM/NASA</small>
+            </div>
+            <calcite-icon icon="chevron-right" scale="s" class="action-arrow"></calcite-icon>
+          </button>
+          <button id="btnMobileActionReport" class="mobile-tool-action-btn action-btn-highlight">
+            <div class="tool-action-icon"><calcite-icon icon="export" scale="m"></calcite-icon></div>
+            <div class="tool-action-info">
+              <span class="tool-action-title">Generar Reporte PDF</span>
+              <small>Informe técnico oficial descargable</small>
+            </div>
+            <calcite-icon icon="launch" scale="s" class="action-arrow"></calcite-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Emergente 2: Leyenda del Mapa Móvil -->
+  <div id="modalMobileLegend" class="glass-modal-overlay hidden">
+    <div class="glass-modal-backdrop" id="btnCloseMobileLegendBackdrop"></div>
+    <div class="glass-calendar-container" style="max-width: 440px;">
+      <div class="glass-calendar-card">
+        <div class="calendar-header-top">
+          <div class="calendar-header-title-wrap">
+            <calcite-icon icon="legend" scale="s"></calcite-icon>
+            <span class="calendar-header-label">Leyenda del Mapa</span>
+          </div>
+          <button id="btnCloseMobileLegend" class="calendar-icon-btn" title="Cerrar">
+            <calcite-icon icon="x" scale="s"></calcite-icon>
+          </button>
+        </div>
+        <div class="legend-widget-container">
+          <div id="legendWidgetDivMobileModal"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Emergente 3: Guía de Uso Móvil -->
+  <div id="modalMobileGuide" class="glass-modal-overlay hidden">
+    <div class="glass-modal-backdrop" id="btnCloseMobileGuideBackdrop"></div>
+    <div class="glass-calendar-container" style="max-width: 500px;">
+      <div class="glass-calendar-card">
+        <div class="calendar-header-top">
+          <div class="calendar-header-title-wrap">
+            <calcite-icon icon="lightbulb" scale="s"></calcite-icon>
+            <span class="calendar-header-label">Guía de Uso del Visor</span>
+          </div>
+          <button id="btnCloseMobileGuide" class="calendar-icon-btn" title="Cerrar">
+            <calcite-icon icon="x" scale="s"></calcite-icon>
+          </button>
+        </div>
+        <div id="mobileGuideContentArea" style="max-height: 70vh; overflow-y: auto;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Emergente 4: Infografía Carrusel (Guía / Móvil) -->
   <div id="modalInfografias" class="glass-modal-overlay hidden">
     <div class="glass-modal-backdrop" id="btnCloseInfografiasBackdrop"></div>
     <div class="glass-infografia-container">

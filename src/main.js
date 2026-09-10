@@ -269,12 +269,8 @@ require([
       dismissLoader();
       showAlert("Sistema Listo", "Selecciona o pasa el mouse sobre un municipio para ver el Pop-up nativo del WebMap.", "success");
 
-      // Auto-abrir banner carrusel de infografías si se ingresa desde móvil (<992px)
-      if (window.innerWidth <= 992) {
-        openInfografiasModal();
-      } else {
-        closeInfografiasModal();
-      }
+      // Garantizar que la infografía inicie cerrada en cualquier dispositivo
+      closeInfografiasModal();
 
       // Detección inicial por GPS en segundo plano para no bloquear el despliegue del mapa
       setTimeout(() => {
@@ -891,6 +887,13 @@ require([
       });
     }
 
+    if (document.getElementById("legendWidgetDivMobileModal")) {
+      new Legend({
+        container: "legendWidgetDivMobileModal",
+        view: view
+      });
+    }
+
     if (document.getElementById("timeSliderDiv")) {
       timeSlider = new TimeSlider({
         container: "timeSliderDiv",
@@ -970,6 +973,61 @@ require([
     if (modalReport) {
       modalReport.classList.add("hidden");
       modalReport.style.display = "none";
+    }
+  }
+
+  // --- FUNCIONALIDAD DE MODALES MÓVILES (VENTANA EMERGENTE DE HERRAMIENTAS MÓVIL) ---
+  const modalMobileTools = document.getElementById("modalMobileTools");
+  const modalMobileLegend = document.getElementById("modalMobileLegend");
+  const modalMobileGuide = document.getElementById("modalMobileGuide");
+  const btnMobileFloatingMenu = document.getElementById("btnMobileFloatingMenu");
+
+  function openMobileToolsModal() {
+    if (modalMobileTools) {
+      modalMobileTools.classList.remove("hidden");
+      modalMobileTools.style.display = "flex";
+    }
+  }
+
+  function closeMobileToolsModal() {
+    if (modalMobileTools) {
+      modalMobileTools.classList.add("hidden");
+      modalMobileTools.style.display = "none";
+    }
+  }
+
+  function openMobileLegendModal() {
+    closeMobileToolsModal();
+    if (modalMobileLegend) {
+      modalMobileLegend.classList.remove("hidden");
+      modalMobileLegend.style.display = "flex";
+    }
+  }
+
+  function closeMobileLegendModal() {
+    if (modalMobileLegend) {
+      modalMobileLegend.classList.add("hidden");
+      modalMobileLegend.style.display = "none";
+    }
+  }
+
+  function openMobileGuideModal() {
+    closeMobileToolsModal();
+    const origGuide = document.querySelector("#tabContentGuide .sidebar-guide-card");
+    const mobileGuideArea = document.getElementById("mobileGuideContentArea");
+    if (origGuide && mobileGuideArea) {
+      mobileGuideArea.innerHTML = origGuide.outerHTML;
+    }
+    if (modalMobileGuide) {
+      modalMobileGuide.classList.remove("hidden");
+      modalMobileGuide.style.display = "flex";
+    }
+  }
+
+  function closeMobileGuideModal() {
+    if (modalMobileGuide) {
+      modalMobileGuide.classList.add("hidden");
+      modalMobileGuide.style.display = "none";
     }
   }
 
@@ -1437,6 +1495,37 @@ require([
     }
     if (btnExportPDF) {
       btnExportPDF.addEventListener("click", exportReportPDF);
+    }
+
+    // Modales de Herramientas y Botón Flotante Móvil
+    if (btnMobileFloatingMenu) {
+      btnMobileFloatingMenu.addEventListener("click", openMobileToolsModal);
+    }
+    const btnCloseMobileTools = document.getElementById("btnCloseMobileTools");
+    const btnCloseMobileToolsBackdrop = document.getElementById("btnCloseMobileToolsBackdrop");
+    if (btnCloseMobileTools) btnCloseMobileTools.addEventListener("click", closeMobileToolsModal);
+    if (btnCloseMobileToolsBackdrop) btnCloseMobileToolsBackdrop.addEventListener("click", closeMobileToolsModal);
+
+    const btnMobileActionLegend = document.getElementById("btnMobileActionLegend");
+    const btnCloseMobileLegend = document.getElementById("btnCloseMobileLegend");
+    const btnCloseMobileLegendBackdrop = document.getElementById("btnCloseMobileLegendBackdrop");
+    if (btnMobileActionLegend) btnMobileActionLegend.addEventListener("click", openMobileLegendModal);
+    if (btnCloseMobileLegend) btnCloseMobileLegend.addEventListener("click", closeMobileLegendModal);
+    if (btnCloseMobileLegendBackdrop) btnCloseMobileLegendBackdrop.addEventListener("click", closeMobileLegendModal);
+
+    const btnMobileActionGuide = document.getElementById("btnMobileActionGuide");
+    const btnCloseMobileGuide = document.getElementById("btnCloseMobileGuide");
+    const btnCloseMobileGuideBackdrop = document.getElementById("btnCloseMobileGuideBackdrop");
+    if (btnMobileActionGuide) btnMobileActionGuide.addEventListener("click", openMobileGuideModal);
+    if (btnCloseMobileGuide) btnCloseMobileGuide.addEventListener("click", closeMobileGuideModal);
+    if (btnCloseMobileGuideBackdrop) btnCloseMobileGuideBackdrop.addEventListener("click", closeMobileGuideModal);
+
+    const btnMobileActionReport = document.getElementById("btnMobileActionReport");
+    if (btnMobileActionReport) {
+      btnMobileActionReport.addEventListener("click", () => {
+        closeMobileToolsModal();
+        openReportModal();
+      });
     }
 
     // Modal Emergente Banner Carrusel de Infografías
