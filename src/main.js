@@ -1073,7 +1073,7 @@ require([
     let mapImgHtml = "";
     if (chkIncludeMap && chkIncludeMap.checked) {
       try {
-        const screenshot = await view.takeScreenshot({ format: "png", width: 1200, height: 800 });
+        const screenshot = await view.takeScreenshot({ format: "png" });
         if (screenshot && screenshot.dataUrl) {
           mapImgHtml = `
             <div style="margin-bottom: 20px; page-break-inside: avoid;">
@@ -1089,25 +1089,54 @@ require([
 
     // 3. Ficha de Indicadores / Arcade Pop-up
     let indicatorsHtml = "";
-    if (chkIncludeIndicators && chkIncludeIndicators.checked && sheetContentContainer && sheetContentContainer.innerHTML.trim() !== "") {
-      indicatorsHtml = `
-        <div style="margin-bottom: 20px; page-break-inside: avoid;">
-          <div style="font-size: 10.5pt; font-weight: 800; color: #0f172a; border-bottom: 1.5px solid #cbd5e1; padding-bottom: 4px; margin-bottom: 10px; text-transform: uppercase;">📊 INDICADORES TERRITORIALES Y POP-UP NATIVO</div>
-          <div class="cloned-indicators">${sheetContentContainer.innerHTML}</div>
-        </div>
-      `;
+    if (chkIncludeIndicators && chkIncludeIndicators.checked) {
+      const contentText = (sheetContentContainer && sheetContentContainer.innerHTML.trim()) ? sheetContentContainer.innerHTML : "";
+      if (contentText) {
+        indicatorsHtml = `
+          <div style="margin-bottom: 20px; page-break-inside: avoid;">
+            <div style="font-size: 10.5pt; font-weight: 800; color: #0f172a; border-bottom: 1.5px solid #cbd5e1; padding-bottom: 4px; margin-bottom: 10px; text-transform: uppercase;">📊 INDICADORES TERRITORIALES Y POP-UP NATIVO</div>
+            <div class="cloned-indicators">${contentText}</div>
+          </div>
+        `;
+      } else {
+        indicatorsHtml = `
+          <div style="margin-bottom: 20px; page-break-inside: avoid;">
+            <div style="font-size: 10.5pt; font-weight: 800; color: #0f172a; border-bottom: 1.5px solid #cbd5e1; padding-bottom: 4px; margin-bottom: 10px; text-transform: uppercase;">📊 BALANCE GENERAL DE ALERTAS</div>
+            <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px;">
+              <strong style="color: #c2410c; font-size: 11pt;">Balance de Alertas Nacionales - IDEAM</strong>
+              <p style="margin: 4px 0 0 0; font-size: 9.5pt; color: #334155;">Monitoreo continuo de municipios con alertas de incendio activas (Roja 🔴, Naranja 🟠, Amarilla 🟡) y focos de calor satelitales VIIRS en Colombia.</p>
+            </div>
+          </div>
+        `;
+      }
     }
 
     // 4. Leyenda & Matriz de Alertas
     let legendHtml = "";
-    const originalLegendCard = document.querySelector("#tabContentLegend .sidebar-legend-card");
-    if (chkIncludeMetadata && chkIncludeMetadata.checked && originalLegendCard) {
-      legendHtml = `
-        <div style="margin-bottom: 20px; page-break-inside: avoid;">
-          <div style="font-size: 10.5pt; font-weight: 800; color: #0f172a; border-bottom: 1.5px solid #cbd5e1; padding-bottom: 4px; margin-bottom: 10px; text-transform: uppercase;">🗺️ LEYENDA DEL MAPA</div>
-          <div class="cloned-legend">${originalLegendCard.innerHTML}</div>
-        </div>
-      `;
+    if (chkIncludeMetadata && chkIncludeMetadata.checked) {
+      const originalLegendCard = document.querySelector("#tabContentLegend .sidebar-legend-card");
+      if (originalLegendCard && originalLegendCard.innerHTML.trim() !== "") {
+        legendHtml = `
+          <div style="margin-bottom: 20px; page-break-inside: avoid;">
+            <div style="font-size: 10.5pt; font-weight: 800; color: #0f172a; border-bottom: 1.5px solid #cbd5e1; padding-bottom: 4px; margin-bottom: 10px; text-transform: uppercase;">🗺️ LEYENDA DEL MAPA</div>
+            <div class="cloned-legend">${originalLegendCard.innerHTML}</div>
+          </div>
+        `;
+      } else {
+        legendHtml = `
+          <div style="margin-bottom: 20px; page-break-inside: avoid;">
+            <div style="font-size: 10.5pt; font-weight: 800; color: #0f172a; border-bottom: 1.5px solid #cbd5e1; padding-bottom: 4px; margin-bottom: 10px; text-transform: uppercase;">🗺️ LEYENDA DEL MAPA & NIVELES DE ALERTA</div>
+            <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px;">
+              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                <div style="background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; font-size: 9pt;">🔴 <strong>Alerta Alta / Roja:</strong> Probabilidad Muy Alta</div>
+                <div style="background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; font-size: 9pt;">🟠 <strong>Alerta Media / Naranja:</strong> Probabilidad Moderada</div>
+                <div style="background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; font-size: 9pt;">🟡 <strong>Alerta Baja / Amarilla:</strong> Probabilidad Baja</div>
+                <div style="background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; font-size: 9pt;">🟢 <strong>Sin Alerta / Verde:</strong> Condiciones Normales</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
     }
 
     // 5. Construcción del HTML Aislado del Documento de Impresión
@@ -1205,26 +1234,41 @@ require([
     if (!printIframe) {
       printIframe = document.createElement("iframe");
       printIframe.id = "hiddenPrintIframe";
-      printIframe.style.position = "fixed";
-      printIframe.style.right = "0";
-      printIframe.style.bottom = "0";
-      printIframe.style.width = "0";
-      printIframe.style.height = "0";
-      printIframe.style.border = "none";
-      printIframe.style.visibility = "hidden";
       document.body.appendChild(printIframe);
     }
+
+    printIframe.style.position = "fixed";
+    printIframe.style.top = "0";
+    printIframe.style.left = "0";
+    printIframe.style.width = "100%";
+    printIframe.style.height = "100%";
+    printIframe.style.zIndex = "9999999";
+    printIframe.style.background = "#ffffff";
+    printIframe.style.border = "none";
+    printIframe.style.display = "block";
+    printIframe.style.opacity = "1";
 
     const printDoc = printIframe.contentWindow.document;
     printDoc.open();
     printDoc.write(printDocHtml);
     printDoc.close();
 
-    // 7. Esperar a que la imagen cargue y disparar diálogo de impresión
-    setTimeout(() => {
-      printIframe.contentWindow.focus();
-      printIframe.contentWindow.print();
-    }, 450);
+    const triggerPrint = () => {
+      try {
+        printIframe.contentWindow.focus();
+        printIframe.contentWindow.print();
+      } catch (err) {
+        console.warn("Fallo al disparar impresión nativa:", err);
+      }
+      setTimeout(() => {
+        if (printIframe) {
+          printIframe.style.display = "none";
+          printIframe.style.opacity = "0";
+        }
+      }, 1500);
+    };
+
+    setTimeout(triggerPrint, 700);
   }
 
   // --- FUNCIONALIDAD DEL BANNER CARRUSEL DE INFOGRAFÍAS (MÓVIL & GUÍA) ---

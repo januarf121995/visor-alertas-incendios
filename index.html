@@ -45,15 +45,21 @@
         <!-- Sección 1: Buscador de Municipio Principal -->
         <div class="sidebar-search-box">
           <label class="search-label">MUNICIPIOS CON ALERTAS POR INCENDIOS ACTIVAS</label>
-          <calcite-combobox 
-            id="selectMunicipio" 
-            placeholder="Buscar municipio en Colombia..." 
-            selection-mode="single"
-            overlay-positioning="fixed"
-            clear-button-disabled="false"
-            scale="m"
-            class="sidebar-combobox">
-          </calcite-combobox>
+          <div class="search-combobox-row">
+            <calcite-combobox 
+              id="selectMunicipio" 
+              placeholder="Buscar municipio en Colombia..." 
+              selection-mode="single"
+              overlay-positioning="fixed"
+              clear-button-disabled="false"
+              scale="m"
+              class="sidebar-combobox">
+            </calcite-combobox>
+            <button id="btnMobileFloatingMenu" class="mobile-floating-menu-btn" title="Herramientas y Paneles">
+              <calcite-icon icon="layers" scale="s"></calcite-icon>
+              <span>Herramientas</span>
+            </button>
+          </div>
         </div>
 
         <!-- Navegación por Pestañas Calcite del Panel Lateral -->
@@ -223,12 +229,6 @@
 
         <!-- Contenedor del Mapa #viewDiv -->
         <div id="viewDiv"></div>
-
-        <!-- Botón Flotante sobre el Mapa en Móvil -->
-        <button id="btnMobileFloatingMenu" class="mobile-floating-menu-btn" title="Herramientas y Paneles">
-          <calcite-icon icon="layers" scale="m"></calcite-icon>
-          <span>Herramientas</span>
-        </button>
 
         <!-- Indicador Pie de Mapa Móvil -->
         <div class="mobile-map-scroll-hint">
