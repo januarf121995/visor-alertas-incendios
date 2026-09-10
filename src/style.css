@@ -1736,8 +1736,12 @@ calcite-scrim:not([loading]),
   border-color: rgba(249, 115, 22, 0.5);
 }
 
-/* Media Query Responsivo para Dispositivos Móviles (<= 768px) */
-@media (max-width: 768px) {
+#printableReportContainer {
+  display: none;
+}
+
+/* Media Query Responsivo para Dispositivos Móviles y Tablets (<= 992px) */
+@media (max-width: 992px) {
   html, body {
     height: 100% !important;
     width: 100% !important;
@@ -1781,24 +1785,26 @@ calcite-scrim:not([loading]),
   /* Botón de Herramientas Posicionado al Costado del Buscador en Móvil */
   .search-combobox-row {
     display: flex !important;
+    flex-direction: row !important;
     align-items: center !important;
     gap: 8px !important;
     width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .sidebar-combobox {
-    flex: 1 !important;
-    width: auto !important;
+    flex: 1 1 0% !important;
     min-width: 0 !important;
+    width: 0 !important;
   }
 
   .mobile-floating-menu-btn {
-    display: flex !important;
+    display: inline-flex !important;
+    flex: 0 0 auto !important;
     position: static !important;
-    flex-shrink: 0 !important;
     height: 38px !important;
     padding: 0 12px !important;
-    background: rgba(249, 115, 22, 0.2) !important;
+    background: rgba(249, 115, 22, 0.25) !important;
     border: 1px solid rgba(249, 115, 22, 0.6) !important;
     border-radius: 10px !important;
     color: #ffffff !important;
@@ -1806,10 +1812,12 @@ calcite-scrim:not([loading]),
     font-weight: 700 !important;
     cursor: pointer !important;
     align-items: center !important;
+    justify-content: center !important;
     gap: 6px !important;
-    box-shadow: 0 2px 10px rgba(249, 115, 22, 0.2) !important;
+    box-shadow: 0 2px 10px rgba(249, 115, 22, 0.25) !important;
     white-space: nowrap !important;
     margin: 0 !important;
+    z-index: 10 !important;
   }
 
   /* Indicador Scroll Activo en Esquina Inferior Derecha del Mapa Móvil */
@@ -1906,6 +1914,33 @@ calcite-scrim:not([loading]),
   @page {
     size: letter portrait;
     margin: 10mm;
+  }
+
+  body > *:not(#printableReportContainer) {
+    display: none !important;
+  }
+
+  #printableReportContainer {
+    display: block !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    z-index: 9999999 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  #printableReportContainer * {
+    color: #0f172a !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    max-height: none !important;
+    overflow: visible !important;
   }
 
   html, 

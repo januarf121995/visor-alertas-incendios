@@ -1229,46 +1229,28 @@ require([
       </html>
     `;
 
-    // 6. Crear o reutilizar Iframe Oculto para Impresión Aislada
-    let printIframe = document.getElementById("hiddenPrintIframe");
-    if (!printIframe) {
-      printIframe = document.createElement("iframe");
-      printIframe.id = "hiddenPrintIframe";
-      document.body.appendChild(printIframe);
+    // 6. Crear o reutilizar Contenedor de Impresión Nativa (compatible con iOS Safari, Android Chrome y Desktop)
+    let printContainer = document.getElementById("printableReportContainer");
+    if (!printContainer) {
+      printContainer = document.createElement("div");
+      printContainer.id = "printableReportContainer";
+      document.body.appendChild(printContainer);
     }
 
-    printIframe.style.position = "fixed";
-    printIframe.style.top = "0";
-    printIframe.style.left = "0";
-    printIframe.style.width = "100%";
-    printIframe.style.height = "100%";
-    printIframe.style.zIndex = "9999999";
-    printIframe.style.background = "#ffffff";
-    printIframe.style.border = "none";
-    printIframe.style.display = "block";
-    printIframe.style.opacity = "1";
+    printContainer.innerHTML = printDocHtml;
 
-    const printDoc = printIframe.contentWindow.document;
-    printDoc.open();
-    printDoc.write(printDocHtml);
-    printDoc.close();
-
-    const triggerPrint = () => {
+    // 7. Esperar a que la imagen se renderice y disparar ventana de impresión nativa del sistema operativo
+    setTimeout(() => {
       try {
-        printIframe.contentWindow.focus();
-        printIframe.contentWindow.print();
+        window.focus();
+        window.print();
       } catch (err) {
-        console.warn("Fallo al disparar impresión nativa:", err);
+        console.warn("Fallo al disparar window.print():", err);
       }
       setTimeout(() => {
-        if (printIframe) {
-          printIframe.style.display = "none";
-          printIframe.style.opacity = "0";
-        }
-      }, 1500);
-    };
-
-    setTimeout(triggerPrint, 700);
+        if (printContainer) printContainer.innerHTML = "";
+      }, 3000);
+    }, 600);
   }
 
   // --- FUNCIONALIDAD DEL BANNER CARRUSEL DE INFOGRAFÍAS (MÓVIL & GUÍA) ---
