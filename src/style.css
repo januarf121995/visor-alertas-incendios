@@ -351,54 +351,6 @@ calcite-combobox::part(container) {
   display: none;
 }
 
-/* Adaptación Responsiva para Pantallas Móviles (<=992px) */
-@media (max-width: 992px) {
-  .instant-app-container {
-    flex-direction: column;
-  }
-
-  .instant-app-sidebar {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 100% !important;
-    height: 55vh;
-    height: 55dvh;
-    border-right: none !important;
-    border-top: 2px solid rgba(249, 115, 22, 0.5) !important;
-    border-radius: 20px 20px 0 0;
-    transform: translateY(0);
-    z-index: 100;
-    margin-left: 0 !important;
-    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.85);
-  }
-
-  .instant-app-sidebar.collapsed-mobile {
-    transform: translateY(calc(100% - 50px));
-  }
-
-  .instant-app-map-area {
-    width: 100%;
-    height: 100%;
-  }
-
-  .mobile-menu-btn {
-    display: inline-block !important;
-  }
-
-  .mobile-map-scroll-hint {
-    bottom: 12px;
-    padding: 5px 12px;
-    display: flex !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-    transform: translateX(-50%) !important;
-  }
-}
-
 .emoji-bounce {
   font-size: 18px;
   display: inline-block;
@@ -1779,32 +1731,38 @@ calcite-scrim:not([loading]),
 /* Media Query Responsivo para Dispositivos Móviles (<= 768px) */
 @media (max-width: 768px) {
   html, body {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    height: auto !important;
+    height: 100% !important;
+    width: 100% !important;
+    overflow: hidden !important;
   }
 
   calcite-shell {
-    height: auto !important;
-    min-height: 100vh;
-    overflow-y: auto !important;
+    height: 100% !important;
+    width: 100% !important;
+    overflow: hidden !important;
   }
 
   .instant-app-container {
+    display: flex !important;
     flex-direction: column !important;
-    height: auto !important;
-    overflow-y: visible !important;
+    height: calc(100vh - 52px) !important;
+    height: calc(100dvh - 52px) !important;
+    overflow-y: auto !important;
     overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    position: relative !important;
   }
 
-  /* El mapa se posiciona en la parte superior ocupando aprox 52vh */
+  /* 1. El mapa se posiciona primero en el orden flex en la parte superior (48vh) */
   .instant-app-map-area {
+    order: 1 !important;
     width: 100% !important;
-    height: 52vh !important;
-    height: 52dvh !important;
+    height: 48vh !important;
+    height: 48dvh !important;
+    min-height: 260px !important;
     position: relative !important;
     flex-shrink: 0 !important;
-    border-bottom: 2px solid rgba(249, 115, 22, 0.3);
+    border-bottom: 2px solid rgba(249, 115, 22, 0.4) !important;
   }
 
   #viewDiv {
@@ -1812,28 +1770,53 @@ calcite-scrim:not([loading]),
     height: 100% !important;
   }
 
-  /* Botón Flotante Activo en Mapa Móvil */
+  /* Botón Flotante Activo en Esquina Inferior Izquierda del Mapa Móvil */
   .mobile-floating-menu-btn {
     display: flex !important;
+    position: absolute !important;
+    bottom: 14px !important;
+    left: 14px !important;
+    z-index: 90 !important;
   }
 
+  /* Indicador Scroll Activo en Esquina Inferior Derecha del Mapa Móvil */
   .mobile-map-scroll-hint {
     display: flex !important;
+    position: absolute !important;
+    bottom: 14px !important;
+    right: 14px !important;
+    left: auto !important;
+    transform: none !important;
+    z-index: 90 !important;
   }
 
-  /* Panel de Búsqueda y Resultados Fluye Abajo como Sección Escrolable */
+  /* 2. Panel de Búsqueda y Resultados se posiciona segundo en la parte inferior */
   .instant-app-sidebar {
+    order: 2 !important;
     width: 100% !important;
-    position: static !important;
-    flex: none !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+    position: relative !important;
+    top: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
     height: auto !important;
     max-height: none !important;
+    transform: none !important;
+    margin: 0 !important;
     border-right: none !important;
-    padding: 16px !important;
-    border-radius: 0 !important;
+    border-top: none !important;
     box-shadow: none !important;
     background: #0d0d0f !important;
-    overflow-y: visible !important;
+    padding: 14px !important;
+    overflow: visible !important;
+  }
+
+  .sidebar-search-box {
+    padding: 0 0 12px 0 !important;
+    background: transparent !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
   }
 
   /* Ocultar Pestañas en Móvil ya que las herramientas están en la Ventana Emergente Flotante */
@@ -1845,6 +1828,7 @@ calcite-scrim:not([loading]),
     height: auto !important;
     max-height: none !important;
     overflow: visible !important;
+    padding: 12px 0 0 0 !important;
   }
 
   /* La sección Estado de la Alerta siempre se mantiene visible abajo */
@@ -1857,16 +1841,25 @@ calcite-scrim:not([loading]),
   }
 
   .app-header-bar {
-    padding: 8px 12px !important;
+    padding: 6px 10px !important;
   }
 
   .header-title {
     font-size: 11px !important;
-    line-height: 1.3 !important;
+    line-height: 1.25 !important;
+    white-space: normal !important;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   .header-controls calcite-action {
     scale: s !important;
+  }
+
+  .mobile-menu-btn {
+    display: none !important;
   }
 }
 
