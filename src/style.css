@@ -218,9 +218,9 @@ calcite-combobox::part(container) {
 
 /* Panel Lateral Izquierdo Fijo/Flotante (Zone Lookup Sidebar) */
 .instant-app-sidebar {
-  width: 420px;
-  min-width: 360px;
-  max-width: 460px;
+  width: 480px;
+  min-width: 420px;
+  max-width: 540px;
   height: 100%;
   background: linear-gradient(180deg, rgba(24, 24, 27, 0.98) 0%, rgba(14, 14, 16, 0.98) 100%) !important;
   border-right: 1.5px solid rgba(249, 115, 22, 0.35) !important;
@@ -233,7 +233,7 @@ calcite-combobox::part(container) {
 }
 
 .instant-app-sidebar.collapsed {
-  margin-left: -420px;
+  margin-left: -480px;
 }
 
 .sidebar-search-box {
@@ -759,9 +759,10 @@ calcite-combobox::part(container) {
   border: 2px dashed #f97316 !important;
   background: linear-gradient(145deg, rgba(24, 24, 27, 0.95) 0%, rgba(18, 18, 20, 0.98) 100%) !important;
   border-radius: 16px;
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 18px 24px;
+  padding: 14px 16px;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(254, 215, 170, 0.15);
   box-sizing: border-box;
   display: flex;
@@ -769,6 +770,32 @@ calcite-combobox::part(container) {
   gap: 12px;
   transition: all 0.3s ease;
   color: #ffffff !important;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.popup-box-content {
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+#sheetContentContainer {
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+#sheetContentContainer table {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+#sheetContentContainer img {
+  max-width: 100%;
+  height: auto;
 }
 
 .designer-box-horizontal:hover {
@@ -1850,8 +1877,18 @@ calcite-scrim:not([loading]),
     border-top: none !important;
     box-shadow: none !important;
     background: #0d0d0f !important;
-    padding: 14px !important;
+    padding: 10px 8px !important;
     overflow: visible !important;
+    box-sizing: border-box !important;
+  }
+
+  .designer-box-horizontal {
+    padding: 12px 10px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
   }
 
   .sidebar-search-box {
